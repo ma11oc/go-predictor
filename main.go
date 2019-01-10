@@ -2,7 +2,6 @@ package main
 
 import (
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
-	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -16,6 +15,10 @@ var (
 		4, 30, 41, 8, 19, 45, 12,
 		23, 34, 52,
 	}
+
+	mm [90]*core.YearMatrix
+
+	err error
 )
 
 func main() {
@@ -23,14 +26,34 @@ func main() {
 	om := core.NewOriginMatrix(&origin, od)
 	// hm := core.NewHumansMatrix(om, od)
 	// am := core.NewAngelsMatrix(om, od)
-	ym := core.NewZeroYearMatrix(om)
 
-	scs := spew.ConfigState{
-		Indent:           "  ",
-		ContinueOnMethod: true,
-		MaxDepth:         6,
+	// build all year matrices
+	mm[0] = core.NewZeroYearMatrix(om)
+	cur := mm[0]
+	for i := 1; i < 90; i++ {
+		if mm[i], err = cur.Next(om, od); err != nil {
+			panic(err)
+		}
+
+		cur = mm[i]
 	}
 
-	scs.Dump(ym)
-	scs.Dump(ym.Next(om, od))
+	/*
+	 *     scs := spew.ConfigState{
+	 *         Indent:           "  ",
+	 *         ContinueOnMethod: true,
+	 *         MaxDepth:         6,
+	 *     }
+	 *
+	 *     scs.Dump(mm[89])
+	 */
+
+	for i := uint8(0); i < 90; i++ {
+		for j := uint8(1); j <= 52; j++ {
+			c, _ := core.NewCardFromNumber(j)
+			mm[i].Decks.Main.GetVRow(c)
+		}
+	}
+	// fmt.Println(mm[32].Decks.Main.AsNumbers())
+	// mm[0].Decks.Drain.PrettyPrint()
 }

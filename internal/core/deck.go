@@ -7,26 +7,13 @@ type Deck struct {
 	Cards [52]*Card
 }
 
-/*
- * func (d Deck) String() string {
- *     var s string
- *
- *     for i, v := range d.Cards {
- *         s += fmt.Sprintf("%v ", v.Number)
- *
- *         if i != len(d.Cards)-1 {
- *             s += " "
- *         }
- *     }
- *
- *     return fmt.Sprintf("Deck{cards: [%v]}", s)
- * }
- *
- */
 // NewOrderedDeck returns *Deck which contains all the 52 cards,
-// in the following order:
-//   index:     0  1      12 13     25     38     51
-//   card:      A♥ 2♥ ... K♥ A♣ ... A♦ ... A♠ ... K♠
+// in the following order (index: number rank suit):
+//    0:  1  A♥ |   1:  2  2♥ |   2:  3  3♥ |   3:  4  4♥ |   4:  5  5♥ |   5:  6  6♥ |   6:  7  7♥ |   7:  8  8♥ |   8:  9  9♥ |   9: 10  10♥ |  10: 11  J♥ |  11: 12  Q♥ |  12: 13  K♥ |
+//   13: 14  A♣ |  14: 15  2♣ |  15: 16  3♣ |  16: 17  4♣ |  17: 18  5♣ |  18: 19  6♣ |  19: 20  7♣ |  20: 21  8♣ |  21: 22  9♣ |  22: 23  10♣ |  23: 24  J♣ |  24: 25  Q♣ |  25: 26  K♣ |
+//   26: 27  A♦ |  27: 28  2♦ |  28: 29  3♦ |  29: 30  4♦ |  30: 31  5♦ |  31: 32  6♦ |  32: 33  7♦ |  33: 34  8♦ |  34: 35  9♦ |  35: 36  10♦ |  36: 37  J♦ |  37: 38  Q♦ |  38: 39  K♦ |
+//   39: 40  A♠ |  40: 41  2♠ |  41: 42  3♠ |  42: 43  4♠ |  43: 44  5♠ |  44: 45  6♠ |  45: 46  7♠ |  46: 47  8♠ |  47: 48  9♠ |  48: 49  10♠ |  49: 50  J♠ |  50: 51  Q♠ |  51: 52  K♠ |
+
 func NewOrderedDeck() *Deck {
 	var c *Card
 	var err error
@@ -72,7 +59,7 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 	return nil, fmt.Errorf("No such card with number %v was found in the deck", n)
 }
 
-func (d *Deck) indexOf(value uint8) (uint8, error) {
+func (d Deck) indexOf(value uint8) (uint8, error) {
 	for i, v := range d.Cards {
 		if v.Number == value {
 			return uint8(i), nil
@@ -80,4 +67,87 @@ func (d *Deck) indexOf(value uint8) (uint8, error) {
 	}
 
 	return 255, fmt.Errorf("Unable to find index of `%v`", value)
+}
+
+func (d Deck) AsNumbers() [52]uint8 {
+	var s [52]uint8
+
+	for i, v := range d.Cards {
+		s[i] += v.Number
+	}
+
+	return s
+}
+
+func (d Deck) AsUnicode() [52]string {
+	var s [52]string
+
+	for i, v := range d.Cards {
+		s[i] = fmt.Sprintf("%v%v ", v.Rank, v.Suit)
+	}
+
+	return s
+}
+
+func (d Deck) GetHRow(c *Card) ([7]*Card, error) {
+	var row [7]*Card
+	var ci uint8 // card index
+	var err error
+
+	if ci, err = d.indexOf(c.Number); err != nil {
+		return row, err
+	}
+
+	for i := uint8(1); i <= 7; i++ {
+		cur := ci + i
+		if cur >= 52 {
+			cur -= 52
+		}
+
+		row[i-1] = d.Cards[cur]
+	}
+
+	return row, nil
+}
+
+// GetVRow ...
+// 6: [48, 41, 34, 27, 20, 13, 6]      [-1, -8,  -15, ...]
+// 5: [47, 40, 33, 26, 19, 12, 5]      [-2, -9,  -16, ...]
+// 4: [46, 39, 32, 25, 18, 11, 4, 51]  [-3, -10, -17, ...]
+// 3: [45, 38, 31, 24, 17, 10, 3, 50]  [-4, -11, -18, ...]
+// 2: [44, 37, 30, 23, 16, 9,  2, 49]  [-5, -12, -19, ...]
+// 1: [43, 36, 29, 22, 15, 8,  1]      [-6, -13, -20, ...]
+// 0: [42, 35, 28, 21, 14, 7,  0]      [-7, -14, -21, ...]
+func (d Deck) GetVRow(c *Card) ([7]*Card, error) {
+	var row [7]*Card
+	var ci uint8 // card index
+	var err error
+
+	if ci, err = d.indexOf(c.Number); err != nil {
+		return row, err
+	}
+
+	for i := 1; i <= 7; i++ {
+		cur := int(ci) - i*7
+		if cur < 0 {
+			switch {
+			case cur%7 == -3 || cur%7 == -4 || cur%7 == -5: // we are in
+				if cur == -3 || cur == -4 || cur == -5 {
+					cur = 54 + cur
+				} else {
+					cur = 56 + cur
+				}
+			default:
+				if i == 7 {
+					continue
+				}
+				cur = 49 + cur
+			}
+		}
+		// fmt.Printf("ci: %2v, i: %v , cur: %3v | ", ci, i, cur)
+		// fmt.Printf("%v: %2v | %v%v\n", i, d.Cards[cur].Number, d.Cards[cur].Rank, d.Cards[cur].Suit)
+		row[i-1] = d.Cards[cur]
+	}
+
+	return row, nil
 }

@@ -182,6 +182,28 @@ func NewZeroYearMatrix(om *Matrix) *YearMatrix {
 	}
 }
 
+func NewBunchOfYearMatrices(om *Matrix, od *Deck) [90]*YearMatrix {
+	var err error
+
+	mm := [90]*YearMatrix{
+		&YearMatrix{
+			Year:   0,
+			Matrix: om,
+		},
+	}
+
+	cur := mm[0]
+	for i := 1; i < 90; i++ {
+		if mm[i], err = cur.Next(om, od); err != nil {
+			panic(err)
+		}
+
+		cur = mm[i]
+	}
+
+	return mm
+}
+
 /*
  *
  * func getMatrixByYear(y uint8) (*matrix, error) {
