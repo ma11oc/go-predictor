@@ -4,7 +4,7 @@ import "fmt"
 
 // Deck is an unordered deck
 type Deck struct {
-	Cards [52]*Card
+	Cards [52]*Card `yaml:"cards"`
 }
 
 // NewOrderedDeck returns *Deck which contains all the 52 cards,
@@ -13,15 +13,15 @@ type Deck struct {
 //   13: 14  A♣ |  14: 15  2♣ |  15: 16  3♣ |  16: 17  4♣ |  17: 18  5♣ |  18: 19  6♣ |  19: 20  7♣ |  20: 21  8♣ |  21: 22  9♣ |  22: 23  10♣ |  23: 24  J♣ |  24: 25  Q♣ |  25: 26  K♣ |
 //   26: 27  A♦ |  27: 28  2♦ |  28: 29  3♦ |  29: 30  4♦ |  30: 31  5♦ |  31: 32  6♦ |  32: 33  7♦ |  33: 34  8♦ |  34: 35  9♦ |  35: 36  10♦ |  36: 37  J♦ |  37: 38  Q♦ |  38: 39  K♦ |
 //   39: 40  A♠ |  40: 41  2♠ |  41: 42  3♠ |  42: 43  4♠ |  43: 44  5♠ |  44: 45  6♠ |  45: 46  7♠ |  46: 47  8♠ |  47: 48  9♠ |  48: 49  10♠ |  49: 50  J♠ |  50: 51  Q♠ |  51: 52  K♠ |
-
-func NewOrderedDeck() *Deck {
+// FIXME: get default locale from config
+func NewOrderedDeck(lang string) *Deck {
 	var c *Card
 	var err error
 
 	od := &Deck{}
 
 	for i := uint8(0); i < 52; i++ {
-		if c, err = NewCardFromNumber(i + 1); err != nil {
+		if c, err = NewCardFromNumber(i+1, lang); err != nil {
 			panic("Unable to create Deck")
 		}
 
@@ -31,13 +31,13 @@ func NewOrderedDeck() *Deck {
 	return od
 }
 
-func NewDeckFromSlice(s [52]uint8) (*Deck, error) {
+func NewDeckFromSlice(s [52]uint8, od *Deck) (*Deck, error) {
 	var err error
 
 	d := &Deck{}
 
 	for i := uint(0); i < 52; i++ {
-		if d.Cards[i], err = NewCardFromNumber(s[i]); err != nil {
+		if d.Cards[i], err = od.GetCardByNumber(s[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -51,7 +51,7 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 	}
 
 	for _, c := range d.Cards {
-		if c.Number == n {
+		if c.ID == n {
 			return c, nil
 		}
 	}
@@ -61,7 +61,7 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 
 func (d Deck) indexOf(value uint8) (uint8, error) {
 	for i, v := range d.Cards {
-		if v.Number == value {
+		if v.ID == value {
 			return uint8(i), nil
 		}
 	}
@@ -73,7 +73,7 @@ func (d Deck) AsNumbers() [52]uint8 {
 	var s [52]uint8
 
 	for i, v := range d.Cards {
-		s[i] += v.Number
+		s[i] += v.ID
 	}
 
 	return s
@@ -94,7 +94,7 @@ func (d Deck) GetHRow(c *Card) ([7]*Card, error) {
 	var ci uint8 // card index
 	var err error
 
-	if ci, err = d.indexOf(c.Number); err != nil {
+	if ci, err = d.indexOf(c.ID); err != nil {
 		return row, err
 	}
 
@@ -123,7 +123,7 @@ func (d Deck) GetVRow(c *Card) ([7]*Card, error) {
 	var ci uint8 // card index
 	var err error
 
-	if ci, err = d.indexOf(c.Number); err != nil {
+	if ci, err = d.indexOf(c.ID); err != nil {
 		return row, err
 	}
 
@@ -145,7 +145,7 @@ func (d Deck) GetVRow(c *Card) ([7]*Card, error) {
 			}
 		}
 		// fmt.Printf("ci: %2v, i: %v , cur: %3v | ", ci, i, cur)
-		// fmt.Printf("%v: %2v | %v%v\n", i, d.Cards[cur].Number, d.Cards[cur].Rank, d.Cards[cur].Suit)
+		// fmt.Printf("%v: %2v | %v%v\n", i, d.Cards[cur].ID, d.Cards[cur].Rank, d.Cards[cur].Suit)
 		row[i-1] = d.Cards[cur]
 	}
 

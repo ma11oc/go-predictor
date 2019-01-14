@@ -26,16 +26,9 @@ type Matrix struct {
 //   drain[i] = ordered_deck[i]
 //   source[i] = origin[i]
 func NewOriginMatrix(origin *[52]uint8, od *Deck) *Matrix {
-	var c *Card
-	var err error
-
-	md := &Deck{}
-
-	for i := uint8(0); i < 52; i++ {
-		if c, err = NewCardFromNumber(origin[i]); err != nil {
-			panic("Unable to build OriginMatrix")
-		}
-		md.Cards[i] = c
+	md, err := NewDeckFromSlice(*origin, od)
+	if err != nil {
+		panic(err)
 	}
 
 	return &Matrix{
@@ -66,8 +59,8 @@ func NewHumansMatrix(om *Matrix, od *Deck) *Matrix {
 	}
 
 	for i := uint8(0); i < 52; i++ {
-		idx := om.Decks.Main.Cards[i].Number - 1
-		sd.Cards[i] = od.Cards[om.Decks.Main.Cards[idx].Number-1]
+		idx := om.Decks.Main.Cards[i].ID - 1
+		sd.Cards[i] = od.Cards[om.Decks.Main.Cards[idx].ID-1]
 	}
 
 	return &Matrix{
@@ -161,7 +154,7 @@ func (m YearMatrix) Next(om *Matrix, od *Deck) (*YearMatrix, error) {
 	}
 
 	for i := uint8(0); i < 52; i++ {
-		if oIdx, err = om.Decks.Main.indexOf(m.Decks.Main.Cards[i].Number); err != nil {
+		if oIdx, err = om.Decks.Main.indexOf(m.Decks.Main.Cards[i].ID); err != nil {
 			panic(err)
 		}
 		if mIdx, err = m.Decks.Main.indexOf(oIdx + 1); err != nil {

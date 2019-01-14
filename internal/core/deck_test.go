@@ -20,7 +20,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			23, 34, 52,
 		}
 
-		od = core.NewOrderedDeck()
+		od = core.NewOrderedDeck("ru-RU")
 		om = core.NewOriginMatrix(&origin, od)
 
 		mm = core.NewBunchOfYearMatrices(om, od)
@@ -39,7 +39,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				var c *core.Card
 
 				for i := uint8(1); i < 52; i++ {
-					c, _ = core.NewCardFromNumber(i)
+					c, _ = core.NewCardFromNumber(i, "ru-RU")
 					Expect(od.GetCardByNumber(i)).To(Equal(c))
 				}
 			})
@@ -60,7 +60,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 	Describe("Build deck", func() {
 		Context("from valid slice", func() {
 			It("should return a deck", func() {
-				Expect(core.NewDeckFromSlice(os)).To(Equal(od))
+				Expect(core.NewDeckFromSlice(os, od)).To(Equal(od))
 			})
 		})
 
@@ -68,7 +68,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should raise an error", func() {
 				s := os
 				s[0] = 255
-				_, err := core.NewDeckFromSlice(s)
+				_, err := core.NewDeckFromSlice(s, od)
 				Expect(err).Should(HaveOccurred())
 				// Expect(err).Should(HaveOccurred(), "current card number is: %v", v)
 			})
@@ -88,7 +88,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 48 | 9♠
 				 */
 
-				card, _ := core.NewCardFromNumber(29)
+				card, _ := core.NewCardFromNumber(29, "ru-RU")
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{40, 7, 33, 44, 11, 22, 48}
@@ -96,7 +96,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v)
+					c, _ := core.NewCardFromNumber(v, "ru-RU")
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -114,7 +114,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 25 | Q♣
 				 */
 
-				card, _ := core.NewCardFromNumber(45)
+				card, _ := core.NewCardFromNumber(45, "ru-RU")
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{12, 23, 34, 52, 3, 14, 25}
@@ -122,7 +122,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v)
+					c, _ := core.NewCardFromNumber(v, "ru-RU")
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -139,7 +139,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 29 | 3♦
 				 */
 
-				card, _ := core.NewCardFromNumber(34)
+				card, _ := core.NewCardFromNumber(34, "ru-RU")
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{52, 3, 14, 25, 49, 18, 29}
@@ -147,7 +147,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v)
+					c, _ := core.NewCardFromNumber(v, "ru-RU")
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -164,7 +164,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 36 | 10♦
 				 */
 
-				card, _ := core.NewCardFromNumber(17)
+				card, _ := core.NewCardFromNumber(17, "ru-RU")
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{28, 50, 21, 32, 43, 10, 36}
@@ -172,7 +172,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v)
+					c, _ := core.NewCardFromNumber(v, "ru-RU")
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -191,7 +191,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 5: 48 | 9♠
 				 */
 
-				card, _ := core.NewCardFromNumber(29)
+				card, _ := core.NewCardFromNumber(29, "ru-RU")
 				row, err := mm[0].Decks.Main.GetVRow(card)
 
 				s := [7]uint8{45, 26, 20, 1, 50, 48}
@@ -200,7 +200,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				// Expect(row[6]).To(Equal(nil))
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v)
+					c, _ := core.NewCardFromNumber(v, "ru-RU")
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -217,7 +217,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 36 | 10♦
 				 */
 
-				card, _ := core.NewCardFromNumber(17)
+				card, _ := core.NewCardFromNumber(17, "ru-RU")
 				row, err := mm[0].Decks.Main.GetVRow(card)
 
 				s := [7]uint8{11, 49, 34, 8, 46, 42, 36}
@@ -226,7 +226,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				// Expect(row[6]).To(Equal(nil))
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v)
+					c, _ := core.NewCardFromNumber(v, "ru-RU")
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -235,7 +235,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should not raise an error", func() {
 				for i := uint8(0); i < 90; i++ {
 					for j := uint8(1); j <= 52; j++ {
-						c, _ := core.NewCardFromNumber(j)
+						c, _ := core.NewCardFromNumber(j, "ru-RU")
 						row, err := mm[i].Decks.Main.GetVRow(c)
 
 						Expect(row).Should(BeAssignableToTypeOf([7]*core.Card{}))

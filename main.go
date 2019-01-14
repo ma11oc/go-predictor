@@ -1,7 +1,11 @@
 package main
 
 import (
+
+	// "github.com/pkg/profile"
+
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -16,44 +20,44 @@ var (
 		23, 34, 52,
 	}
 
-	mm [90]*core.YearMatrix
+	od         *core.Deck
+	om, hm, am *core.Matrix
+	mm         [90]*core.YearMatrix
 
 	err error
+
+	d *core.Deck
 )
 
+func init() {
+	// core.PrintAllPeriodicityCicles()
+
+}
+
 func main() {
-	od := core.NewOrderedDeck()
-	om := core.NewOriginMatrix(&origin, od)
+	// CPU profiling by default
+	// defer profile.Start().Stop()
+	// Memory profiling
+	// defer profile.Start(profile.MemProfile).Stop()
+
+	core.LoadLocales("locales/ru-RU.yaml")
+
+	scs := spew.ConfigState{Indent: "  "}
+
+	od := core.NewOrderedDeck("ru-RU")
+	for _, v := range od.Cards {
+		scs.Dump(v)
+		// scs.Dump(v)
+		// fmt.Printf("%2v: %v\n", i, v.Meanings.General.Keywords)
+		// fmt.Printf("%2v: %v\n", i, v.Meanings.Longterm.Keywords)
+	}
+	// od := core.NewOrderedDeck()
+	// om := core.NewOriginMatrix(&origin, od)
 	// hm := core.NewHumansMatrix(om, od)
 	// am := core.NewAngelsMatrix(om, od)
+	// mm := core.NewBunchOfYearMatrices(om, od)
+	// fmt.Println(hm)
+	// fmt.Println(am)
+	// fmt.Println(mm)
 
-	// build all year matrices
-	mm[0] = core.NewZeroYearMatrix(om)
-	cur := mm[0]
-	for i := 1; i < 90; i++ {
-		if mm[i], err = cur.Next(om, od); err != nil {
-			panic(err)
-		}
-
-		cur = mm[i]
-	}
-
-	/*
-	 *     scs := spew.ConfigState{
-	 *         Indent:           "  ",
-	 *         ContinueOnMethod: true,
-	 *         MaxDepth:         6,
-	 *     }
-	 *
-	 *     scs.Dump(mm[89])
-	 */
-
-	for i := uint8(0); i < 90; i++ {
-		for j := uint8(1); j <= 52; j++ {
-			c, _ := core.NewCardFromNumber(j)
-			mm[i].Decks.Main.GetVRow(c)
-		}
-	}
-	// fmt.Println(mm[32].Decks.Main.AsNumbers())
-	// mm[0].Decks.Drain.PrettyPrint()
 }

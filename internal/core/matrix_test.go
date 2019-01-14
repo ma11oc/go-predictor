@@ -20,7 +20,7 @@ var _ = Describe("Internal/Core/Matrix", func() {
 			23, 34, 52,
 		}
 
-		od = core.NewOrderedDeck()
+		od = core.NewOrderedDeck("ru-RU")
 		om = core.NewOriginMatrix(&origin, od)
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("Internal/Core/Matrix", func() {
 	Describe("Build origin matrix", func() {
 		Context("with valid origin matrix and ordered deck", func() {
 			It("should return a valid matrix", func() {
-				md, _ := core.NewDeckFromSlice(origin)
+				md, _ := core.NewDeckFromSlice(origin, od)
 				Expect(om.Decks.Main).To(Equal(md))
 				Expect(om.Decks.Drain).To(Equal(od))
 				Expect(om.Decks.Source).To(Equal(md))
@@ -53,7 +53,7 @@ var _ = Describe("Internal/Core/Matrix", func() {
 					14, 48, 46, 29, 6, 27, 23, 21, 42, 4, 44, 51, 19,
 					3, 1, 35, 18, 39, 37, 33, 50, 16, 34, 10, 31, 8,
 					13, 47, 24, 49, 5, 26, 7, 28, 41, 22, 43, 20, 52,
-				})
+				}, od)
 				Expect(hm.Decks.Main).To(Equal(om.Decks.Main))
 				Expect(hm.Decks.Drain).To(Equal(od))
 				Expect(hm.Decks.Source).To(Equal(sd))
@@ -72,7 +72,7 @@ var _ = Describe("Internal/Core/Matrix", func() {
 					2, 40, 31, 18, 5, 47, 34, 21, 12, 50, 37, 3, 41,
 					28, 19, 6, 44, 35, 22, 9, 51, 38, 25, 42, 29, 16,
 					7, 45, 32, 23, 10, 48, 39, 26, 13, 4, 20, 36, 52,
-				})
+				}, od)
 				Expect(am.Decks.Main).To(Equal(od))
 				Expect(am.Decks.Drain).To(Equal(dd))
 				Expect(am.Decks.Source).To(Equal(om.Decks.Main))

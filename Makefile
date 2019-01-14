@@ -36,6 +36,15 @@ proto:
 	@install -v -m 0644 $(TMP)/api/proto/v1/predictor.swagger.json api/swagger/v1/
 	@rm -rf $(TMP)
 
+cpu-prof:
+	go build -o predictor-main main.go
+	go tool pprof --pdf ~/go/bin/yourbinary /var/path/to/cpu.pprof > file.pdf
+
+mem-prof:
+	PPROF_TMPDIR=$(TMP) go build -o $(TMP)/predictor-main main.go
+	PPROF_TMPDIR=$(TMP) $(TMP)/predictor-main 1>/dev/null
+	go tool pprof -top $(TMP)/predictor-main $(TMP)/mem.pprof
+	@rm -rf $(TMP)
 
 # .PHONY: all
 

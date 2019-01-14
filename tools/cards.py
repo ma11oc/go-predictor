@@ -11,66 +11,66 @@ from jinja2 import Template
 
 
 TEMPLATE = '''
-- id: {{ id }}
-  rank: {{ rank }}
-  suit: {{ suit }}
-  title: {{ title }}
-  meaning:
-    general:
-      keywords: >-
-        {{ general_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ general_description | wordwrap(width=71, wrapstring='\n        ') }}
-    longterm:
-      keywords: >-
-        {{ longterm_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ longterm_description | wordwrap(width=71, wrapstring='\n        ')}}
-    mercury:
-      keywords: >-
-        {{ mercury_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ mercury_description | wordwrap(width=71, wrapstring='\n        ') }}
-    venus:
-      keywords: >-
-        {{ venus_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ venus_description | wordwrap(width=71, wrapstring='\n        ') }}
-    mars:
-      keywords: >-
-        {{ mars_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ mars_description | wordwrap(width=71, wrapstring='\n        ') }}
-    jupiter:
-      keywords: >-
-        {{ jupiter_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ jupiter_description | wordwrap(width=71, wrapstring='\n        ') }}
-    saturn:
-      keywords: >-
-        {{ saturn_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ saturn_description | wordwrap(width=71, wrapstring='\n        ') }}
-    uranus:
-      keywords: >-
-        {{ uranus_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ uranus_description | wordwrap(width=71, wrapstring='\n        ') }}
-    neptune:
-      keywords: >-
-        {{ neptune_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ neptune_description | wordwrap(width=71, wrapstring='\n        ') }}
-    pluto:
-      keywords: >-
-        {{ pluto_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ pluto_description | wordwrap(width=71, wrapstring='\n        ') }}
-    result:
-      keywords: >-
-        {{ result_keywords | wordwrap(width=71, wrapstring='\n        ') }}
-      description: >-
-        {{ result_description | wordwrap(width=71, wrapstring='\n        ') }}
+  - id: {{ id }}
+    rank: {{ rank }}
+    suit: {{ suit }}
+    title: {{ title }}
+    meaning:
+      general:
+        keywords: >-
+          {{ general_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ general_description | wordwrap(width=71, wrapstring='\n          ') }}
+      longterm:
+        keywords: >-
+          {{ longterm_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ longterm_description | wordwrap(width=71, wrapstring='\n          ')}}
+      mercury:
+        keywords: >-
+          {{ mercury_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ mercury_description | wordwrap(width=71, wrapstring='\n          ') }}
+      venus:
+        keywords: >-
+          {{ venus_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ venus_description | wordwrap(width=71, wrapstring='\n          ') }}
+      mars:
+        keywords: >-
+          {{ mars_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ mars_description | wordwrap(width=71, wrapstring='\n          ') }}
+      jupiter:
+        keywords: >-
+          {{ jupiter_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ jupiter_description | wordwrap(width=71, wrapstring='\n          ') }}
+      saturn:
+        keywords: >-
+          {{ saturn_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ saturn_description | wordwrap(width=71, wrapstring='\n          ') }}
+      uranus:
+        keywords: >-
+          {{ uranus_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ uranus_description | wordwrap(width=71, wrapstring='\n          ') }}
+      neptune:
+        keywords: >-
+          {{ neptune_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ neptune_description | wordwrap(width=71, wrapstring='\n          ') }}
+      pluto:
+        keywords: >-
+          {{ pluto_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ pluto_description | wordwrap(width=71, wrapstring='\n          ') }}
+      result:
+        keywords: >-
+          {{ result_keywords | wordwrap(width=71, wrapstring='\n          ') }}
+        description: >-
+          {{ result_description | wordwrap(width=71, wrapstring='\n          ') }}
 
 '''
 
@@ -113,6 +113,7 @@ def main():
 
     idx = 1
     print('---')
+    print('deck:')
     for row in csv_reader:
         card = row[1].decode(encoding='utf-8')
         values = dict(
