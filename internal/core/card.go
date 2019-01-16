@@ -35,16 +35,16 @@ var (
 )
 
 type Meaning struct {
-	Keywords    string `yaml:"keywords"`
-	Description string `yaml:"description"`
+	Keywords    string `yaml:"keywords" validate:"nonzero"`
+	Description string `yaml:"description" validate:"nonzero"`
 }
 
 // Card represents a simple priimtive in matrices
 type Card struct {
-	ID       uint8  `yaml:"id"`
-	Rank     string `yaml:"rank"`
-	Suit     string `yaml:"suit"`
-	Title    string `yaml:"title"`
+	ID       uint8  `yaml:"id" validate:"nonzero,min=1,max=52"`
+	Rank     string `yaml:"rank" validate:"nonzero,min=1,max=2"`
+	Suit     string `yaml:"suit" validate:"nonzero,len=3"`
+	Title    string `yaml:"title" validate:"nonzero"`
 	Meanings struct {
 		General  Meaning
 		Longterm Meaning

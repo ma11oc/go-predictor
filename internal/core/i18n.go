@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/go-validator/validator"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 	yaml "gopkg.in/yaml.v2"
@@ -12,18 +13,19 @@ import (
 // loadtranslation
 //
 type Locale struct {
-	Lang     string `yaml:"lang"`
+	Lang     string `yaml:"lang" validate:"nonzero"`
 	Matrices []struct {
 		ID string `yaml:"id"`
 	}
-	Cards []Card `yaml:"cards"`
+	Cards []Card `yaml:"cards" validate:"len=52"`
 }
 
-/*
- * func (l Locale) Validate() (bool, error) {
- *     return nil, nil
- * }
- */
+func (l Locale) Validate() error {
+	if errs := validator.Validate(l); errs != nil {
+		return errs
+	}
+	return nil
+}
 
 func MustLoadLocale(p string) error {
 	var content []byte
@@ -39,6 +41,10 @@ func MustLoadLocale(p string) error {
 	err = yaml.Unmarshal([]byte(content), &locale)
 	if err != nil {
 		panic(err)
+	}
+
+	if err = locale.Validate(); err != nil {
+		panic(fmt.Errorf("Locale %v is invalid: %v\n", p, err))
 	}
 
 	lang := language.Make(locale.Lang)

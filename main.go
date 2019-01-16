@@ -4,6 +4,9 @@ import (
 
 	// "github.com/pkg/profile"
 
+	"fmt"
+	"time"
+
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -40,22 +43,31 @@ func main() {
 	// Memory profiling
 	// defer profile.Start(profile.MemProfile).Stop()
 
+	// core.LoadLocales("locales/ru-RU.yaml", "locales/en-US.yaml")
 	core.LoadLocales("locales/ru-RU.yaml")
 
-	scs := spew.ConfigState{Indent: "  "}
-
 	od := core.NewOrderedDeck("ru-RU")
-	for _, v := range od.Cards {
-		scs.Dump(v)
+	for i, v := range od.Cards {
+		// scs.Dump(v)
+		fmt.Printf("%2v: %v\n", i, v.Title)
 		// scs.Dump(v)
 		// fmt.Printf("%2v: %v\n", i, v.Meanings.General.Keywords)
 		// fmt.Printf("%2v: %v\n", i, v.Meanings.Longterm.Keywords)
 	}
 	// od := core.NewOrderedDeck()
-	// om := core.NewOriginMatrix(&origin, od)
-	// hm := core.NewHumansMatrix(om, od)
+	om := core.NewOriginMatrix(&origin, od)
+	hm := core.NewHumansMatrix(om, od)
 	// am := core.NewAngelsMatrix(om, od)
-	// mm := core.NewBunchOfYearMatrices(om, od)
+	mm := core.NewBunchOfYearMatrices(om, od)
+	b := time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC)
+	p, _ := core.NewPerson(b, od, mm, hm)
+
+	scs := spew.ConfigState{
+		Indent:   "  ",
+		MaxDepth: 3,
+	}
+	scs.Dump(p)
+
 	// fmt.Println(hm)
 	// fmt.Println(am)
 	// fmt.Println(mm)

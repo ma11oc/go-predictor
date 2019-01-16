@@ -59,6 +59,17 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 	return nil, fmt.Errorf("No such card with number %v was found in the deck", n)
 }
 
+// GetCardByIndex returns appropriate card from a deck
+func (d Deck) GetCardByIndex(i uint8) (*Card, error) {
+	var c *Card
+
+	if c = d.Cards[i]; c == nil {
+		return nil, fmt.Errorf("No such card with index %v was found in the deck", i)
+	}
+
+	return c, nil
+}
+
 func (d Deck) indexOf(value uint8) (uint8, error) {
 	for i, v := range d.Cards {
 		if v.ID == value {
