@@ -60,11 +60,15 @@ func main() {
 	// am := core.NewAngelsMatrix(om, od)
 	mm := core.NewBunchOfYearMatrices(om, od)
 	b := time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC)
-	p, _ := core.NewPerson(b, od, mm, hm)
+	env := map[string]time.Time{
+		"Wife":     time.Date(1986, time.July, 19, 0, 0, 0, 0, time.UTC),
+		"Daughter": time.Date(2014, time.October, 11, 0, 0, 0, 0, time.UTC),
+	}
+	p, _ := core.NewPerson(b, od, mm, hm, env)
 
 	scs := spew.ConfigState{
 		Indent:   "  ",
-		MaxDepth: 3,
+		MaxDepth: 7,
 	}
 	scs.Dump(p)
 
