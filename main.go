@@ -4,7 +4,6 @@ import (
 
 	// "github.com/pkg/profile"
 
-	"fmt"
 	"time"
 
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
@@ -47,27 +46,20 @@ func main() {
 	core.LoadLocales("locales/ru-RU.yaml")
 
 	od := core.NewOrderedDeck("ru-RU")
-	for i, v := range od.Cards {
-		// scs.Dump(v)
-		fmt.Printf("%2v: %v\n", i, v.Title)
-		// scs.Dump(v)
-		// fmt.Printf("%2v: %v\n", i, v.Meanings.General.Keywords)
-		// fmt.Printf("%2v: %v\n", i, v.Meanings.Longterm.Keywords)
-	}
-	// od := core.NewOrderedDeck()
 	om := core.NewOriginMatrix(&origin, od)
 	hm := core.NewHumansMatrix(om, od)
 	// am := core.NewAngelsMatrix(om, od)
 	mm := core.NewBunchOfYearMatrices(om, od)
+	pc := core.NewBunchOfPlanetCycles()
 	b := time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC)
 	env := map[string]time.Time{
-		"Wife":     time.Date(1986, time.July, 19, 0, 0, 0, 0, time.UTC),
-		"Daughter": time.Date(2014, time.October, 11, 0, 0, 0, 0, time.UTC),
+		"marina": time.Date(1986, time.July, 19, 0, 0, 0, 0, time.UTC),
+		"kira":   time.Date(2014, time.October, 11, 0, 0, 0, 0, time.UTC),
 	}
-	p, _ := core.NewPerson(b, od, mm, hm, env)
+	p, _ := core.NewPerson(b, od, mm, hm, pc, env)
 
 	scs := spew.ConfigState{
-		Indent:   "  ",
+		Indent:   "    ",
 		MaxDepth: 7,
 	}
 	scs.Dump(p)
