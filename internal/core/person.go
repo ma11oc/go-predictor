@@ -66,9 +66,7 @@ func (p *Person) resolveMainCards(od *Deck, hm *Matrix) error {
 	var err error
 	var idx uint8
 
-	idx = uint8(54 - (p.Birthday.Day() + (int(p.Birthday.Month()) * 2)))
-
-	if p.Cards.Main, err = od.GetCardByNumber(idx + 1); err != nil {
+	if p.Cards.Main, err = od.GetCardByBirthday(p.Birthday); err != nil {
 		return err
 	}
 
@@ -91,19 +89,19 @@ func (p *Person) resolveLongtermCard(mm [90]*YearMatrix) error {
 	var idx uint8
 	var err error
 
-	age := time.Now().Year() - p.Birthday.Year()
+	age := uint8(time.Since(p.Birthday).Hours() / 24 / 365)
 	ym := mm[age/7]
-	delta := uint8((age - age/7))
 
 	if idx, err = ym.Matrix.Decks.Main.indexOf(p.Cards.Main.ID); err != nil {
 		return err
 	}
 
-	if idx+delta >= 52 {
-		idx = idx + delta - 52
+	idx += age%7 + 1
+	if idx >= 52 {
+		idx -= 52
 	}
 
-	if p.Cards.Longterm, err = ym.Matrix.Decks.Main.GetCardByNumber(idx); err != nil {
+	if p.Cards.Longterm, err = ym.Matrix.Decks.Main.GetCardByIndex(idx); err != nil {
 		return err
 	}
 
@@ -112,8 +110,8 @@ func (p *Person) resolveLongtermCard(mm [90]*YearMatrix) error {
 
 func (p *Person) resolveCurrentYearMatrix(mm [90]*YearMatrix) error {
 	// age := time.Now().Year() - p.Birthday.Year()
-	age := time.Since(p.Birthday).Hours() / 24 / 365
-	ym := mm[uint8(age)]
+	age := uint8(time.Since(p.Birthday).Hours() / 24 / 365)
+	ym := mm[age]
 
 	if ym == nil {
 		return fmt.Errorf("Unable to resolve current year matrix for age: %v", age)
@@ -124,16 +122,6 @@ func (p *Person) resolveCurrentYearMatrix(mm [90]*YearMatrix) error {
 	return nil
 }
 
-/*
-         * 2665", // ♥ hearts
-		 * "\u2663", // ♣ clovers
-		 * "\u2666", // ♦ tiles
-		 * "\u2660", // ♠ pikes
-*/
-
-// age: 31, Q♦  -> 2♦/2♠
-// age: 31, K♥  -> 4♦/5♠
-// age: 31, 10♥ -> 2♥/7♥
 func (p *Person) resolvePlutoCards() error {
 	var idx uint8
 	var err error

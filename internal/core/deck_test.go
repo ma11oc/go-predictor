@@ -1,6 +1,8 @@
 package core_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -33,7 +35,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 		}
 	)
 
-	Describe("Get card", func() {
+	Describe("Get card by number", func() {
 		Context("With valid index", func() {
 			It("should return a valid card", func() {
 				var c *core.Card
@@ -50,6 +52,20 @@ var _ = Describe("Internal/Core/Deck", func() {
 				for _, v := range []int{-1, 0, 53} {
 					_, err := od.GetCardByNumber(uint8(v))
 					Expect(err).Should(HaveOccurred(), "current card number is: %v", v)
+				}
+			})
+		})
+	})
+
+	Describe("Get card by birthday", func() {
+		Context("With valid time.Time", func() {
+			It("should return a valid card", func() {
+				b := time.Date(1999, 12, 31, 0, 0, 0, 0, time.UTC)
+
+				for i := 1; i <= 366; i++ {
+					c, err := od.GetCardByBirthday(b.AddDate(0, 0, i))
+					Expect(err).ShouldNot(HaveOccurred())
+					Expect(c).Should(BeAssignableToTypeOf(&core.Card{}))
 				}
 			})
 		})

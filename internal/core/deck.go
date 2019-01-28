@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // Deck is an unordered deck
 type Deck struct {
@@ -57,6 +60,17 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 	}
 
 	return nil, fmt.Errorf("No such card with number %v was found in the deck", n)
+}
+
+// GetCardByBirthday returns appropriate card from a deck
+func (d Deck) GetCardByBirthday(t time.Time) (*Card, error) {
+	idx := uint8(54-(t.Day()+(int(t.Month())*2))) + 1
+
+	if idx < 1 || idx > 52 {
+		return nil, fmt.Errorf("Got invalid card number `%v` for birthday: %v", idx, t)
+	}
+
+	return d.GetCardByNumber(idx)
 }
 
 // GetCardByIndex returns appropriate card from a deck
