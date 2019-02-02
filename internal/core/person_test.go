@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"golang.org/x/text/language"
 
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
 )
@@ -22,9 +23,10 @@ var _ = Describe("Internal/Core/Deck", func() {
 			23, 34, 52,
 		}
 
-		locale = "ru-RU"
+		locales = core.MustLoadLocales("../../locales/ru-RU.yaml")
+		lang    = language.Make("ru-RU")
 
-		od = core.NewOrderedDeck(locale)
+		od = core.NewOrderedDeck(lang, locales)
 		om = core.NewOriginMatrix(&origin, od)
 
 		mm = core.NewBunchOfYearMatrices(om, od)
@@ -36,7 +38,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return 9♣", func() {
 				b := time.Date(time.Now().Year()-41, time.March, 20, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(22, locale)).To(Equal(p.Cards.Longterm))
+				Expect(core.NewCardFromNumber(22, lang, locales)).To(Equal(p.Cards.Longterm))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -44,7 +46,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return K♠", func() {
 				b := time.Date(time.Now().Year()-38, time.March, 25, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(52, locale)).To(Equal(p.Cards.Longterm))
+				Expect(core.NewCardFromNumber(52, lang, locales)).To(Equal(p.Cards.Longterm))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -52,7 +54,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return J♦", func() {
 				b := time.Date(time.Now().Year()-41, time.March, 27, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(37, locale)).To(Equal(p.Cards.Longterm))
+				Expect(core.NewCardFromNumber(37, lang, locales)).To(Equal(p.Cards.Longterm))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -60,7 +62,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return 10♠", func() {
 				b := time.Date(time.Now().Year()-66, time.January, 21, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(49, locale)).To(Equal(p.Cards.Longterm))
+				Expect(core.NewCardFromNumber(49, lang, locales)).To(Equal(p.Cards.Longterm))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -71,8 +73,8 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return pluto as 2♦ and pluto result as 2♠", func() {
 				b := time.Date(time.Now().Year()-31, time.January, 15, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(28, locale)).To(Equal(p.Cards.Pluto))
-				Expect(core.NewCardFromNumber(41, locale)).To(Equal(p.Cards.PlutoResult))
+				Expect(core.NewCardFromNumber(28, lang, locales)).To(Equal(p.Cards.Pluto))
+				Expect(core.NewCardFromNumber(41, lang, locales)).To(Equal(p.Cards.PlutoResult))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -80,8 +82,8 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return pluto as 4♦ and pluto result as 5♠", func() {
 				b := time.Date(time.Now().Year()-32, time.September, 24, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(30, locale)).To(Equal(p.Cards.Pluto))
-				Expect(core.NewCardFromNumber(44, locale)).To(Equal(p.Cards.PlutoResult))
+				Expect(core.NewCardFromNumber(30, lang, locales)).To(Equal(p.Cards.Pluto))
+				Expect(core.NewCardFromNumber(44, lang, locales)).To(Equal(p.Cards.PlutoResult))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -89,8 +91,8 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return pluto as 2♥ and pluto result as 7♥", func() {
 				b := time.Date(time.Now().Year()-32, time.November, 23, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(2, locale)).To(Equal(p.Cards.Pluto))
-				Expect(core.NewCardFromNumber(7, locale)).To(Equal(p.Cards.PlutoResult))
+				Expect(core.NewCardFromNumber(2, lang, locales)).To(Equal(p.Cards.Pluto))
+				Expect(core.NewCardFromNumber(7, lang, locales)).To(Equal(p.Cards.PlutoResult))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
@@ -98,8 +100,8 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return pluto as 2♥ and pluto result as 7♥", func() {
 				b := time.Date(time.Now().Year()-68, time.September, 2, 0, 0, 0, 0, time.UTC)
 				p, err := core.NewPerson(b, od, mm, om, nil, nil)
-				Expect(core.NewCardFromNumber(49, locale)).To(Equal(p.Cards.Pluto))
-				Expect(core.NewCardFromNumber(4, locale)).To(Equal(p.Cards.PlutoResult))
+				Expect(core.NewCardFromNumber(49, lang, locales)).To(Equal(p.Cards.Pluto))
+				Expect(core.NewCardFromNumber(4, lang, locales)).To(Equal(p.Cards.PlutoResult))
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})

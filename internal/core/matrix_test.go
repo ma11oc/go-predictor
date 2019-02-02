@@ -3,6 +3,7 @@ package core_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"golang.org/x/text/language"
 
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
 )
@@ -20,7 +21,10 @@ var _ = Describe("Internal/Core/Matrix", func() {
 			23, 34, 52,
 		}
 
-		od = core.NewOrderedDeck("ru-RU")
+		locales = core.MustLoadLocales("../../locales/ru-RU.yaml")
+		lang    = language.Make("ru-RU")
+
+		od = core.NewOrderedDeck(lang, locales)
 		om = core.NewOriginMatrix(&origin, od)
 	)
 

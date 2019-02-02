@@ -3,82 +3,99 @@ package core
 import (
 	"fmt"
 	"io/ioutil"
+	"reflect"
 
 	"github.com/go-validator/validator"
 	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 	yaml "gopkg.in/yaml.v2"
 )
+
+func init() {
+	validator.SetValidationFunc("langtag", isParsableLanguageTag)
+}
+
+// Make sure a value of a field is parsible by language.Parse()
+func isParsableLanguageTag(v interface{}, param string) error {
+	st := reflect.ValueOf(v)
+	if st.Kind() != reflect.String {
+		return validator.ErrUnsupported
+
+	}
+	if _, err := language.Parse(st.String()); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // loadtranslation
 //
 type Locale struct {
-	Lang     string `yaml:"lang" validate:"nonzero"`
+	Lang     string `yaml:"lang" validate:"nonzero,langtag"`
 	Matrices []struct {
 		ID string `yaml:"id"`
 	}
 	Cards []Card `yaml:"cards" validate:"len=52"`
 }
 
-func (l Locale) Validate() error {
+func (l *Locale) GetCardByID(id uint8) (*Card, error) {
+	if id <= 0 || id > 52 {
+		return nil, fmt.Errorf("Wrong id has been specified: %v", id)
+	}
+
+	card := l.Cards[id-1]
+
+	if card.ID != id {
+		return nil, fmt.Errorf("Locale seems broken: index != id-1 (index: %v, id: %v)", id-1, card.ID)
+	}
+
+	return &card, nil
+}
+
+func (l *Locale) Validate() error {
 	if errs := validator.Validate(l); errs != nil {
 		return errs
 	}
 	return nil
 }
 
-func MustLoadLocale(p string) error {
+func NewLocale(p string) (*Locale, error) {
 	var content []byte
 	var err error
 
-	content, err = ioutil.ReadFile(p)
-	if err != nil {
-		panic(err)
+	if content, err = ioutil.ReadFile(p); err != nil {
+		return nil, fmt.Errorf("unable to read locale file: %v", err)
 	}
 
 	locale := &Locale{}
 
-	err = yaml.Unmarshal([]byte(content), &locale)
-	if err != nil {
-		panic(err)
+	if err = yaml.Unmarshal([]byte(content), &locale); err != nil {
+		return nil, fmt.Errorf("unable to unmarshall locale: %v", err)
 	}
 
 	if err = locale.Validate(); err != nil {
-		panic(fmt.Errorf("Locale %v is invalid: %v\n", p, err))
+		return nil, fmt.Errorf("locale %v is invalid: %v", p, err)
 	}
 
-	lang := language.Make(locale.Lang)
-
-	for _, c := range locale.Cards {
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".title"), c.Title)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.general.keywords"), c.Meanings.General.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.general.description"), c.Meanings.General.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.longterm.keywords"), c.Meanings.Longterm.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.longterm.description"), c.Meanings.Longterm.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.mercury.keywords"), c.Meanings.Mercury.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.mercury.description"), c.Meanings.Mercury.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.venus.keywords"), c.Meanings.Venus.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.venus.description"), c.Meanings.Venus.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.mars.keywords"), c.Meanings.Mars.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.mars.description"), c.Meanings.Mars.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.jupiter.keywords"), c.Meanings.Jupiter.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.jupiter.description"), c.Meanings.Jupiter.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.saturn.keywords"), c.Meanings.Saturn.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.saturn.description"), c.Meanings.Saturn.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.uranus.keywords"), c.Meanings.Uranus.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.uranus.description"), c.Meanings.Uranus.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.neptune.keywords"), c.Meanings.Neptune.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.neptune.description"), c.Meanings.Neptune.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.pluto.keywords"), c.Meanings.Pluto.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.pluto.description"), c.Meanings.Pluto.Description)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.result.keywords"), c.Meanings.Result.Keywords)
-		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.result.description"), c.Meanings.Result.Description)
-	}
-	return nil
+	return locale, nil
 }
 
-func LoadLocales(paths ...string) {
+func MustLoadLocales(paths ...string) map[language.Tag]*Locale {
+	var locale *Locale
+	var err error
+
+	locales := make(map[language.Tag]*Locale, len(paths))
+
 	for _, p := range paths {
-		MustLoadLocale(p)
+		if locale, err = NewLocale(p); err != nil {
+			panic(err)
+		}
+
+		// Lang has been validated before, so there is not need to parse it
+		lang := language.Make(locale.Lang)
+
+		locales[lang] = locale
 	}
+
+	return locales
 }

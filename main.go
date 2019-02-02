@@ -4,10 +4,12 @@ import (
 
 	// "github.com/pkg/profile"
 
+	"fmt"
 	"time"
 
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
 	"github.com/davecgh/go-spew/spew"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -42,10 +44,10 @@ func main() {
 	// Memory profiling
 	// defer profile.Start(profile.MemProfile).Stop()
 
-	// core.LoadLocales("locales/ru-RU.yaml", "locales/en-US.yaml")
-	core.LoadLocales("locales/ru-RU.yaml")
+	locales := core.MustLoadLocales("locales/ru-RU.yaml")
+	lang := language.Make("ru-RU")
 
-	od := core.NewOrderedDeck("ru-RU")
+	od := core.NewOrderedDeck(lang, locales)
 	om := core.NewOriginMatrix(&origin, od)
 	hm := core.NewHumansMatrix(om, od)
 	// am := core.NewAngelsMatrix(om, od)
@@ -59,7 +61,7 @@ func main() {
 	p, _ := core.NewPerson(b, od, mm, hm, pc, env)
 
 	scs := spew.ConfigState{
-		Indent:   "---|",
+		Indent:   "|---",
 		MaxDepth: 7,
 	}
 	scs.Dump(p)
