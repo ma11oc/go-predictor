@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -116,8 +115,6 @@ func GetCurrentPlanetCycles(t time.Time, pc *[7][54]*PlanetCycle) *[7]*PlanetCyc
 	if pc == nil {
 		return nil
 	}
-
-	fmt.Println(pc)
 
 	r := [7]*PlanetCycle{}
 

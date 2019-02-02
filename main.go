@@ -59,7 +59,7 @@ func main() {
 	p, _ := core.NewPerson(b, od, mm, hm, pc, env)
 
 	scs := spew.ConfigState{
-		Indent:   "    ",
+		Indent:   "---|",
 		MaxDepth: 7,
 	}
 	scs.Dump(p)

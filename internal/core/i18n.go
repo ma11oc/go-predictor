@@ -49,7 +49,6 @@ func MustLoadLocale(p string) error {
 
 	lang := language.Make(locale.Lang)
 
-	// FIXME: validate locale struct
 	for _, c := range locale.Cards {
 		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".title"), c.Title)
 		message.SetString(lang, fmt.Sprintf("%v%v", c.ID, ".meanings.general.keywords"), c.Meanings.General.Keywords)
