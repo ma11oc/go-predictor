@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-
-	"golang.org/x/text/language"
 )
 
 type Meaning struct {
@@ -13,9 +11,9 @@ type Meaning struct {
 
 // Card represents a simple primitive in matrices
 type Card struct {
-	ID       uint8  `yaml:"id" validate:"nonzero,min=1,max=52"`
-	Rank     string `yaml:"rank" validate:"nonzero,min=1,max=2"`
-	Suit     string `yaml:"suit" validate:"nonzero,len=3"`
+	ID       uint8  `yaml:"id" validate:"min=0,max=52"`
+	Rank     string `yaml:"rank" validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
+	Suit     string `yaml:"suit" validate:"nonzero,min=3,max=4"`
 	Title    string `yaml:"title" validate:"nonzero"`
 	Meanings struct {
 		General  Meaning
@@ -33,10 +31,10 @@ type Card struct {
 }
 
 // NewCardFromNumber returns type *Card from the given number (0, 52]
-func NewCardFromNumber(n uint8, t language.Tag, ll map[language.Tag]*Locale) (*Card, error) {
+func NewCardFromNumber(n uint8, loc *Locale) (*Card, error) {
 	if n <= 0 || n > 52 {
 		return nil, fmt.Errorf("Unable to create card: invalid number %v", n)
 	}
 
-	return ll[t].GetCardByID(n)
+	return loc.GetCardByID(n)
 }

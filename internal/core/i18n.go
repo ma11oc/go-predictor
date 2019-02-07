@@ -11,10 +11,64 @@ import (
 )
 
 func init() {
-	validator.SetValidationFunc("langtag", isParsableLanguageTag)
+	validator.SetValidationFunc("langstr", isParsableLanguageTag)
 }
 
-// Make sure a value of a field is parsible by language.Parse()
+var (
+	origin = [52]uint8{
+		3, 14, 25, 49, 18, 29, 40,
+		7, 33, 44, 11, 22, 48, 2,
+		13, 39, 6, 17, 28, 50, 21,
+		32, 43, 10, 36, 47, 1, 27,
+		38, 5, 16, 42, 9, 20, 31,
+		51, 24, 35, 46, 15, 26, 37,
+		4, 30, 41, 8, 19, 45, 12,
+		23, 34, 52,
+	}
+)
+
+type Locale struct {
+	Lang string `yaml:"lang" validate:"nonzero,langstr"`
+	Base struct {
+		od *Deck
+		om *Matrix
+		hm *Matrix
+		am *Matrix
+		mm *[90]*YearMatrix
+		pc *[7][54]*PlanetCycle
+	}
+	Matrices []struct {
+		ID string `yaml:"id"`
+	}
+	Exceptions struct {
+		Joker *Card
+	}
+	Cards []Card `yaml:"cards" validate:"len=52"`
+}
+
+func (l Locale) GetOrderedDeck() *Deck {
+	return l.Base.od
+}
+
+func (l Locale) GetYearMatrices() *[90]*YearMatrix {
+	return l.Base.mm
+}
+
+func (l Locale) GetOriginMatrix() *Matrix {
+	return l.Base.om
+}
+
+func (l Locale) GetHumansMatrix() *Matrix {
+	return l.Base.hm
+}
+
+func (l Locale) GetAngelsMatrix() *Matrix {
+	return l.Base.am
+}
+
+type Locales map[language.Tag]*Locale
+
+// Make sure a value of a field is parsable by language.Parse()
 func isParsableLanguageTag(v interface{}, param string) error {
 	st := reflect.ValueOf(v)
 	if st.Kind() != reflect.String {
@@ -30,13 +84,18 @@ func isParsableLanguageTag(v interface{}, param string) error {
 
 // loadtranslation
 //
-type Locale struct {
-	Lang     string `yaml:"lang" validate:"nonzero,langtag"`
-	Matrices []struct {
-		ID string `yaml:"id"`
-	}
-	Cards []Card `yaml:"cards" validate:"len=52"`
-}
+/*
+ * type Locale struct {
+ *     Lang     string `yaml:"lang" validate:"nonzero,langstr"`
+ *     Matrices []struct {
+ *         ID string `yaml:"id"`
+ *     }
+ *     Exceptions struct {
+ *         Joker *Card
+ *     }
+ *     Cards []Card `yaml:"cards" validate:"len=52"`
+ * }
+ */
 
 func (l *Locale) GetCardByID(id uint8) (*Card, error) {
 	if id <= 0 || id > 52 {
@@ -67,35 +126,42 @@ func NewLocale(p string) (*Locale, error) {
 		return nil, fmt.Errorf("unable to read locale file: %v", err)
 	}
 
-	locale := &Locale{}
+	loc := &Locale{}
 
-	if err = yaml.Unmarshal([]byte(content), &locale); err != nil {
+	if err = yaml.Unmarshal([]byte(content), &loc); err != nil {
 		return nil, fmt.Errorf("unable to unmarshall locale: %v", err)
 	}
 
-	if err = locale.Validate(); err != nil {
+	if err = loc.Validate(); err != nil {
 		return nil, fmt.Errorf("locale %v is invalid: %v", p, err)
 	}
 
-	return locale, nil
+	loc.Base.od = NewOrderedDeck(loc)
+	loc.Base.om = NewOriginMatrix(&origin, loc.Base.od)
+	loc.Base.hm = NewHumansMatrix(loc.Base.om, loc.Base.od)
+	loc.Base.am = NewAngelsMatrix(loc.Base.om, loc.Base.od)
+	loc.Base.mm = NewBunchOfYearMatrices(loc.Base.om, loc.Base.od)
+	loc.Base.pc = NewBunchOfPlanetCycles()
+
+	return loc, nil
 }
 
-func MustLoadLocales(paths ...string) map[language.Tag]*Locale {
-	var locale *Locale
+func BuildLocales(paths ...string) Locales {
+	var loc *Locale
 	var err error
 
-	locales := make(map[language.Tag]*Locale, len(paths))
+	ll := make(map[language.Tag]*Locale, len(paths))
 
 	for _, p := range paths {
-		if locale, err = NewLocale(p); err != nil {
+		if loc, err = NewLocale(p); err != nil {
 			panic(err)
 		}
 
 		// Lang has been validated before, so there is not need to parse it
-		lang := language.Make(locale.Lang)
+		lang := language.Make(loc.Lang)
 
-		locales[lang] = locale
+		ll[lang] = loc
 	}
 
-	return locales
+	return ll
 }

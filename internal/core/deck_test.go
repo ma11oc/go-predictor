@@ -5,32 +5,12 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"golang.org/x/text/language"
 
 	"bitbucket.org/shchukin_a/go-predictor/internal/core"
 )
 
 var _ = Describe("Internal/Core/Deck", func() {
 	var (
-		origin = [52]uint8{
-			3, 14, 25, 49, 18, 29, 40,
-			7, 33, 44, 11, 22, 48, 2,
-			13, 39, 6, 17, 28, 50, 21,
-			32, 43, 10, 36, 47, 1, 27,
-			38, 5, 16, 42, 9, 20, 31,
-			51, 24, 35, 46, 15, 26, 37,
-			4, 30, 41, 8, 19, 45, 12,
-			23, 34, 52,
-		}
-
-		locales = core.MustLoadLocales("../../locales/ru-RU.yaml")
-		lang    = language.Make("ru-RU")
-
-		od = core.NewOrderedDeck(lang, locales)
-		om = core.NewOriginMatrix(&origin, od)
-
-		mm = core.NewBunchOfYearMatrices(om, od)
-
 		os = [52]uint8{
 			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
 			14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
@@ -45,7 +25,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				var c *core.Card
 
 				for i := uint8(1); i < 52; i++ {
-					c, _ = core.NewCardFromNumber(i, lang, locales)
+					c, _ = core.NewCardFromNumber(i, locale)
 					Expect(od.GetCardByNumber(i)).To(Equal(c))
 				}
 			})
@@ -66,11 +46,18 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should return a valid card", func() {
 				b := time.Date(1999, 12, 31, 0, 0, 0, 0, time.UTC)
 
-				for i := 1; i <= 366; i++ {
+				for i := 1; i <= 365; i++ {
 					c, err := od.GetCardByBirthday(b.AddDate(0, 0, i))
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(c).Should(BeAssignableToTypeOf(&core.Card{}))
 				}
+			})
+		})
+		Context("With birthday at XXXX-12-31", func() {
+			It("should raise an error", func() {
+				b := time.Date(1999, 12, 31, 0, 0, 0, 0, time.UTC)
+				_, err := od.GetCardByBirthday(b)
+				Expect(err).Should(HaveOccurred())
 			})
 		})
 	})
@@ -108,7 +95,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 48 | 9♠
 				 */
 
-				card, _ := core.NewCardFromNumber(29, lang, locales)
+				card, _ := core.NewCardFromNumber(29, locale)
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{40, 7, 33, 44, 11, 22, 48}
@@ -116,7 +103,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v, lang, locales)
+					c, _ := core.NewCardFromNumber(v, locale)
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -134,7 +121,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 25 | Q♣
 				 */
 
-				card, _ := core.NewCardFromNumber(45, lang, locales)
+				card, _ := core.NewCardFromNumber(45, locale)
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{12, 23, 34, 52, 3, 14, 25}
@@ -142,7 +129,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v, lang, locales)
+					c, _ := core.NewCardFromNumber(v, locale)
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -159,7 +146,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 29 | 3♦
 				 */
 
-				card, _ := core.NewCardFromNumber(34, lang, locales)
+				card, _ := core.NewCardFromNumber(34, locale)
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{52, 3, 14, 25, 49, 18, 29}
@@ -167,7 +154,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v, lang, locales)
+					c, _ := core.NewCardFromNumber(v, locale)
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -184,7 +171,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 36 | 10♦
 				 */
 
-				card, _ := core.NewCardFromNumber(17, lang, locales)
+				card, _ := core.NewCardFromNumber(17, locale)
 				row, err := mm[0].Decks.Main.GetHRow(card)
 
 				s := [7]uint8{28, 50, 21, 32, 43, 10, 36}
@@ -192,7 +179,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v, lang, locales)
+					c, _ := core.NewCardFromNumber(v, locale)
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -211,7 +198,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 5: 48 | 9♠
 				 */
 
-				card, _ := core.NewCardFromNumber(29, lang, locales)
+				card, _ := core.NewCardFromNumber(29, locale)
 				row, err := mm[0].Decks.Main.GetVRow(card)
 
 				s := [7]uint8{45, 26, 20, 1, 50, 48}
@@ -220,7 +207,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				// Expect(row[6]).To(Equal(nil))
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v, lang, locales)
+					c, _ := core.NewCardFromNumber(v, locale)
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -237,7 +224,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				* 6: 36 | 10♦
 				 */
 
-				card, _ := core.NewCardFromNumber(17, lang, locales)
+				card, _ := core.NewCardFromNumber(17, locale)
 				row, err := mm[0].Decks.Main.GetVRow(card)
 
 				s := [7]uint8{11, 49, 34, 8, 46, 42, 36}
@@ -246,7 +233,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 				// Expect(row[6]).To(Equal(nil))
 
 				for i, v := range s {
-					c, _ := core.NewCardFromNumber(v, lang, locales)
+					c, _ := core.NewCardFromNumber(v, locale)
 					Expect(row[i]).To(Equal(c))
 				}
 			})
@@ -255,7 +242,7 @@ var _ = Describe("Internal/Core/Deck", func() {
 			It("should not raise an error", func() {
 				for i := uint8(0); i < 90; i++ {
 					for j := uint8(1); j <= 52; j++ {
-						c, _ := core.NewCardFromNumber(j, lang, locales)
+						c, _ := core.NewCardFromNumber(j, locale)
 						row, err := mm[i].Decks.Main.GetVRow(c)
 
 						Expect(row).Should(BeAssignableToTypeOf([7]*core.Card{}))
@@ -265,14 +252,4 @@ var _ = Describe("Internal/Core/Deck", func() {
 			})
 		})
 	})
-
-	/*
-	 * for i := uint8(0); i < 90; i++ {
-	 *     for j := uint8(1); j <= 52; j++ {
-	 *         c, _ := core.NewCardFromNumber(j)
-	 *         mm[i].Decks.Main.GetVRow(c)
-	 *     }
-	 * }
-	 */
-
 })

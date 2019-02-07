@@ -3,8 +3,6 @@ package core
 import (
 	"fmt"
 	"time"
-
-	"golang.org/x/text/language"
 )
 
 // Deck is an unordered deck
@@ -27,14 +25,14 @@ type Deck struct {
 //    0: 11  J♥ | 23: 24  J♣ | 36: 37  J♦ | 49: 50  J♠
 //    1: 12  Q♥ | 24: 25  Q♣ | 37: 38  Q♦ | 50: 51  Q♠
 //    2: 13  K♥ | 25: 26  K♣ | 38: 39  K♦ | 51: 52  K♠
-func NewOrderedDeck(t language.Tag, ll map[language.Tag]*Locale) *Deck {
+func NewOrderedDeck(loc *Locale) *Deck {
 	var c *Card
 	var err error
 
 	od := &Deck{}
 
 	for i := uint8(0); i < 52; i++ {
-		if c, err = NewCardFromNumber(i+1, t, ll); err != nil {
+		if c, err = NewCardFromNumber(i+1, loc); err != nil {
 			panic("Unable to create Deck")
 		}
 
@@ -110,7 +108,7 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 func (d Deck) GetCardByBirthday(t time.Time) (*Card, error) {
 	idx := 54 - (t.Day() + (int(t.Month()) * 2)) + 1
 
-	if idx < 1 || idx > 52 {
+	if idx <= 0 || idx > 52 {
 		return nil, fmt.Errorf("Got invalid card number `%v` for birthday: %v", idx, t)
 	}
 

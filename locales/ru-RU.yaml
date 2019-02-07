@@ -1,9 +1,44 @@
 ---
 lang: ru-RU
+
 matrices:
   - id: origin
   - id: humans
   - id: angels
+
+exceptions:
+  joker:
+    rank: Joker
+    suit: 🃏
+    title: Выход из матрицы
+    meanings:
+      general: &default_meaning
+        keywords: >-
+          Выход из матрицы.
+        description: >-
+          Джокер может стать любой картой в колоде. Невозможно сделать
+          предсказание.
+      longterm:
+        <<: *default_meaning
+      mercury:
+        <<: *default_meaning
+      venus:
+        <<: *default_meaning
+      mars:
+        <<: *default_meaning
+      jupiter:
+        <<: *default_meaning
+      saturn:
+        <<: *default_meaning
+      uranus:
+        <<: *default_meaning
+      neptune:
+        <<: *default_meaning
+      pluto:
+        <<: *default_meaning
+      result:
+        <<: *default_meaning
+
 cards:
   - id: 1
     rank: A

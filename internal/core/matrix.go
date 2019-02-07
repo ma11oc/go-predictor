@@ -175,7 +175,7 @@ func NewZeroYearMatrix(om *Matrix) *YearMatrix {
 	}
 }
 
-func NewBunchOfYearMatrices(om *Matrix, od *Deck) [90]*YearMatrix {
+func NewBunchOfYearMatrices(om *Matrix, od *Deck) *[90]*YearMatrix {
 	var err error
 
 	mm := [90]*YearMatrix{
@@ -194,7 +194,7 @@ func NewBunchOfYearMatrices(om *Matrix, od *Deck) [90]*YearMatrix {
 		cur = mm[i]
 	}
 
-	return mm
+	return &mm
 }
 
 /*

@@ -6,17 +6,26 @@ import (
 	"time"
 )
 
+type Bit uint8
+
+const (
+	Male Bit = 1 << iota
+	Female
+	Other
+)
+
+type PersonConfig struct {
+	Name        string
+	Gender      Bit
+	Birthday    time.Time
+	Environment []*PersonConfig
+}
+
 type Person struct {
+	Name     string
+	Gender   Bit
 	Birthday time.Time `yaml:"birthday" valid:"nonzero"`
-	// Gender
-	Environment map[string]*Person
-	Matrices    struct {
-		Current *YearMatrix
-	}
-
-	PlanetCycles [7]*PlanetCycle
-
-	Cards struct {
+	Cards    struct {
 		Main        *Card
 		Drain       *Card
 		Source      *Card
@@ -25,16 +34,39 @@ type Person struct {
 		PlutoResult *Card
 		Personal    [3]*Card
 	}
+
+	PlanetCycles [7]*PlanetCycle
+	Environment  []*Person
+
+	Matrices struct {
+		Current *YearMatrix
+	}
 }
 
-func NewPerson(t time.Time, od *Deck, mm [90]*YearMatrix, om *Matrix, pc *[7][54]*PlanetCycle, env map[string]time.Time) (*Person, error) {
+func NewPerson(pconf *PersonConfig, loc *Locale) (*Person, error) {
 	var err error
 
+	od := loc.Base.od
+	om := loc.Base.om
+	mm := loc.Base.mm
+	pc := loc.Base.pc
+	env := pconf.Environment
+
 	p := &Person{
-		Birthday:    t,
-		Environment: make(map[string]*Person, len(env)),
+		Name:        pconf.Name,
+		Gender:      pconf.Gender,
+		Birthday:    pconf.Birthday,
+		Environment: make([]*Person, len(env)),
 	}
 
+	// handle joker
+	if pconf.Birthday.Month() == time.December && pconf.Birthday.Day() == 31 {
+		p.Cards.Main = loc.Exceptions.Joker
+
+		return p, nil
+	}
+
+	// resolve person
 	if err = p.resolveMainCards(od, om); err != nil {
 		return nil, err
 	}
@@ -51,7 +83,7 @@ func NewPerson(t time.Time, od *Deck, mm [90]*YearMatrix, om *Matrix, pc *[7][54
 		return nil, err
 	}
 
-	if err = p.resolveEnvironment(t, od, mm, om, env); err != nil {
+	if err = p.resolveEnvironment(pconf, loc); err != nil {
 		return nil, err
 	}
 
@@ -85,7 +117,7 @@ func (p *Person) resolveMainCards(od *Deck, hm *Matrix) error {
 	return nil
 }
 
-func (p *Person) resolveLongtermCard(mm [90]*YearMatrix) error {
+func (p *Person) resolveLongtermCard(mm *[90]*YearMatrix) error {
 	var idx uint8
 	var err error
 
@@ -108,8 +140,7 @@ func (p *Person) resolveLongtermCard(mm [90]*YearMatrix) error {
 	return nil
 }
 
-func (p *Person) resolveCurrentYearMatrix(mm [90]*YearMatrix) error {
-	// age := time.Now().Year() - p.Birthday.Year()
+func (p *Person) resolveCurrentYearMatrix(mm *[90]*YearMatrix) error {
 	age := uint8(time.Since(p.Birthday).Hours() / 24 / 365)
 	ym := mm[age]
 
@@ -157,20 +188,22 @@ func (p *Person) resolvePlutoCards() error {
 	return nil
 }
 
-func (p *Person) resolveEnvironment(t time.Time, od *Deck, mm [90]*YearMatrix, om *Matrix, env map[string]time.Time) error {
+func (p *Person) resolveEnvironment(pc *PersonConfig, loc *Locale) error {
 	var err error
 	var person *Person
+
+	env := pc.Environment
 
 	if env == nil {
 		return nil
 	}
 
-	for k, v := range env {
-		if person, err = NewPerson(v, od, mm, om, nil, nil); err != nil {
+	for i, v := range env {
+		if person, err = NewPerson(v, loc); err != nil {
 			log.Printf("Unable to build new person when resolving env: %v", err)
 		}
 
-		p.Environment[k] = person
+		p.Environment[i] = person
 	}
 
 	return nil
@@ -178,7 +211,6 @@ func (p *Person) resolveEnvironment(t time.Time, od *Deck, mm [90]*YearMatrix, o
 
 func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle) error {
 	var r [7]*Card
-	// var cpc [7]*PlanetCycle
 	var err error
 
 	if r, err = p.Matrices.Current.Decks.Main.GetHRow(p.Cards.Main); err != nil {
