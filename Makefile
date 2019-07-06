@@ -46,6 +46,9 @@ mem-prof:
 	go tool pprof -top $(TMP)/predictor-main $(TMP)/mem.pprof
 	@rm -rf $(TMP)
 
+tests:
+	ginkgo ./internal/core
+
 # .PHONY: all
 
 # all: build

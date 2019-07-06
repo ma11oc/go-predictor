@@ -111,6 +111,15 @@ func (l *Locale) GetCardByID(id uint8) (*Card, error) {
 	return &card, nil
 }
 
+/*
+ * func (l *Locale) GetCardByString(s string) (*Card, error) {
+ *     if len(s) < 2 || len(s) > 3 {
+ *         return nil, fmt.Errorf("Wrong string length for card has been specified: %v", s)
+ *     }
+ *     FIXME
+ * }
+ */
+
 func (l *Locale) Validate() error {
 	if errs := validator.Validate(l); errs != nil {
 		return errs

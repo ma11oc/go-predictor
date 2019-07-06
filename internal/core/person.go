@@ -59,7 +59,8 @@ func NewPerson(pconf *PersonConfig, loc *Locale) (*Person, error) {
 		Environment: make([]*Person, len(env)),
 	}
 
-	// handle joker
+	// In case of Joker, there is nothing to resolve. It has only Main card
+	// with special meaning. So, handle this special case and return struct.
 	if pconf.Birthday.Month() == time.December && pconf.Birthday.Day() == 31 {
 		p.Cards.Main = loc.Exceptions.Joker
 
