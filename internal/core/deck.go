@@ -48,15 +48,15 @@ func NewDeckFromSlice(s [52]uint8, od *Deck) (*Deck, error) {
 	d := &Deck{}
 
 	for i := uint(0); i < 52; i++ {
-		if d.Cards[i], err = od.GetCardByNumber(s[i]); err != nil {
+		if d.Cards[i], err = od.FindCardByNumber(s[i]); err != nil {
 			return nil, err
 		}
 	}
 	return d, nil
 }
 
-// GetCardByNumber returns appropriate card from a deck
-func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
+// FindCardByNumber returns appropriate card from a deck
+func (d Deck) FindCardByNumber(n uint8) (*Card, error) {
 	if n <= 0 || n > 52 {
 		return nil, fmt.Errorf("Invalid card number: %d", n)
 	}
@@ -70,7 +70,7 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 	return nil, fmt.Errorf("No such card with number %v was found in the deck", n)
 }
 
-// GetCardByBirthday returns appropriate card from a deck
+// FindCardByBirthday returns appropriate card from a deck
 //
 //     | Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec
 //  ---+-----------------------------------------------------------
@@ -105,18 +105,18 @@ func (d Deck) GetCardByNumber(n uint8) (*Card, error) {
 //  29 |  J♣   9♣   7♣   5♣   3♣   A♣   Q♥  10♥   8♥   6♥   4♥   2♥
 //  30 | 10♣        6♣   4♣   2♣   K♥   J♥   9♥   7♥   5♥   3♥   A♥
 //  31 |  9♣        5♣        A♣       10♥   8♥        4♥        🃏
-func (d Deck) GetCardByBirthday(t time.Time) (*Card, error) {
+func (d Deck) FindCardByBirthday(t time.Time) (*Card, error) {
 	idx := 54 - (t.Day() + (int(t.Month()) * 2)) + 1
 
 	if idx <= 0 || idx > 52 {
 		return nil, fmt.Errorf("Got invalid card number `%v` for birthday: %v", idx, t)
 	}
 
-	return d.GetCardByNumber(uint8(idx))
+	return d.FindCardByNumber(uint8(idx))
 }
 
-// GetCardByIndex returns appropriate card from a deck
-func (d Deck) GetCardByIndex(i uint8) (*Card, error) {
+// FindCardByIndex returns appropriate card from a deck
+func (d Deck) FindCardByIndex(i uint8) (*Card, error) {
 	var c *Card
 
 	if c = d.Cards[i]; c == nil {
@@ -156,7 +156,7 @@ func (d Deck) AsUnicode() [52]string {
 	return s
 }
 
-func (d Deck) GetHRow(c *Card) ([7]*Card, error) {
+func (d Deck) CalcHRow(c *Card) ([7]*Card, error) {
 	var row [7]*Card
 	var ci uint8 // card index
 	var err error
@@ -177,7 +177,7 @@ func (d Deck) GetHRow(c *Card) ([7]*Card, error) {
 	return row, nil
 }
 
-// GetVRow ...
+// CalcVRow ...
 // 6: [48, 41, 34, 27, 20, 13, 6]      [-1, -8,  -15, ...]
 // 5: [47, 40, 33, 26, 19, 12, 5]      [-2, -9,  -16, ...]
 // 4: [46, 39, 32, 25, 18, 11, 4, 51]  [-3, -10, -17, ...]
@@ -185,7 +185,7 @@ func (d Deck) GetHRow(c *Card) ([7]*Card, error) {
 // 2: [44, 37, 30, 23, 16, 9,  2, 49]  [-5, -12, -19, ...]
 // 1: [43, 36, 29, 22, 15, 8,  1]      [-6, -13, -20, ...]
 // 0: [42, 35, 28, 21, 14, 7,  0]      [-7, -14, -21, ...]
-func (d Deck) GetVRow(c *Card) ([7]*Card, error) {
+func (d Deck) CalcVRow(c *Card) ([7]*Card, error) {
 	var row [7]*Card
 	var ci uint8 // card index
 	var err error

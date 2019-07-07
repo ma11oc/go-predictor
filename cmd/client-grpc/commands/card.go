@@ -36,7 +36,7 @@ var cardCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		d, err := time.Parse("2006-01-02", cmd.Flags().Lookup("birthday").Value.String())
 
-		r, err := predictorClient.GetCardByBirthday(ctx, &pb.Date{
+		r, err := predictorClient.FindCardByBirthday(ctx, &pb.Date{
 			Year:  uint32(d.Year()),
 			Month: uint32(d.Month()),
 			Day:   uint32(d.Day()),

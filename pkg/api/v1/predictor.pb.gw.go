@@ -46,7 +46,7 @@ func request_Predictor_GetBaseMatrix_0(ctx context.Context, marshaler runtime.Ma
 
 }
 
-func request_Predictor_GetCardByBirthday_0(ctx context.Context, marshaler runtime.Marshaler, client PredictorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_Predictor_FindCardByBirthday_0(ctx context.Context, marshaler runtime.Marshaler, client PredictorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq Date
 	var metadata runtime.ServerMetadata
 
@@ -58,7 +58,7 @@ func request_Predictor_GetCardByBirthday_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetCardByBirthday(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.FindCardByBirthday(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -121,7 +121,7 @@ func RegisterPredictorHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 
 	})
 
-	mux.Handle("POST", pattern_Predictor_GetCardByBirthday_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_Predictor_FindCardByBirthday_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -130,14 +130,14 @@ func RegisterPredictorHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Predictor_GetCardByBirthday_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Predictor_FindCardByBirthday_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Predictor_GetCardByBirthday_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Predictor_FindCardByBirthday_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -147,11 +147,11 @@ func RegisterPredictorHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 var (
 	pattern_Predictor_GetBaseMatrix_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "echo"}, ""))
 
-	pattern_Predictor_GetCardByBirthday_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "card"}, ""))
+	pattern_Predictor_FindCardByBirthday_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "card"}, ""))
 )
 
 var (
 	forward_Predictor_GetBaseMatrix_0 = runtime.ForwardResponseMessage
 
-	forward_Predictor_GetCardByBirthday_0 = runtime.ForwardResponseMessage
+	forward_Predictor_FindCardByBirthday_0 = runtime.ForwardResponseMessage
 )

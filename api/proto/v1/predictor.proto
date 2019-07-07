@@ -16,7 +16,7 @@ service Predictor {
       };
     };
 
-  rpc GetCardByBirthday(Date) returns (Card) {
+  rpc FindCardByBirthday(Date) returns (Card) {
     option (google.api.http) = {
       post: "/v1/card"
       body: "*"

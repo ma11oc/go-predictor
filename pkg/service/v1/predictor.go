@@ -58,7 +58,7 @@ func (s *predictorServer) GetBaseMatrix(ctx context.Context, e *empty.Empty) (*p
 	}, nil
 }
 
-func (s *predictorServer) GetCardByBirthday(ctx context.Context, date *pb.Date) (*pb.Card, error) {
+func (s *predictorServer) FindCardByBirthday(ctx context.Context, date *pb.Date) (*pb.Card, error) {
 	d := time.Date(int(date.Year), time.Month(int(date.Month)), int(date.Day), 0, 0, 0, 0, time.UTC)
 	fmt.Printf("got birthday: %v\n", d)
 
@@ -66,7 +66,7 @@ func (s *predictorServer) GetCardByBirthday(ctx context.Context, date *pb.Date) 
 		return nil, status.Error(codes.Unknown, "index out of range")
 	}
 
-	card := core.GetCardByBirthday(&d)
+	card := core.FindCardByBirthday(&d)
 
 	return &pb.Card{
 		Number: uint32(card.Order),

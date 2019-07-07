@@ -220,7 +220,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type PredictorClient interface {
 	GetBaseMatrix(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*Matrix, error)
-	GetCardByBirthday(ctx context.Context, in *Date, opts ...grpc.CallOption) (*Card, error)
+	FindCardByBirthday(ctx context.Context, in *Date, opts ...grpc.CallOption) (*Card, error)
 }
 
 type predictorClient struct {
@@ -240,9 +240,9 @@ func (c *predictorClient) GetBaseMatrix(ctx context.Context, in *empty.Empty, op
 	return out, nil
 }
 
-func (c *predictorClient) GetCardByBirthday(ctx context.Context, in *Date, opts ...grpc.CallOption) (*Card, error) {
+func (c *predictorClient) FindCardByBirthday(ctx context.Context, in *Date, opts ...grpc.CallOption) (*Card, error) {
 	out := new(Card)
-	err := c.cc.Invoke(ctx, "/predictor.Predictor/GetCardByBirthday", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/predictor.Predictor/FindCardByBirthday", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +252,7 @@ func (c *predictorClient) GetCardByBirthday(ctx context.Context, in *Date, opts 
 // PredictorServer is the server API for Predictor service.
 type PredictorServer interface {
 	GetBaseMatrix(context.Context, *empty.Empty) (*Matrix, error)
-	GetCardByBirthday(context.Context, *Date) (*Card, error)
+	FindCardByBirthday(context.Context, *Date) (*Card, error)
 }
 
 func RegisterPredictorServer(s *grpc.Server, srv PredictorServer) {
@@ -277,20 +277,20 @@ func _Predictor_GetBaseMatrix_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Predictor_GetCardByBirthday_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Predictor_FindCardByBirthday_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Date)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PredictorServer).GetCardByBirthday(ctx, in)
+		return srv.(PredictorServer).FindCardByBirthday(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/predictor.Predictor/GetCardByBirthday",
+		FullMethod: "/predictor.Predictor/FindCardByBirthday",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PredictorServer).GetCardByBirthday(ctx, req.(*Date))
+		return srv.(PredictorServer).FindCardByBirthday(ctx, req.(*Date))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -304,8 +304,8 @@ var _Predictor_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Predictor_GetBaseMatrix_Handler,
 		},
 		{
-			MethodName: "GetCardByBirthday",
-			Handler:    _Predictor_GetCardByBirthday_Handler,
+			MethodName: "FindCardByBirthday",
+			Handler:    _Predictor_FindCardByBirthday_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

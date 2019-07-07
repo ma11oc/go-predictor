@@ -97,7 +97,7 @@ func NewAngelsMatrix(om *Matrix, od *Deck) *Matrix {
 		if idx, err = om.Decks.Main.indexOf(i + 1); err != nil {
 			panic(err)
 		}
-		if dd.Cards[i], err = od.GetCardByNumber(idx + 1); err != nil {
+		if dd.Cards[i], err = od.FindCardByNumber(idx + 1); err != nil {
 			panic(err)
 		}
 	}

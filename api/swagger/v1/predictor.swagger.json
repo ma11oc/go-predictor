@@ -17,7 +17,7 @@
   "paths": {
     "/v1/card": {
       "post": {
-        "operationId": "GetCardByBirthday",
+        "operationId": "FindCardByBirthday",
         "responses": {
           "200": {
             "description": "A successful response.",

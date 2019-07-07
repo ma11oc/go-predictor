@@ -99,7 +99,7 @@ func (p *Person) resolveMainCards(od *Deck, hm *Matrix) error {
 	var err error
 	var idx uint8
 
-	if p.Cards.Main, err = od.GetCardByBirthday(p.Birthday); err != nil {
+	if p.Cards.Main, err = od.FindCardByBirthday(p.Birthday); err != nil {
 		return err
 	}
 
@@ -107,11 +107,11 @@ func (p *Person) resolveMainCards(od *Deck, hm *Matrix) error {
 		return err
 	}
 
-	if p.Cards.Drain, err = hm.Decks.Drain.GetCardByIndex(idx); err != nil {
+	if p.Cards.Drain, err = hm.Decks.Drain.FindCardByIndex(idx); err != nil {
 		return err
 	}
 
-	if p.Cards.Source, err = hm.Decks.Source.GetCardByIndex(idx); err != nil {
+	if p.Cards.Source, err = hm.Decks.Source.FindCardByIndex(idx); err != nil {
 		return err
 	}
 
@@ -134,7 +134,7 @@ func (p *Person) resolveLongtermCard(mm *[90]*YearMatrix) error {
 		idx -= 52
 	}
 
-	if p.Cards.Longterm, err = ym.Matrix.Decks.Main.GetCardByIndex(idx); err != nil {
+	if p.Cards.Longterm, err = ym.Matrix.Decks.Main.FindCardByIndex(idx); err != nil {
 		return err
 	}
 
@@ -172,7 +172,7 @@ func (p *Person) resolvePlutoCards() error {
 
 	idx += 8
 
-	if p.Cards.Pluto, err = p.Matrices.Current.Decks.Main.GetCardByIndex(idx); err != nil {
+	if p.Cards.Pluto, err = p.Matrices.Current.Decks.Main.FindCardByIndex(idx); err != nil {
 		return err
 	}
 
@@ -182,7 +182,7 @@ func (p *Person) resolvePlutoCards() error {
 
 	idx++
 
-	if p.Cards.PlutoResult, err = p.Matrices.Current.Decks.Main.GetCardByIndex(idx); err != nil {
+	if p.Cards.PlutoResult, err = p.Matrices.Current.Decks.Main.FindCardByIndex(idx); err != nil {
 		return err
 	}
 
@@ -214,7 +214,7 @@ func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle) error {
 	var r [7]*Card
 	var err error
 
-	if r, err = p.Matrices.Current.Decks.Main.GetHRow(p.Cards.Main); err != nil {
+	if r, err = p.Matrices.Current.Decks.Main.CalcHRow(p.Cards.Main); err != nil {
 		return err
 	}
 
