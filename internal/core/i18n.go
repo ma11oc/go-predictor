@@ -97,7 +97,7 @@ func isParsableLanguageTag(v interface{}, param string) error {
  * }
  */
 
-func (l *Locale) GetCardByID(id uint8) (*Card, error) {
+func (l *Locale) FindCardByID(id uint8) (*Card, error) {
 	if id <= 0 || id > 52 {
 		return nil, fmt.Errorf("Wrong id has been specified: %v", id)
 	}
@@ -111,14 +111,22 @@ func (l *Locale) GetCardByID(id uint8) (*Card, error) {
 	return &card, nil
 }
 
-/*
- * func (l *Locale) GetCardByString(s string) (*Card, error) {
- *     if len(s) < 2 || len(s) > 3 {
- *         return nil, fmt.Errorf("Wrong string length for card has been specified: %v", s)
- *     }
- *     FIXME
- * }
- */
+func (l *Locale) FindCardByStr(s string) (*Card, error) {
+	runes := []rune(s)
+
+	if len(runes) < 2 || len(runes) > 3 {
+		return nil, fmt.Errorf("Unable to find card: invalid length of string '%v': %v", s, len(s))
+	}
+
+	// FIXME: we should rely on the correct order of cards in a locale
+	for _, card := range l.Cards {
+		if card.Rank == string(runes[:len(runes)-1]) && card.Suit == string(runes[len(runes)-1:]) {
+			return &card, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Failed to find card `%s` in the locale", s)
+}
 
 func (l *Locale) Validate() error {
 	if errs := validator.Validate(l); errs != nil {
