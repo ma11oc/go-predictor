@@ -2,21 +2,11 @@ syntax = "proto3";
 
 package predictor;
 
-import "google/protobuf/empty.proto";
-import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 
-// TODO: api version
-// TODO: accept language
-service Predictor {
-  rpc GetBaseMatrix(google.protobuf.Empty) returns (Matrix) {
-    option (google.api.http) = {
-        post: "/v1/echo"
-        body: "*"
-      };
-    };
 
-  rpc FindCardByBirthday(Date) returns (Card) {
+service PredictorService {
+  rpc FindCardByBirthday(CardRequest) returns (CardResponse) {
     option (google.api.http) = {
       post: "/v1/card"
       body: "*"
@@ -24,18 +14,45 @@ service Predictor {
   };
 }
 
-message Date {
-  uint32 year = 1;
-  uint32 month = 2;
-  uint32 day = 3;
+
+message PersonConfig {
+  enum Gender {
+    OTHER = 0;
+    MALE = 1;
+    FEMALE = 2;
+  }
+
+  enum Features {
+    NOT_SPECIFIED = 0x0;
+    BUSINESS_OWNER = 0x01;
+    CREATOR = 0x02;
+  }
+
+  string name = 3;
+  Gender gender = 4;
+  string birthday = 5;
+
+  uint32 features = 6;
+
+  repeated PersonConfig environment = 7;
 }
 
 message Card {
-  uint32 number = 1;
-  string suite = 2;
-  string rank = 3;
+  /* uint32 number = 1; */
+  /* string suite = 2; */
+  /* string rank = 3; */
 }
 
-message Matrix {
-  google.protobuf.ListValue m = 1;
+message CardRequest {
+  string api = 1;
+  string lang = 2;
+
+  PersonConfig personConfig = 3;
+}
+
+message CardResponse {
+  string api = 1;
+  string lang = 2;
+
+  Card card = 3;
 }

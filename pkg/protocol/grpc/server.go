@@ -7,14 +7,15 @@ import (
 	"os/signal"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
 	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
 	"bitbucket.org/shchukin_a/go-predictor/pkg/protocol/grpc/middleware"
 )
 
-// RunServer runs gRPC service to publish ToDo service
-func RunServer(ctx context.Context, v1API v1.PredictorServer, port string) error {
+// RunServer runs gRPC service to publish Predictor service
+func RunServer(ctx context.Context, v1API v1.PredictorServiceServer, port string) error {
 	listen, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
@@ -28,7 +29,11 @@ func RunServer(ctx context.Context, v1API v1.PredictorServer, port string) error
 
 	// register service
 	server := grpc.NewServer(opts...)
-	v1.RegisterPredictorServer(server, v1API)
+	v1.RegisterPredictorServiceServer(server, v1API)
+
+	// Register reflection service on gRPC server.
+	// FIXME: must be removed on prod
+	reflection.Register(server)
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)

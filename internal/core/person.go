@@ -6,25 +6,56 @@ import (
 	"time"
 )
 
-type Bit uint8
+/*
+ * func init() {
+ *     validator.SetValidationFunc("gender", isValidGender)
+ * }
+ */
+
+type Gender uint8
 
 const (
-	Male Bit = 1 << iota
-	Female
-	Other
+	OTHER Gender = iota
+	MALE
+	FEMALE
+)
+
+type Features uint8
+
+const (
+	BusinessOwner Features = 1 << iota
+	Creator
 )
 
 type PersonConfig struct {
-	Name        string
-	Gender      Bit
-	Birthday    time.Time
-	Environment []*PersonConfig
+	Name        string          `yaml:"name"        validate:"nonzero"`
+	Gender      Gender          `yaml:"gender"      validate:"min=0,max=2"`
+	Birthday    time.Time       `yaml:"birthday"    validate:"nonzero"`
+	Features    Features        `yaml:"features"    validate:"min=0,max=3"`
+	Environment []*PersonConfig `yaml:"environment"`
 }
+
+/*
+ * // Make sure a value of a field is parsable by language.Parse()
+ * func isValidFeatures(v interface{}, param string) error {
+ *     st := reflect.ValueOf(v)
+ *     if st.Kind() != reflect.Uint8 {
+ *         return validator.ErrUnsupported
+ *
+ *     }
+ *
+ *     if v != MALE && v != FEMALE {
+ *         return fmt.Errorf("Gender other than 'male' or 'female' doesn't supported")
+ *     }
+ *
+ *     return nil
+ * }
+ */
 
 type Person struct {
 	Name     string
-	Gender   Bit
-	Birthday time.Time `yaml:"birthday" valid:"nonzero"`
+	Gender   Gender
+	Birthday time.Time
 	Cards    struct {
 		Main        *Card
 		Drain       *Card
@@ -233,5 +264,26 @@ func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle) error {
 		p.PlanetCycles[i].Card = v
 	}
 
+	return nil
+}
+
+// Men:
+//   - in spite of age, each man has Jack with the same Suit as his main card,
+//     except the case when a man already has Jack with the same Suit
+//     as a main card
+//   - if a man over 36 years old, he has King with the same Suit
+//   - if a man is a business owner with at least 2 employees and more,
+//     or a man is a chief (behaves like a chief) he has King with the same Suit
+// Women:
+//   - women may have up to 3 personal cards at the same time
+//   - in spite of age, each woman has Queen with the same Suit as her main card
+//     except the case when a woman already has Queen with the same Suit
+//     as a main card
+//   - if a woman is an actress, a writer or an artist, she has the Jack with
+//     the same Suit
+//   - if a woman is a business owner with at least 2 employees and more,
+//     or a woman is a chief (behaves like a chief) she has King with the same Suit
+//   - women younger than 20 years old has Jack with the same Suit
+func (p *Person) resolvePersonalCards(pc *PersonConfig, loc *Locale) error {
 	return nil
 }

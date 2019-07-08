@@ -1,11 +1,10 @@
 SHELL := /bin/bash
-TMP:=$(shell /usr/bin/mktemp -d)
 
 build-server:
 	go build -o bin/predictor cmd/server/main.go
 
 server: build-server
-	./bin/predictor -grpc-port 50051 -http-port 8080
+	./bin/predictor -grpc-port 50051 -http-port 8080 -locale locales/ru-RU.yaml
 
 
 build-client:
@@ -16,6 +15,7 @@ client: build-client
 
 
 proto:
+	$(eval TMP := $(shell mktemp -d))
 	@protoc -I/usr/local/include -I. \
 		-I$(GOPATH)/src \
 		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
@@ -41,6 +41,7 @@ cpu-prof:
 	go tool pprof --pdf ~/go/bin/yourbinary /var/path/to/cpu.pprof > file.pdf
 
 mem-prof:
+	$(eval TMP := $(shell mktemp -d))
 	PPROF_TMPDIR=$(TMP) go build -o $(TMP)/predictor-main main.go
 	PPROF_TMPDIR=$(TMP) $(TMP)/predictor-main 1>/dev/null
 	go tool pprof -top $(TMP)/predictor-main $(TMP)/mem.pprof
