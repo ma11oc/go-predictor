@@ -4,12 +4,14 @@ import (
 	"time"
 )
 
+// Planet represents a planet primitive
 type Planet struct {
 	ID     uint8  `yaml:"id"      validate:"min=1,max=7"`
 	Name   string `yaml:"name"    validate:"nonzero"`
 	Symbol string `yaml:"symbol"  validate:"nonzero,regexp=^(☿|♀|♂|♃|♄|♅|♆)$"`
 }
 
+// PlanetCycle represents a planet cycle primitive
 type PlanetCycle struct {
 	Card   *Card
 	Planet *Planet
@@ -17,6 +19,8 @@ type PlanetCycle struct {
 	End    time.Time
 }
 
+// NewBunchOfPlanetCycles returns matrix with planet cycles during a year
+// See README.md > Appendix > Planet Cycles
 func NewBunchOfPlanetCycles() *[7][54]*PlanetCycle {
 	d := time.Date(1999, 12, 31, 0, 0, 0, 0, time.UTC)
 	m := [7][54]*PlanetCycle{}
@@ -54,10 +58,10 @@ func NewBunchOfPlanetCycles() *[7][54]*PlanetCycle {
  * }
  */
 
+// GetCurrentPlanetCycles calculates planet cycles according to birthday
+// and returns array with them
 func GetCurrentPlanetCycles(t time.Time, pc *[7][54]*PlanetCycle, planets *[7]*Planet) *[7]*PlanetCycle {
-	// just add 52 days from birthday 7 times
-
-	if pc == nil {
+	if pc == nil || planets == nil {
 		return nil
 	}
 
@@ -69,6 +73,7 @@ func GetCurrentPlanetCycles(t time.Time, pc *[7][54]*PlanetCycle, planets *[7]*P
 	x := int(days / 54)
 	y := int(days+x*2) % 54
 
+	// just add 52 days from birthday 7 times
 	for i := 0; i < 7; i++ {
 		if x+i+1 >= 7 {
 			x = (i + 1) * -1
