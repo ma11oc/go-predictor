@@ -6,27 +6,39 @@ import (
 	"time"
 )
 
-/*
- * func init() {
- *     validator.SetValidationFunc("gender", isValidGender)
- * }
- */
-
+// Gender could be one of Other, Male, Female.type Gender uint8
 type Gender uint8
 
 const (
-	OTHER Gender = iota
-	MALE
-	FEMALE
+	// Other actually doesn't make any sense for predictions
+	Other Gender = iota
+
+	// Male for men
+	Male
+
+	// Female for women
+	Female
 )
 
+// Features represents qualities of a person which is very important
+// for predictions.
+// Could be one of:
+//   - BusinessOwner 0x01
+//   - Creator       0x02
+// Several features can be set simultaneously and be checked like:
+//   features|BusinessOwner != 0
 type Features uint8
 
 const (
+	// BusinessOwner means businessmen/businesswomen or
+	// chief with more than 1 empleyee
 	BusinessOwner Features = 1 << iota
+
+	// Creator means actress, writer or artist.
 	Creator
 )
 
+// PersonConfig represents a minimum piece of information, required for prediction
 type PersonConfig struct {
 	Name        string          `yaml:"name"        validate:"nonzero"`
 	Gender      Gender          `yaml:"gender"      validate:"min=0,max=2"`
@@ -35,6 +47,7 @@ type PersonConfig struct {
 	Environment []*PersonConfig `yaml:"environment"`
 }
 
+// Person contains all the information required for prediction
 type Person struct {
 	Name     string
 	Gender   Gender
@@ -57,6 +70,8 @@ type Person struct {
 	}
 }
 
+// NewPerson returns pointer to a resolved Person, based on PersonConfig
+// and Locale
 func NewPerson(pconf *PersonConfig, loc *Locale) (*Person, error) {
 	var err error
 
@@ -232,7 +247,7 @@ func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle, planets *[7]*Plane
 		return err
 	}
 
-	if pc == nil {
+	if pc == nil || planets == nil {
 		return nil
 	}
 
