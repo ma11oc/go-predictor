@@ -43,7 +43,8 @@ type Locale struct {
 	Exceptions struct {
 		Joker *Card
 	}
-	Cards []Card `yaml:"cards" validate:"len=52"`
+	Cards   []Card      `yaml:"cards"   validate:"len=52"`
+	Planets *[7]*Planet `yaml:"planets" validate:"len=7"`
 }
 
 func (l Locale) GetOrderedDeck() *Deck {
@@ -163,7 +164,7 @@ func NewLocale(p string) (*Locale, error) {
 	return loc, nil
 }
 
-func BuildLocales(paths ...string) Locales {
+func MustBuildLocales(paths ...string) Locales {
 	var loc *Locale
 	var err error
 

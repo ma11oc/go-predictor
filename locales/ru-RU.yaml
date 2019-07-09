@@ -39,6 +39,29 @@ exceptions:
       result:
         <<: *default_meaning
 
+planets:
+  - id: 1
+    name: Меркурий
+    symbol: ☿
+  - id: 2
+    name: Венера
+    symbol: ♀
+  - id: 3
+    name: Марс
+    symbol: ♂
+  - id: 4
+    name: Юпитер
+    symbol: ♃
+  - id: 5
+    name: Сатурн
+    symbol: ♄
+  - id: 6
+    name: Уран
+    symbol: ♅
+  - id: 7
+    name: Нептун
+    symbol: ♆
+
 cards:
   - id: 1
     rank: A

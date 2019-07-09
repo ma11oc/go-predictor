@@ -21,7 +21,7 @@ var (
 		23, 34, 52,
 	}
 
-	locales = core.BuildLocales("../../locales/ru-RU.yaml")
+	locales = core.MustBuildLocales("../../locales/ru-RU.yaml")
 	lang    = language.Make("ru-RU")
 	locale  = locales[lang]
 

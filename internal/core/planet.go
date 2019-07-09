@@ -4,11 +4,10 @@ import (
 	"time"
 )
 
-// TODO: Symbol is a rune
 type Planet struct {
-	ID     uint8
-	Name   string
-	Symbol string
+	ID     uint8  `yaml:"id"      validate:"min=1,max=7"`
+	Name   string `yaml:"name"    validate:"nonzero"`
+	Symbol string `yaml:"symbol"  validate:"nonzero,regexp=^(☿|♀|♂|♃|♄|♅|♆)$"`
 }
 
 type PlanetCycle struct {
@@ -17,56 +16,6 @@ type PlanetCycle struct {
 	Start  time.Time
 	End    time.Time
 }
-
-// https://en.wikipedia.org/wiki/Astrological_symbols
-// Transpluto \u2be8
-
-var (
-	Planets = [7]*Planet{
-		&Planet{
-			ID:     1,
-			Name:   "mercury",
-			Symbol: "\u263f", // ☿
-		},
-		&Planet{
-			ID:     2,
-			Name:   "venus",
-			Symbol: "\u2640", // ♀
-		},
-		&Planet{
-			ID:     3,
-			Name:   "mars",
-			Symbol: "\u2642", // ♂
-		},
-		&Planet{
-			ID:     4,
-			Name:   "jupiter",
-			Symbol: "\u2643", // ♃
-		},
-		&Planet{
-			ID:     5,
-			Name:   "saturn",
-			Symbol: "\u2644", // ♄
-		},
-		&Planet{
-			ID:     6,
-			Name:   "uranus",
-			Symbol: "\u2645", // ♅
-		},
-		&Planet{
-			ID:     7,
-			Name:   "neptune",
-			Symbol: "\u2646", // ♆
-		},
-		/*
-		 * &Planet{
-		 *     ID:  8,
-		 *     Name:   "pluto",
-		 *     Symbol: "\u2647", // ♇
-		 * },
-		 */
-	}
-)
 
 func date(year, month, day int) time.Time {
 	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
@@ -163,7 +112,7 @@ func NewBunchOfPlanetCycles() *[7][54]*PlanetCycle {
  * }
  */
 
-func GetCurrentPlanetCycles(t time.Time, pc *[7][54]*PlanetCycle) *[7]*PlanetCycle {
+func GetCurrentPlanetCycles(t time.Time, pc *[7][54]*PlanetCycle, planets *[7]*Planet) *[7]*PlanetCycle {
 	// just add 52 days from birthday 7 times
 
 	if pc == nil {
@@ -184,7 +133,7 @@ func GetCurrentPlanetCycles(t time.Time, pc *[7][54]*PlanetCycle) *[7]*PlanetCyc
 		}
 
 		r[i] = (*pc)[x+i+1][y]
-		r[i].Planet = Planets[i]
+		r[i].Planet = planets[i]
 	}
 
 	return &r

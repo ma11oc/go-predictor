@@ -35,23 +35,6 @@ type PersonConfig struct {
 	Environment []*PersonConfig `yaml:"environment"`
 }
 
-/*
- * // Make sure a value of a field is parsable by language.Parse()
- * func isValidFeatures(v interface{}, param string) error {
- *     st := reflect.ValueOf(v)
- *     if st.Kind() != reflect.Uint8 {
- *         return validator.ErrUnsupported
- *
- *     }
- *
- *     if v != MALE && v != FEMALE {
- *         return fmt.Errorf("Gender other than 'male' or 'female' doesn't supported")
- *     }
- *
- *     return nil
- * }
- */
-
 type Person struct {
 	Name     string
 	Gender   Gender
@@ -119,7 +102,7 @@ func NewPerson(pconf *PersonConfig, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
-	if err = p.resolvePlanetCycles(pc); err != nil {
+	if err = p.resolvePlanetCycles(pc, loc.Planets); err != nil {
 		return nil, err
 	}
 
@@ -241,7 +224,7 @@ func (p *Person) resolveEnvironment(pc *PersonConfig, loc *Locale) error {
 	return nil
 }
 
-func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle) error {
+func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle, planets *[7]*Planet) error {
 	var r [7]*Card
 	var err error
 
@@ -253,7 +236,7 @@ func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle) error {
 		return nil
 	}
 
-	cpc := GetCurrentPlanetCycles(p.Birthday, pc)
+	cpc := GetCurrentPlanetCycles(p.Birthday, pc, planets)
 
 	for i, v := range r {
 		if v == nil {
