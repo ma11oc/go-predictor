@@ -27,6 +27,8 @@ var (
 	}
 )
 
+// Locale is a fundamental primitive. It contains all the descriptions
+// required for any prediction
 type Locale struct {
 	Lang string `yaml:"lang" validate:"nonzero,langstr"`
 	Base struct {
@@ -47,26 +49,32 @@ type Locale struct {
 	Planets *[7]*Planet `yaml:"planets" validate:"len=7"`
 }
 
+// GetOrderedDeck is ordered Deck getter
 func (l Locale) GetOrderedDeck() *Deck {
 	return l.Base.od
 }
 
+// GetYearMatrices is Year Matrices getter
 func (l Locale) GetYearMatrices() *[90]*YearMatrix {
 	return l.Base.mm
 }
 
+// GetOriginMatrix is Origin Matrix getter
 func (l Locale) GetOriginMatrix() *Matrix {
 	return l.Base.om
 }
 
+// GetHumansMatrix is Humans Matrix getter
 func (l Locale) GetHumansMatrix() *Matrix {
 	return l.Base.hm
 }
 
+// GetAngelsMatrix is Angels Matrix getter
 func (l Locale) GetAngelsMatrix() *Matrix {
 	return l.Base.am
 }
 
+// Locales contains all the available and loaded Locales
 type Locales map[language.Tag]*Locale
 
 // Make sure a value of a field is parsable by language.Parse()
@@ -98,6 +106,7 @@ func isParsableLanguageTag(v interface{}, param string) error {
  * }
  */
 
+// FindCardByID receives a number (id) of card and returns appropriate *Card from Locale
 func (l *Locale) FindCardByID(id uint8) (*Card, error) {
 	if id <= 0 || id > 52 {
 		return nil, fmt.Errorf("Wrong id has been specified: %v", id)
@@ -112,6 +121,7 @@ func (l *Locale) FindCardByID(id uint8) (*Card, error) {
 	return &card, nil
 }
 
+// FindCardByStr receives string like 'K♠' and returns appropriate *Card from Locale
 func (l *Locale) FindCardByStr(s string) (*Card, error) {
 	runes := []rune(s)
 
@@ -129,6 +139,7 @@ func (l *Locale) FindCardByStr(s string) (*Card, error) {
 	return nil, fmt.Errorf("Failed to find card `%s` in the locale", s)
 }
 
+// Validate Locale
 func (l *Locale) Validate() error {
 	if errs := validator.Validate(l); errs != nil {
 		return errs
@@ -136,6 +147,8 @@ func (l *Locale) Validate() error {
 	return nil
 }
 
+// NewLocale reads file with locale, tries to unmarshall it and on success
+// returns *Locale
 func NewLocale(p string) (*Locale, error) {
 	var content []byte
 	var err error
@@ -164,6 +177,8 @@ func NewLocale(p string) (*Locale, error) {
 	return loc, nil
 }
 
+// MustBuildLocales returnes Locales (map[language.Tag]*Locale) or raises panic
+// It doesn't make sense to continue without locales
 func MustBuildLocales(paths ...string) Locales {
 	var loc *Locale
 	var err error
