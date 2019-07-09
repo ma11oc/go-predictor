@@ -5,16 +5,6 @@ package predictor;
 import "google/api/annotations.proto";
 
 
-service PredictorService {
-  rpc FindCardByBirthday(CardRequest) returns (CardResponse) {
-    option (google.api.http) = {
-      post: "/v1/card"
-      body: "*"
-    };
-  };
-}
-
-
 message PersonConfig {
   enum Gender {
     OTHER = 0;
@@ -28,31 +18,78 @@ message PersonConfig {
     CREATOR = 0x02;
   }
 
-  string name = 3;
-  Gender gender = 4;
-  string birthday = 5;
+  string name                       = 3;
+  Gender gender                     = 4;
+  string birthday                   = 5;
 
-  uint32 features = 6;
+  uint32 features                   = 6;
 
   repeated PersonConfig environment = 7;
 }
 
-message Card {
-  /* uint32 number = 1; */
-  /* string suite = 2; */
-  /* string rank = 3; */
+message Meaning {
+  string keywords    = 1;
+  string description = 2;
 }
 
-message CardRequest {
-  string api = 1;
-  string lang = 2;
+message Card {
+  uint32 id       = 1;
+  string rank     = 2;
+  string suit     = 3;
+  string title    = 4;
+
+  // Only one meaning according to a context (e.g. longterm, pluto and so on)
+  Meaning meaning = 5;
+  // map<string, Meaning> meanings = 5;
+}
+
+message Planet {
+  uint32 id     = 1;
+  string name   = 2;
+  string symbol = 3;
+}
+
+message PlanetCycleDate {
+  uint32 month = 1;
+  uint32 day   = 2;
+}
+
+message PlanetCycle {
+	Card card             = 1;
+	Planet planet         = 2;
+	PlanetCycleDate start = 3;
+	PlanetCycleDate end   = 4;
+}
+
+message GeneralRequest {
+  string api                = 1;
+  string lang               = 2;
 
   PersonConfig personConfig = 3;
 }
 
 message CardResponse {
-  string api = 1;
+  string api  = 1;
   string lang = 2;
 
-  Card card = 3;
+  Card card   = 3;
+}
+
+message PredictionResponse {
+  string api                        = 1;
+  string lang                       = 2;
+
+  repeated PlanetCycle planetCycles = 3;
+  map<string, Card> cards           = 4;
+}
+
+
+service PredictorService {
+  rpc GetGeneralPrediction(GeneralRequest) returns (PredictionResponse) {
+    option (google.api.http) = {
+      post: "/v1/predict"
+      body: "*"
+    };
+  };
+
 }

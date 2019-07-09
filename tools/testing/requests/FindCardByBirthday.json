@@ -1,0 +1,10 @@
+{
+  "api": "v1",
+  "lang": "ru-RU",
+  "personConfig": {
+    "name": "Alex",
+    "birthday": "1986-04-15",
+    "gender": 1,
+    "features": 3
+  }
+}

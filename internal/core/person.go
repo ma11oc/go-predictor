@@ -265,6 +265,7 @@ func (p *Person) resolvePlanetCycles(pc *[7][54]*PlanetCycle, planets *[7]*Plane
 	return nil
 }
 
+// TODO: resolvePersonalCards
 // Men:
 //   - in spite of age, each man has Jack with the same Suit as his main card,
 //     except the case when a man already has Jack with the same Suit

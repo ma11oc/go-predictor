@@ -15,14 +15,14 @@
     "application/json"
   ],
   "paths": {
-    "/v1/card": {
+    "/v1/predict": {
       "post": {
-        "operationId": "FindCardByBirthday",
+        "operationId": "GetGeneralPrediction",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/predictorCardResponse"
+              "$ref": "#/definitions/predictorPredictionResponse"
             }
           }
         },
@@ -32,7 +32,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/predictorCardRequest"
+              "$ref": "#/definitions/predictorGeneralRequest"
             }
           }
         ],
@@ -53,9 +53,28 @@
       "default": "OTHER"
     },
     "predictorCard": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "rank": {
+          "type": "string"
+        },
+        "suit": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "meaning": {
+          "$ref": "#/definitions/predictorMeaning",
+          "title": "Only one meaning according to a context (e.g. longterm, pluto and so on)"
+        }
+      }
     },
-    "predictorCardRequest": {
+    "predictorGeneralRequest": {
       "type": "object",
       "properties": {
         "api": {
@@ -69,17 +88,14 @@
         }
       }
     },
-    "predictorCardResponse": {
+    "predictorMeaning": {
       "type": "object",
       "properties": {
-        "api": {
+        "keywords": {
           "type": "string"
         },
-        "lang": {
+        "description": {
           "type": "string"
-        },
-        "card": {
-          "$ref": "#/definitions/predictorCard"
         }
       }
     },
@@ -103,6 +119,74 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/predictorPersonConfig"
+          }
+        }
+      }
+    },
+    "predictorPlanet": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        }
+      }
+    },
+    "predictorPlanetCycle": {
+      "type": "object",
+      "properties": {
+        "card": {
+          "$ref": "#/definitions/predictorCard"
+        },
+        "planet": {
+          "$ref": "#/definitions/predictorPlanet"
+        },
+        "start": {
+          "$ref": "#/definitions/predictorPlanetCycleDate"
+        },
+        "end": {
+          "$ref": "#/definitions/predictorPlanetCycleDate"
+        }
+      }
+    },
+    "predictorPlanetCycleDate": {
+      "type": "object",
+      "properties": {
+        "month": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "day": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "predictorPredictionResponse": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "planetCycles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/predictorPlanetCycle"
+          }
+        },
+        "cards": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/predictorCard"
           }
         }
       }

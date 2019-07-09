@@ -150,7 +150,60 @@ func (m *PersonConfig) GetEnvironment() []*PersonConfig {
 	return nil
 }
 
+type Meaning struct {
+	Keywords             string   `protobuf:"bytes,1,opt,name=keywords,proto3" json:"keywords,omitempty"`
+	Description          string   `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Meaning) Reset()         { *m = Meaning{} }
+func (m *Meaning) String() string { return proto.CompactTextString(m) }
+func (*Meaning) ProtoMessage()    {}
+func (*Meaning) Descriptor() ([]byte, []int) {
+	return fileDescriptor_76009c59104259e6, []int{1}
+}
+
+func (m *Meaning) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Meaning.Unmarshal(m, b)
+}
+func (m *Meaning) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Meaning.Marshal(b, m, deterministic)
+}
+func (m *Meaning) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Meaning.Merge(m, src)
+}
+func (m *Meaning) XXX_Size() int {
+	return xxx_messageInfo_Meaning.Size(m)
+}
+func (m *Meaning) XXX_DiscardUnknown() {
+	xxx_messageInfo_Meaning.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Meaning proto.InternalMessageInfo
+
+func (m *Meaning) GetKeywords() string {
+	if m != nil {
+		return m.Keywords
+	}
+	return ""
+}
+
+func (m *Meaning) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
 type Card struct {
+	Id    uint32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Rank  string `protobuf:"bytes,2,opt,name=rank,proto3" json:"rank,omitempty"`
+	Suit  string `protobuf:"bytes,3,opt,name=suit,proto3" json:"suit,omitempty"`
+	Title string `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
+	// Only one meaning according to a context (e.g. longterm, pluto and so on)
+	Meaning              *Meaning `protobuf:"bytes,5,opt,name=meaning,proto3" json:"meaning,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -160,7 +213,7 @@ func (m *Card) Reset()         { *m = Card{} }
 func (m *Card) String() string { return proto.CompactTextString(m) }
 func (*Card) ProtoMessage()    {}
 func (*Card) Descriptor() ([]byte, []int) {
-	return fileDescriptor_76009c59104259e6, []int{1}
+	return fileDescriptor_76009c59104259e6, []int{2}
 }
 
 func (m *Card) XXX_Unmarshal(b []byte) error {
@@ -181,7 +234,207 @@ func (m *Card) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Card proto.InternalMessageInfo
 
-type CardRequest struct {
+func (m *Card) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *Card) GetRank() string {
+	if m != nil {
+		return m.Rank
+	}
+	return ""
+}
+
+func (m *Card) GetSuit() string {
+	if m != nil {
+		return m.Suit
+	}
+	return ""
+}
+
+func (m *Card) GetTitle() string {
+	if m != nil {
+		return m.Title
+	}
+	return ""
+}
+
+func (m *Card) GetMeaning() *Meaning {
+	if m != nil {
+		return m.Meaning
+	}
+	return nil
+}
+
+type Planet struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Symbol               string   `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Planet) Reset()         { *m = Planet{} }
+func (m *Planet) String() string { return proto.CompactTextString(m) }
+func (*Planet) ProtoMessage()    {}
+func (*Planet) Descriptor() ([]byte, []int) {
+	return fileDescriptor_76009c59104259e6, []int{3}
+}
+
+func (m *Planet) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Planet.Unmarshal(m, b)
+}
+func (m *Planet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Planet.Marshal(b, m, deterministic)
+}
+func (m *Planet) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Planet.Merge(m, src)
+}
+func (m *Planet) XXX_Size() int {
+	return xxx_messageInfo_Planet.Size(m)
+}
+func (m *Planet) XXX_DiscardUnknown() {
+	xxx_messageInfo_Planet.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Planet proto.InternalMessageInfo
+
+func (m *Planet) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *Planet) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Planet) GetSymbol() string {
+	if m != nil {
+		return m.Symbol
+	}
+	return ""
+}
+
+type PlanetCycleDate struct {
+	Month                uint32   `protobuf:"varint,1,opt,name=month,proto3" json:"month,omitempty"`
+	Day                  uint32   `protobuf:"varint,2,opt,name=day,proto3" json:"day,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PlanetCycleDate) Reset()         { *m = PlanetCycleDate{} }
+func (m *PlanetCycleDate) String() string { return proto.CompactTextString(m) }
+func (*PlanetCycleDate) ProtoMessage()    {}
+func (*PlanetCycleDate) Descriptor() ([]byte, []int) {
+	return fileDescriptor_76009c59104259e6, []int{4}
+}
+
+func (m *PlanetCycleDate) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlanetCycleDate.Unmarshal(m, b)
+}
+func (m *PlanetCycleDate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlanetCycleDate.Marshal(b, m, deterministic)
+}
+func (m *PlanetCycleDate) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlanetCycleDate.Merge(m, src)
+}
+func (m *PlanetCycleDate) XXX_Size() int {
+	return xxx_messageInfo_PlanetCycleDate.Size(m)
+}
+func (m *PlanetCycleDate) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlanetCycleDate.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlanetCycleDate proto.InternalMessageInfo
+
+func (m *PlanetCycleDate) GetMonth() uint32 {
+	if m != nil {
+		return m.Month
+	}
+	return 0
+}
+
+func (m *PlanetCycleDate) GetDay() uint32 {
+	if m != nil {
+		return m.Day
+	}
+	return 0
+}
+
+type PlanetCycle struct {
+	Card                 *Card            `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
+	Planet               *Planet          `protobuf:"bytes,2,opt,name=planet,proto3" json:"planet,omitempty"`
+	Start                *PlanetCycleDate `protobuf:"bytes,3,opt,name=start,proto3" json:"start,omitempty"`
+	End                  *PlanetCycleDate `protobuf:"bytes,4,opt,name=end,proto3" json:"end,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
+}
+
+func (m *PlanetCycle) Reset()         { *m = PlanetCycle{} }
+func (m *PlanetCycle) String() string { return proto.CompactTextString(m) }
+func (*PlanetCycle) ProtoMessage()    {}
+func (*PlanetCycle) Descriptor() ([]byte, []int) {
+	return fileDescriptor_76009c59104259e6, []int{5}
+}
+
+func (m *PlanetCycle) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlanetCycle.Unmarshal(m, b)
+}
+func (m *PlanetCycle) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlanetCycle.Marshal(b, m, deterministic)
+}
+func (m *PlanetCycle) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlanetCycle.Merge(m, src)
+}
+func (m *PlanetCycle) XXX_Size() int {
+	return xxx_messageInfo_PlanetCycle.Size(m)
+}
+func (m *PlanetCycle) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlanetCycle.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlanetCycle proto.InternalMessageInfo
+
+func (m *PlanetCycle) GetCard() *Card {
+	if m != nil {
+		return m.Card
+	}
+	return nil
+}
+
+func (m *PlanetCycle) GetPlanet() *Planet {
+	if m != nil {
+		return m.Planet
+	}
+	return nil
+}
+
+func (m *PlanetCycle) GetStart() *PlanetCycleDate {
+	if m != nil {
+		return m.Start
+	}
+	return nil
+}
+
+func (m *PlanetCycle) GetEnd() *PlanetCycleDate {
+	if m != nil {
+		return m.End
+	}
+	return nil
+}
+
+type GeneralRequest struct {
 	Api                  string        `protobuf:"bytes,1,opt,name=api,proto3" json:"api,omitempty"`
 	Lang                 string        `protobuf:"bytes,2,opt,name=lang,proto3" json:"lang,omitempty"`
 	PersonConfig         *PersonConfig `protobuf:"bytes,3,opt,name=personConfig,proto3" json:"personConfig,omitempty"`
@@ -190,46 +443,46 @@ type CardRequest struct {
 	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *CardRequest) Reset()         { *m = CardRequest{} }
-func (m *CardRequest) String() string { return proto.CompactTextString(m) }
-func (*CardRequest) ProtoMessage()    {}
-func (*CardRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_76009c59104259e6, []int{2}
+func (m *GeneralRequest) Reset()         { *m = GeneralRequest{} }
+func (m *GeneralRequest) String() string { return proto.CompactTextString(m) }
+func (*GeneralRequest) ProtoMessage()    {}
+func (*GeneralRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_76009c59104259e6, []int{6}
 }
 
-func (m *CardRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CardRequest.Unmarshal(m, b)
+func (m *GeneralRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GeneralRequest.Unmarshal(m, b)
 }
-func (m *CardRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CardRequest.Marshal(b, m, deterministic)
+func (m *GeneralRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GeneralRequest.Marshal(b, m, deterministic)
 }
-func (m *CardRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CardRequest.Merge(m, src)
+func (m *GeneralRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GeneralRequest.Merge(m, src)
 }
-func (m *CardRequest) XXX_Size() int {
-	return xxx_messageInfo_CardRequest.Size(m)
+func (m *GeneralRequest) XXX_Size() int {
+	return xxx_messageInfo_GeneralRequest.Size(m)
 }
-func (m *CardRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_CardRequest.DiscardUnknown(m)
+func (m *GeneralRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GeneralRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CardRequest proto.InternalMessageInfo
+var xxx_messageInfo_GeneralRequest proto.InternalMessageInfo
 
-func (m *CardRequest) GetApi() string {
+func (m *GeneralRequest) GetApi() string {
 	if m != nil {
 		return m.Api
 	}
 	return ""
 }
 
-func (m *CardRequest) GetLang() string {
+func (m *GeneralRequest) GetLang() string {
 	if m != nil {
 		return m.Lang
 	}
 	return ""
 }
 
-func (m *CardRequest) GetPersonConfig() *PersonConfig {
+func (m *GeneralRequest) GetPersonConfig() *PersonConfig {
 	if m != nil {
 		return m.PersonConfig
 	}
@@ -249,7 +502,7 @@ func (m *CardResponse) Reset()         { *m = CardResponse{} }
 func (m *CardResponse) String() string { return proto.CompactTextString(m) }
 func (*CardResponse) ProtoMessage()    {}
 func (*CardResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_76009c59104259e6, []int{3}
+	return fileDescriptor_76009c59104259e6, []int{7}
 }
 
 func (m *CardResponse) XXX_Unmarshal(b []byte) error {
@@ -291,47 +544,134 @@ func (m *CardResponse) GetCard() *Card {
 	return nil
 }
 
+type PredictionResponse struct {
+	Api                  string           `protobuf:"bytes,1,opt,name=api,proto3" json:"api,omitempty"`
+	Lang                 string           `protobuf:"bytes,2,opt,name=lang,proto3" json:"lang,omitempty"`
+	PlanetCycles         []*PlanetCycle   `protobuf:"bytes,3,rep,name=planetCycles,proto3" json:"planetCycles,omitempty"`
+	Cards                map[string]*Card `protobuf:"bytes,4,rep,name=cards,proto3" json:"cards,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
+}
+
+func (m *PredictionResponse) Reset()         { *m = PredictionResponse{} }
+func (m *PredictionResponse) String() string { return proto.CompactTextString(m) }
+func (*PredictionResponse) ProtoMessage()    {}
+func (*PredictionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_76009c59104259e6, []int{8}
+}
+
+func (m *PredictionResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PredictionResponse.Unmarshal(m, b)
+}
+func (m *PredictionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PredictionResponse.Marshal(b, m, deterministic)
+}
+func (m *PredictionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PredictionResponse.Merge(m, src)
+}
+func (m *PredictionResponse) XXX_Size() int {
+	return xxx_messageInfo_PredictionResponse.Size(m)
+}
+func (m *PredictionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PredictionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PredictionResponse proto.InternalMessageInfo
+
+func (m *PredictionResponse) GetApi() string {
+	if m != nil {
+		return m.Api
+	}
+	return ""
+}
+
+func (m *PredictionResponse) GetLang() string {
+	if m != nil {
+		return m.Lang
+	}
+	return ""
+}
+
+func (m *PredictionResponse) GetPlanetCycles() []*PlanetCycle {
+	if m != nil {
+		return m.PlanetCycles
+	}
+	return nil
+}
+
+func (m *PredictionResponse) GetCards() map[string]*Card {
+	if m != nil {
+		return m.Cards
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("predictor.PersonConfig_Gender", PersonConfig_Gender_name, PersonConfig_Gender_value)
 	proto.RegisterEnum("predictor.PersonConfig_Features", PersonConfig_Features_name, PersonConfig_Features_value)
 	proto.RegisterType((*PersonConfig)(nil), "predictor.PersonConfig")
+	proto.RegisterType((*Meaning)(nil), "predictor.Meaning")
 	proto.RegisterType((*Card)(nil), "predictor.Card")
-	proto.RegisterType((*CardRequest)(nil), "predictor.CardRequest")
+	proto.RegisterType((*Planet)(nil), "predictor.Planet")
+	proto.RegisterType((*PlanetCycleDate)(nil), "predictor.PlanetCycleDate")
+	proto.RegisterType((*PlanetCycle)(nil), "predictor.PlanetCycle")
+	proto.RegisterType((*GeneralRequest)(nil), "predictor.GeneralRequest")
 	proto.RegisterType((*CardResponse)(nil), "predictor.CardResponse")
+	proto.RegisterType((*PredictionResponse)(nil), "predictor.PredictionResponse")
+	proto.RegisterMapType((map[string]*Card)(nil), "predictor.PredictionResponse.CardsEntry")
 }
 
 func init() { proto.RegisterFile("api/proto/v1/predictor.proto", fileDescriptor_76009c59104259e6) }
 
 var fileDescriptor_76009c59104259e6 = []byte{
-	// 441 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xd1, 0x6e, 0xd3, 0x30,
-	0x14, 0x86, 0x97, 0x34, 0xcb, 0xda, 0xd3, 0x76, 0x84, 0x83, 0xc4, 0xa2, 0x6a, 0x42, 0x55, 0xb8,
-	0x29, 0x5c, 0xb4, 0xa2, 0x48, 0x48, 0x80, 0x84, 0xb4, 0x96, 0x14, 0x2a, 0x41, 0x5b, 0x39, 0x45,
-	0x08, 0x6e, 0x26, 0xaf, 0xf1, 0x82, 0xa5, 0xcd, 0x0e, 0x8e, 0x57, 0x69, 0xb7, 0xbc, 0x02, 0x2f,
-	0xc3, 0x7b, 0xf0, 0x0a, 0x3c, 0x08, 0xb2, 0xd3, 0x96, 0x00, 0x02, 0xed, 0x2a, 0xc7, 0xbf, 0xff,
-	0x9c, 0xcf, 0xff, 0xb1, 0xe1, 0x98, 0xe6, 0x7c, 0x90, 0x2b, 0xa9, 0xe5, 0x60, 0xfd, 0x68, 0x90,
-	0x2b, 0x96, 0xf2, 0x95, 0x96, 0xaa, 0x6f, 0x25, 0x6c, 0xec, 0x84, 0xce, 0x71, 0x26, 0x65, 0x76,
-	0xc1, 0x06, 0xc6, 0x4f, 0x85, 0x90, 0x9a, 0x6a, 0x2e, 0x45, 0x51, 0x1a, 0xa3, 0x6f, 0x2e, 0xb4,
-	0x16, 0x4c, 0x15, 0x52, 0x8c, 0xa5, 0x38, 0xe7, 0x19, 0x22, 0x78, 0x82, 0x5e, 0xb2, 0xb0, 0xd6,
-	0x75, 0x7a, 0x0d, 0x62, 0x6b, 0x7c, 0x02, 0x7e, 0xc6, 0x44, 0xca, 0x54, 0xe8, 0x75, 0x9d, 0xde,
-	0xe1, 0xf0, 0x5e, 0xff, 0x17, 0xaf, 0xfa, 0x73, 0xff, 0x95, 0x75, 0x91, 0x8d, 0x1b, 0x3b, 0x50,
-	0x3f, 0xe3, 0x4a, 0x7f, 0x4a, 0xe9, 0x75, 0xb8, 0x6f, 0xfb, 0xed, 0xd6, 0x66, 0xef, 0x9c, 0x51,
-	0x7d, 0xa5, 0x58, 0x11, 0xfa, 0x5d, 0xa7, 0xd7, 0x26, 0xbb, 0x35, 0x3e, 0x85, 0x26, 0x13, 0x6b,
-	0xae, 0xa4, 0xb8, 0x64, 0x42, 0x87, 0x07, 0xdd, 0x5a, 0xaf, 0x39, 0x3c, 0xfa, 0x07, 0x94, 0x54,
-	0xbd, 0xd1, 0x03, 0xf0, 0xcb, 0x43, 0x60, 0x03, 0xf6, 0xe7, 0xcb, 0xd7, 0x31, 0x09, 0xf6, 0xb0,
-	0x0e, 0xde, 0xdb, 0x93, 0x37, 0x71, 0xe0, 0x20, 0x80, 0x3f, 0x89, 0x6d, 0xed, 0x46, 0x2f, 0xa0,
-	0x3e, 0xd9, 0x12, 0x6f, 0x43, 0x7b, 0x36, 0x5f, 0x9e, 0x26, 0x8b, 0x78, 0x3c, 0x9d, 0x4c, 0xe3,
-	0x97, 0xc1, 0x1e, 0x22, 0x1c, 0x8e, 0xde, 0x25, 0xd3, 0x59, 0x9c, 0x24, 0xa7, 0xf3, 0xf7, 0xb3,
-	0x98, 0x04, 0x0e, 0x36, 0xe1, 0x60, 0x4c, 0xe2, 0x93, 0xe5, 0x9c, 0x04, 0x6e, 0xe4, 0x83, 0x37,
-	0xa6, 0x2a, 0x8d, 0x72, 0x68, 0x9a, 0x2f, 0x61, 0x9f, 0xaf, 0x58, 0xa1, 0x31, 0x80, 0x1a, 0xcd,
-	0x79, 0xe8, 0xd8, 0xbc, 0xa6, 0x34, 0x23, 0xbd, 0xa0, 0x22, 0x0b, 0xdd, 0x72, 0xa4, 0xa6, 0xc6,
-	0xe7, 0xd0, 0xca, 0x2b, 0x21, 0xec, 0xb8, 0xff, 0x93, 0xf1, 0x37, 0x73, 0xf4, 0x01, 0x5a, 0x25,
-	0xb1, 0xc8, 0xa5, 0x28, 0xd8, 0x0d, 0x91, 0xf7, 0xc1, 0x5b, 0x51, 0x95, 0x6e, 0x50, 0xb7, 0x2a,
-	0x28, 0xdb, 0xcc, 0x6e, 0x0e, 0x05, 0x04, 0x8b, 0xad, 0x9e, 0x30, 0xb5, 0xe6, 0x2b, 0x86, 0x1f,
-	0x01, 0x27, 0x5c, 0xa4, 0xc6, 0x35, 0xba, 0x1e, 0x6d, 0x2f, 0xf0, 0xee, 0x9f, 0x0d, 0xca, 0xfc,
-	0x9d, 0xa3, 0xbf, 0xf4, 0xf2, 0x94, 0xd1, 0x9d, 0x2f, 0xdf, 0x7f, 0x7c, 0x75, 0xdb, 0x51, 0xdd,
-	0x3c, 0x58, 0x03, 0x7b, 0xe6, 0x3c, 0x3c, 0xf3, 0xed, 0x33, 0x7c, 0xfc, 0x33, 0x00, 0x00, 0xff,
-	0xff, 0x1e, 0xd9, 0x72, 0xa4, 0xcf, 0x02, 0x00, 0x00,
+	// 733 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xdd, 0x6a, 0xdb, 0x48,
+	0x14, 0x8e, 0x64, 0x5b, 0x8e, 0x8f, 0x1c, 0x47, 0x19, 0x42, 0x56, 0x6b, 0xb2, 0x8b, 0xd1, 0xb2,
+	0xe0, 0x2c, 0x21, 0xde, 0xf5, 0xc2, 0xb2, 0xc9, 0x42, 0x20, 0xeb, 0x28, 0xae, 0xa1, 0x89, 0xcd,
+	0x38, 0xa5, 0xf4, 0x2a, 0x4c, 0xac, 0x89, 0x23, 0x2c, 0x8f, 0xd4, 0xd1, 0xd8, 0xc5, 0xd0, 0x9b,
+	0xe6, 0x15, 0xfa, 0x32, 0xbd, 0xe9, 0x53, 0xf4, 0x15, 0xfa, 0x20, 0x65, 0x46, 0x92, 0xad, 0x90,
+	0x1f, 0xda, 0xbb, 0xf3, 0xf3, 0x9d, 0x73, 0xbe, 0xf3, 0xcd, 0x91, 0x60, 0x97, 0x44, 0x7e, 0x2b,
+	0xe2, 0xa1, 0x08, 0x5b, 0xf3, 0xbf, 0x5a, 0x11, 0xa7, 0x9e, 0x3f, 0x12, 0x21, 0x3f, 0x50, 0x21,
+	0x54, 0x59, 0x06, 0xea, 0xbb, 0xe3, 0x30, 0x1c, 0x07, 0xb4, 0x25, 0xf1, 0x84, 0xb1, 0x50, 0x10,
+	0xe1, 0x87, 0x2c, 0x4e, 0x80, 0xce, 0x27, 0x1d, 0xaa, 0x03, 0xca, 0xe3, 0x90, 0x75, 0x42, 0x76,
+	0xe3, 0x8f, 0x11, 0x82, 0x22, 0x23, 0x53, 0x6a, 0x17, 0x1a, 0x5a, 0xb3, 0x82, 0x95, 0x8d, 0xfe,
+	0x01, 0x63, 0x4c, 0x99, 0x47, 0xb9, 0x5d, 0x6c, 0x68, 0xcd, 0x5a, 0xfb, 0xd7, 0x83, 0xd5, 0xbc,
+	0x7c, 0xf1, 0x41, 0x57, 0xa1, 0x70, 0x8a, 0x46, 0x75, 0x58, 0xbf, 0xf6, 0xb9, 0xb8, 0xf5, 0xc8,
+	0xc2, 0x2e, 0xa9, 0x7e, 0x4b, 0x5f, 0xe6, 0x6e, 0x28, 0x11, 0x33, 0x4e, 0x63, 0xdb, 0x68, 0x68,
+	0xcd, 0x0d, 0xbc, 0xf4, 0xd1, 0x21, 0x98, 0x94, 0xcd, 0x7d, 0x1e, 0xb2, 0x29, 0x65, 0xc2, 0x2e,
+	0x37, 0x0a, 0x4d, 0xb3, 0xfd, 0xd3, 0x13, 0x43, 0x71, 0x1e, 0xeb, 0xec, 0x81, 0x91, 0x90, 0x40,
+	0x15, 0x28, 0xf5, 0x2f, 0x5f, 0xb8, 0xd8, 0x5a, 0x43, 0xeb, 0x50, 0x3c, 0x3f, 0x79, 0xe9, 0x5a,
+	0x1a, 0x02, 0x30, 0xce, 0x5c, 0x65, 0xeb, 0xce, 0x31, 0xac, 0x9f, 0x65, 0x13, 0xb7, 0x60, 0xe3,
+	0xa2, 0x7f, 0x79, 0x35, 0x1c, 0xb8, 0x9d, 0xde, 0x59, 0xcf, 0x3d, 0xb5, 0xd6, 0x10, 0x82, 0xda,
+	0xff, 0xaf, 0x86, 0xbd, 0x0b, 0x77, 0x38, 0xbc, 0xea, 0xbf, 0xbe, 0x70, 0xb1, 0xa5, 0x21, 0x13,
+	0xca, 0x1d, 0xec, 0x9e, 0x5c, 0xf6, 0xb1, 0xa5, 0x3b, 0x5d, 0x28, 0x9f, 0x53, 0xc2, 0x7c, 0x36,
+	0x96, 0xcb, 0x4c, 0xe8, 0xe2, 0x5d, 0xc8, 0xbd, 0xd8, 0xd6, 0x92, 0x45, 0x33, 0x1f, 0x35, 0xc0,
+	0xf4, 0x68, 0x3c, 0xe2, 0x7e, 0x24, 0x75, 0xb7, 0x75, 0x95, 0xce, 0x87, 0x9c, 0x3b, 0x0d, 0x8a,
+	0x1d, 0xc2, 0x3d, 0x54, 0x03, 0xdd, 0xf7, 0x54, 0x83, 0x0d, 0xac, 0xfb, 0x9e, 0x7c, 0x0b, 0x4e,
+	0xd8, 0x24, 0xad, 0x51, 0xb6, 0x8c, 0xc5, 0x33, 0x5f, 0x64, 0xef, 0x23, 0x6d, 0xb4, 0x0d, 0x25,
+	0xe1, 0x8b, 0x80, 0xaa, 0xe7, 0xa9, 0xe0, 0xc4, 0x41, 0xfb, 0x50, 0x9e, 0x26, 0xfc, 0x94, 0xf8,
+	0x66, 0x1b, 0xe5, 0x14, 0x4c, 0x99, 0xe3, 0x0c, 0xe2, 0x9c, 0x82, 0x31, 0x08, 0x08, 0xa3, 0xe2,
+	0x31, 0x16, 0xea, 0x22, 0xf4, 0xdc, 0x45, 0xec, 0x80, 0x11, 0x2f, 0xa6, 0xd7, 0x61, 0x90, 0xf2,
+	0x48, 0x3d, 0xe7, 0x10, 0x36, 0x93, 0x2e, 0x9d, 0xc5, 0x28, 0xa0, 0xa7, 0x44, 0x50, 0x49, 0x6e,
+	0x1a, 0x32, 0x71, 0x9b, 0x76, 0x4c, 0x1c, 0x64, 0x41, 0x41, 0x5e, 0x85, 0xae, 0x62, 0xd2, 0x74,
+	0x3e, 0x6b, 0x60, 0xe6, 0x6a, 0xd1, 0x6f, 0x50, 0x1c, 0x11, 0x9e, 0x10, 0x31, 0xdb, 0x9b, 0x39,
+	0xee, 0x52, 0x2b, 0xac, 0x92, 0x68, 0x0f, 0x8c, 0x48, 0xd5, 0xa8, 0x4e, 0x66, 0x7b, 0x2b, 0x7f,
+	0x24, 0x2a, 0x81, 0x53, 0x00, 0xfa, 0x13, 0x4a, 0xb1, 0x20, 0x3c, 0x51, 0xce, 0x6c, 0xd7, 0x1f,
+	0x20, 0x97, 0x94, 0x71, 0x02, 0x44, 0xfb, 0x50, 0xa0, 0xcc, 0x53, 0xa2, 0x3e, 0x8f, 0x97, 0x30,
+	0x27, 0x86, 0x5a, 0x97, 0x32, 0xca, 0x49, 0x80, 0xe9, 0xdb, 0x19, 0x8d, 0x85, 0xdc, 0x91, 0x44,
+	0x7e, 0x7a, 0x10, 0xd2, 0x94, 0x52, 0x06, 0x84, 0x8d, 0x33, 0x29, 0xa5, 0x8d, 0xfe, 0x83, 0x6a,
+	0x94, 0x3b, 0xe7, 0x94, 0xde, 0x93, 0xd7, 0x7e, 0x0f, 0xec, 0xbc, 0x81, 0xaa, 0x52, 0x83, 0xc6,
+	0x51, 0xc8, 0x62, 0xfa, 0x9d, 0x23, 0x33, 0x69, 0x0b, 0xcf, 0x48, 0xeb, 0x7c, 0xd0, 0x01, 0x0d,
+	0x92, 0x84, 0x1f, 0xb2, 0x1f, 0x9c, 0x70, 0x04, 0xd5, 0x68, 0x25, 0x52, 0x6c, 0x17, 0xd4, 0x27,
+	0xbc, 0xf3, 0xb8, 0x86, 0xf8, 0x1e, 0x16, 0x1d, 0x43, 0x49, 0x12, 0x88, 0xed, 0xa2, 0x2a, 0x6a,
+	0xe6, 0x8b, 0x1e, 0xf0, 0x51, 0x8c, 0x63, 0x97, 0x09, 0xbe, 0xc0, 0x49, 0x59, 0xbd, 0x07, 0xb0,
+	0x0a, 0x4a, 0xbe, 0x13, 0xba, 0xc8, 0xf8, 0x4e, 0xe8, 0x02, 0xfd, 0x0e, 0xa5, 0x39, 0x09, 0x66,
+	0x34, 0x3d, 0x99, 0x07, 0xeb, 0x27, 0xd9, 0x23, 0xfd, 0x5f, 0xad, 0xfd, 0x1e, 0xac, 0x41, 0x96,
+	0x1c, 0x52, 0x3e, 0xf7, 0x47, 0x14, 0xdd, 0xc2, 0x76, 0x97, 0x8a, 0xf4, 0xa9, 0x57, 0x84, 0xd0,
+	0xcf, 0xb9, 0x3e, 0xf7, 0x0f, 0xa1, 0xfe, 0xcb, 0xb3, 0x2b, 0x38, 0x3b, 0x77, 0x5f, 0xbe, 0x7e,
+	0xd4, 0x2d, 0xc7, 0xcc, 0xfd, 0xc9, 0x8f, 0xb4, 0x3f, 0xae, 0x0d, 0xf5, 0x8b, 0xfe, 0xfb, 0x5b,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x01, 0x6e, 0x9c, 0x84, 0xeb, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -346,7 +686,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type PredictorServiceClient interface {
-	FindCardByBirthday(ctx context.Context, in *CardRequest, opts ...grpc.CallOption) (*CardResponse, error)
+	GetGeneralPrediction(ctx context.Context, in *GeneralRequest, opts ...grpc.CallOption) (*PredictionResponse, error)
 }
 
 type predictorServiceClient struct {
@@ -357,9 +697,9 @@ func NewPredictorServiceClient(cc *grpc.ClientConn) PredictorServiceClient {
 	return &predictorServiceClient{cc}
 }
 
-func (c *predictorServiceClient) FindCardByBirthday(ctx context.Context, in *CardRequest, opts ...grpc.CallOption) (*CardResponse, error) {
-	out := new(CardResponse)
-	err := c.cc.Invoke(ctx, "/predictor.PredictorService/FindCardByBirthday", in, out, opts...)
+func (c *predictorServiceClient) GetGeneralPrediction(ctx context.Context, in *GeneralRequest, opts ...grpc.CallOption) (*PredictionResponse, error) {
+	out := new(PredictionResponse)
+	err := c.cc.Invoke(ctx, "/predictor.PredictorService/GetGeneralPrediction", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -368,27 +708,27 @@ func (c *predictorServiceClient) FindCardByBirthday(ctx context.Context, in *Car
 
 // PredictorServiceServer is the server API for PredictorService service.
 type PredictorServiceServer interface {
-	FindCardByBirthday(context.Context, *CardRequest) (*CardResponse, error)
+	GetGeneralPrediction(context.Context, *GeneralRequest) (*PredictionResponse, error)
 }
 
 func RegisterPredictorServiceServer(s *grpc.Server, srv PredictorServiceServer) {
 	s.RegisterService(&_PredictorService_serviceDesc, srv)
 }
 
-func _PredictorService_FindCardByBirthday_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CardRequest)
+func _PredictorService_GetGeneralPrediction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GeneralRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PredictorServiceServer).FindCardByBirthday(ctx, in)
+		return srv.(PredictorServiceServer).GetGeneralPrediction(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/predictor.PredictorService/FindCardByBirthday",
+		FullMethod: "/predictor.PredictorService/GetGeneralPrediction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PredictorServiceServer).FindCardByBirthday(ctx, req.(*CardRequest))
+		return srv.(PredictorServiceServer).GetGeneralPrediction(ctx, req.(*GeneralRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -398,8 +738,8 @@ var _PredictorService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*PredictorServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "FindCardByBirthday",
-			Handler:    _PredictorService_FindCardByBirthday_Handler,
+			MethodName: "GetGeneralPrediction",
+			Handler:    _PredictorService_GetGeneralPrediction_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
