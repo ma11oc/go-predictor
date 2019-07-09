@@ -4,16 +4,17 @@ import (
 	"time"
 )
 
+// Meaning describes a card
 type Meaning struct {
-	Keywords    string `yaml:"keywords" validate:"nonzero"`
+	Keywords    string `yaml:"keywords"    validate:"nonzero"`
 	Description string `yaml:"description" validate:"nonzero"`
 }
 
 // Card represents a simple primitive in matrices
 type Card struct {
-	ID       uint8  `yaml:"id" validate:"min=0,max=52"`
-	Rank     string `yaml:"rank" validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
-	Suit     string `yaml:"suit" validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
+	ID       uint8  `yaml:"id"    validate:"min=0,max=52"`
+	Rank     string `yaml:"rank"  validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
+	Suit     string `yaml:"suit"  validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
 	Title    string `yaml:"title" validate:"nonzero"`
 	Meanings struct {
 		General  Meaning
@@ -30,6 +31,8 @@ type Card struct {
 	}
 }
 
+// GetBirthdays returns array with all the birthday dates during a year,
+// associated with particular card
 func (c Card) GetBirthdays() ([]time.Time, error) {
 	var bdays []time.Time
 
@@ -53,6 +56,7 @@ func NewCardFromNumber(n uint8, loc *Locale) (*Card, error) {
 	return loc.FindCardByID(n)
 }
 
+// NewCardFromString returns card, found by string like 'K♠'
 func NewCardFromString(s string, loc *Locale) (*Card, error) {
 	return loc.FindCardByStr(s)
 }
