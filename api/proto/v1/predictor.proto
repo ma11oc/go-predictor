@@ -7,15 +7,15 @@ import "google/api/annotations.proto";
 
 message PersonConfig {
   enum Gender {
-    OTHER = 0;
-    MALE = 1;
+    OTHER  = 0;
+    MALE   = 1;
     FEMALE = 2;
   }
 
   enum Features {
-    NOT_SPECIFIED = 0x0;
+    NOT_SPECIFIED  = 0x0;
     BUSINESS_OWNER = 0x01;
-    CREATOR = 0x02;
+    CREATOR        = 0x02;
   }
 
   string name                       = 3;

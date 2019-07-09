@@ -17,7 +17,7 @@ import (
 	// gw "bitbucket.org/shchukin_a/go-predictor/api"
 	core "bitbucket.org/shchukin_a/go-predictor/internal/core"
 	// pb "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
-	"github.com/davecgh/go-spew/spew"
+
 	"github.com/go-validator/validator"
 
 	// "bitbucket.org/shchukin_a/go-predictor/pkg/logger"
@@ -123,19 +123,48 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	scs := spew.ConfigState{
-		Indent:   "    ",
-		MaxDepth: 3,
-	}
-	scs.Dump(pconf)
+	planetCycles := make([]*v1.PlanetCycle, len(person.PlanetCycles))
 
-	// message PredictionResponse {
-	//   string api                        = 1;
-	//   string lang                       = 2;
-	//
-	//   repeated PlanetCycle planetCycles = 3;
-	//   map<string, Card> cards           = 4;
-	// }
+	for i, v := range person.PlanetCycles {
+
+		planetCycles[i] = &v1.PlanetCycle{
+			Card: &v1.Card{
+				Id:    uint32(v.Card.ID),
+				Rank:  v.Card.Rank,
+				Suit:  v.Card.Suit,
+				Title: v.Card.Title,
+				Meaning: &v1.Meaning{
+					Keywords:    "UNSUPPORTED",
+					Description: "UNSUPPORTED",
+				},
+			},
+			Planet: &v1.Planet{
+				Id:     uint32(v.Planet.ID),
+				Name:   v.Planet.Name,
+				Symbol: v.Planet.Symbol,
+			},
+			Start: &v1.PlanetCycleDate{
+				Month: uint32(v.Start.Month()),
+				Day:   uint32(v.Start.Day()),
+			},
+			End: &v1.PlanetCycleDate{
+				Month: uint32(v.End.Month()),
+				Day:   uint32(v.End.Day()),
+			},
+		}
+	}
+
+	/*
+	 * scs := spew.ConfigState{
+	 *     Indent:   "    ",
+	 *     MaxDepth: 3,
+	 * }
+	 * scs.Dump(pconf)
+	 * scs.Dump(person.PlanetCycles)
+	 * scs.Dump(len(person.PlanetCycles))
+	 * scs.Dump(planetCycles)
+	 * scs.Dump(len(planetCycles))
+	 */
 
 	return &v1.PredictionResponse{
 		Api:  apiVersion,
@@ -203,5 +232,6 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				},
 			},
 		},
+		PlanetCycles: planetCycles,
 	}, nil
 }
