@@ -123,36 +123,38 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	planetCycles := make([]*v1.PlanetCycle, len(person.PlanetCycles))
-
-	for i, v := range person.PlanetCycles {
-
-		planetCycles[i] = &v1.PlanetCycle{
-			Card: &v1.Card{
-				Id:    uint32(v.Card.ID),
-				Rank:  v.Card.Rank,
-				Suit:  v.Card.Suit,
-				Title: v.Card.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    "UNSUPPORTED",
-					Description: "UNSUPPORTED",
-				},
-			},
-			Planet: &v1.Planet{
-				Id:     uint32(v.Planet.ID),
-				Name:   v.Planet.Name,
-				Symbol: v.Planet.Symbol,
-			},
-			Start: &v1.PlanetCycleDate{
-				Month: uint32(v.Start.Month()),
-				Day:   uint32(v.Start.Day()),
-			},
-			End: &v1.PlanetCycleDate{
-				Month: uint32(v.End.Month()),
-				Day:   uint32(v.End.Day()),
-			},
-		}
-	}
+	/*
+	 *     planetCycles := make([]*v1.PlanetCycle, len(person.PlanetCycles))
+	 *
+	 *     for i, v := range person.PlanetCycles {
+	 *
+	 *         planetCycles[i] = &v1.PlanetCycle{
+	 *             Card: &v1.Card{
+	 *                 Id:    uint32(v.Card.ID),
+	 *                 Rank:  v.Card.Rank,
+	 *                 Suit:  v.Card.Suit,
+	 *                 Title: v.Card.Title,
+	 *                 Meaning: &v1.Meaning{
+	 *                     Keywords:    "UNSUPPORTED",
+	 *                     Description: "UNSUPPORTED",
+	 *                 },
+	 *             },
+	 *             Planet: &v1.Planet{
+	 *                 Id:     uint32(v.Planet.ID),
+	 *                 Name:   v.Planet.Name,
+	 *                 Symbol: v.Planet.Symbol,
+	 *             },
+	 *             Start: &v1.PlanetCycleDate{
+	 *                 Month: uint32(v.Start.Month()),
+	 *                 Day:   uint32(v.Start.Day()),
+	 *             },
+	 *             End: &v1.PlanetCycleDate{
+	 *                 Month: uint32(v.End.Month()),
+	 *                 Day:   uint32(v.End.Day()),
+	 *             },
+	 *         }
+	 *     }
+	 */
 
 	/*
 	 * scs := spew.ConfigState{
@@ -177,8 +179,8 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.Cards.Main.Suit,
 				Title: person.Cards.Main.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Main.Meanings.General.Keywords,
-					Description: person.Cards.Main.Meanings.General.Description,
+					Keywords:    person.Cards.Main.Context.General.Keywords,
+					Description: person.Cards.Main.Context.General.Description,
 				},
 			},
 			"drain": &v1.Card{
@@ -187,8 +189,8 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.Cards.Drain.Suit,
 				Title: person.Cards.Drain.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Drain.Meanings.General.Keywords,
-					Description: person.Cards.Drain.Meanings.General.Description,
+					Keywords:    person.Cards.Drain.Context.General.Keywords,
+					Description: person.Cards.Drain.Context.General.Description,
 				},
 			},
 			"source": &v1.Card{
@@ -197,8 +199,8 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.Cards.Source.Suit,
 				Title: person.Cards.Source.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Source.Meanings.General.Keywords,
-					Description: person.Cards.Source.Meanings.General.Description,
+					Keywords:    person.Cards.Source.Context.General.Keywords,
+					Description: person.Cards.Source.Context.General.Description,
 				},
 			},
 			"longterm": &v1.Card{
@@ -207,8 +209,8 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.Cards.Longterm.Suit,
 				Title: person.Cards.Longterm.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Longterm.Meanings.Longterm.Keywords,
-					Description: person.Cards.Longterm.Meanings.Longterm.Description,
+					Keywords:    person.Cards.Longterm.Context.Longterm.Keywords,
+					Description: person.Cards.Longterm.Context.Longterm.Description,
 				},
 			},
 			"pluto": &v1.Card{
@@ -217,8 +219,8 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.Cards.Pluto.Suit,
 				Title: person.Cards.Pluto.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Longterm.Meanings.Pluto.Keywords,
-					Description: person.Cards.Longterm.Meanings.Pluto.Description,
+					Keywords:    person.Cards.Longterm.Context.Pluto.Keywords,
+					Description: person.Cards.Longterm.Context.Pluto.Description,
 				},
 			},
 			"pluto/result": &v1.Card{
@@ -227,11 +229,11 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.Cards.PlutoResult.Suit,
 				Title: person.Cards.PlutoResult.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Longterm.Meanings.Result.Keywords,
-					Description: person.Cards.Longterm.Meanings.Result.Description,
+					Keywords:    person.Cards.Longterm.Context.Result.Keywords,
+					Description: person.Cards.Longterm.Context.Result.Description,
 				},
 			},
 		},
-		PlanetCycles: planetCycles,
+		// PlanetCycles: planetCycles,
 	}, nil
 }

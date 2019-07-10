@@ -12,11 +12,12 @@ type Meaning struct {
 
 // Card represents a simple primitive in matrices
 type Card struct {
-	ID       uint8  `yaml:"id"    validate:"min=0,max=52"`
-	Rank     string `yaml:"rank"  validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
-	Suit     string `yaml:"suit"  validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
-	Title    string `yaml:"title" validate:"nonzero"`
-	Meanings struct {
+	ID    uint8  `yaml:"id"    validate:"min=0,max=52"`
+	Rank  string `yaml:"rank"  validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
+	Suit  string `yaml:"suit"  validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
+	Title string `yaml:"title" validate:"nonzero"`
+	// Descriptor Meaning
+	Context struct {
 		General  Meaning
 		Longterm Meaning
 		Mercury  Meaning

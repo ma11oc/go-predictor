@@ -62,6 +62,7 @@ message PlanetCycle {
 }
 
 message GeneralRequest {
+  // TODO: request for specific year
   string api                = 1;
   string lang               = 2;
 

@@ -30,23 +30,25 @@ var (
 // Locale is a fundamental primitive. It contains all the descriptions
 // required for any prediction
 type Locale struct {
+	// TODO: meta description of cards
 	Lang string `yaml:"lang" validate:"nonzero,langstr"`
 	Base struct {
 		od *Deck
 		om *Matrix
 		hm *Matrix
 		am *Matrix
-		mm *[90]*YearMatrix
-		pc *[7][54]*PlanetCycle
+		mm *Matrices
+		cc *Cycles
 	}
+	// Descriptors map[string]Meaning
 	Matrices []struct {
 		ID string `yaml:"id"`
 	}
 	Exceptions struct {
 		Joker *Card
 	}
-	Cards   []Card      `yaml:"cards"   validate:"len=52"`
-	Planets *[7]*Planet `yaml:"planets" validate:"len=7"`
+	Cards   []Card `yaml:"cards"   validate:"len=52"`
+	Planets map[string]Planet
 }
 
 // GetOrderedDeck is ordered Deck getter
@@ -55,7 +57,7 @@ func (l Locale) GetOrderedDeck() *Deck {
 }
 
 // GetYearMatrices is Year Matrices getter
-func (l Locale) GetYearMatrices() *[90]*YearMatrix {
+func (l Locale) GetYearMatrices() *Matrices {
 	return l.Base.mm
 }
 
@@ -171,8 +173,8 @@ func NewLocale(p string) (*Locale, error) {
 	loc.Base.om = NewOriginMatrix(&origin, loc.Base.od)
 	loc.Base.hm = NewHumansMatrix(loc.Base.om, loc.Base.od)
 	loc.Base.am = NewAngelsMatrix(loc.Base.om, loc.Base.od)
-	loc.Base.mm = NewBunchOfYearMatrices(loc.Base.om, loc.Base.od)
-	loc.Base.pc = NewBunchOfPlanetCycles()
+	loc.Base.mm = NewMatrices(loc.Base.om, loc.Base.od)
+	loc.Base.cc = NewCyclesMatrix()
 
 	return loc, nil
 }

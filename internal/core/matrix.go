@@ -1,6 +1,6 @@
 package core
 
-// Matrix is a base struct.
+// Matrix is a base primitive
 type Matrix struct {
 	Decks struct {
 		Main   *Deck
@@ -8,6 +8,9 @@ type Matrix struct {
 		Source *Deck
 	}
 }
+
+// Matrices is alias for all the matrices for [0, 89] years
+type Matrices [90]*YearMatrix
 
 /*
  * func (m Matrix) PrettyPrint() {
@@ -116,24 +119,19 @@ func NewAngelsMatrix(om *Matrix, od *Deck) *Matrix {
 
 }
 
-/*
- * year
- *  m  main = year_matrix[i-1];
- *  d  drain = i;
- *  s  source = origin[i-1];
- * }
- */
-
+// MatrixIterator describes Iterator for matrices
 type MatrixIterator interface {
 	Next(m *Matrix, d *Deck) (*Matrix, error)
 }
 
+// YearMatrix is a base primitive
 type YearMatrix struct {
 	Year uint8
 	*Matrix
 	MatrixIterator
 }
 
+// Next is the Matrix iterator
 func (m YearMatrix) Next(om *Matrix, od *Deck) (*YearMatrix, error) {
 	var oIdx uint8
 	var mIdx uint8
@@ -168,6 +166,7 @@ func (m YearMatrix) Next(om *Matrix, od *Deck) (*YearMatrix, error) {
 	return next, nil
 }
 
+// NewZeroYearMatrix receives origin Matrix and returns YearMatrix for 0 year
 func NewZeroYearMatrix(om *Matrix) *YearMatrix {
 	return &YearMatrix{
 		Year:   0,
@@ -175,10 +174,12 @@ func NewZeroYearMatrix(om *Matrix) *YearMatrix {
 	}
 }
 
-func NewBunchOfYearMatrices(om *Matrix, od *Deck) *[90]*YearMatrix {
+// NewMatrices receives origin Matrix and ordered Deck and
+// returns all the matrices for years [0, 89]
+func NewMatrices(om *Matrix, od *Deck) *Matrices {
 	var err error
 
-	mm := [90]*YearMatrix{
+	mm := &Matrices{
 		&YearMatrix{
 			Year:   0,
 			Matrix: om,
@@ -194,24 +195,5 @@ func NewBunchOfYearMatrices(om *Matrix, od *Deck) *[90]*YearMatrix {
 		cur = mm[i]
 	}
 
-	return &mm
+	return mm
 }
-
-/*
- *
- * func getMatrixByYear(y uint8) (*matrix, error) {
- *     var i uint8
- *
- *     if y == 0 {
- *         return nil, fmt.Errorf("Invalid year number")
- *     }
- *
- *     if y < 90 {
- *         i = y
- *     } else {
- *         i = y % 90
- *     }
- *
- *     return matrices[i-1], nil
- * }
- */
