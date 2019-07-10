@@ -14,7 +14,7 @@ type Planet struct {
 }
 
 // Planets is an alias for map of planets
-type Planets map[string]*Planet
+type Planets [7]*Planet
 
 // Cycle has start and end dates
 type Cycle struct {
@@ -36,9 +36,11 @@ type PlanetCycle struct {
 	End    time.Time
 }
 
+// PlanetCycles is alias to array of PlanetCycle
+type PlanetCycles [7]*PlanetCycle
+
 // NewCyclesMatrix returns matrix with planet cycles during a year
 // See README.md > Appendix > Planet Cycles
-// FIXME: in fact, this is a matrix with durations only, not cycles
 func NewCyclesMatrix() *Cycles {
 	d := time.Date(1999, 12, 31, 0, 0, 0, 0, time.UTC)
 	m := Cycles{}

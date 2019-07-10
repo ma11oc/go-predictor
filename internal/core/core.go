@@ -167,89 +167,47 @@ func FindVRow(m *YearMatrix, c *Card) (*Row, error) {
 	return row, nil
 }
 
-/*
- * func (p *Person) FindPlanetCycles(b time.Time, cycles *Cycles, planets Planets, hrow Row, vrow Row) error {
- *
- *     // scs := spew.ConfigState{
- *     // 	Indent:   "    ",
- *     // 	MaxDepth: 3,
- *     // }
- *     // scs.Dump(planets)
- *
- *     var row [7]*Card
- *     var err error
- *
- *     // FIXME: why we exit from func when one of the params is nil?
- *     if cycles == nil || planets == nil {
- *         return nil
- *     }
- *
- *     cc := FindCurrentPlanetCycles(p.Birthday, cycles, planets)
- *
- *     for i, v := range row {
- *         // FIXME: why we skip nil values? why valus can be nil?
- *         if v == nil {
- *             continue
- *         }
- *
- *         p.PlanetCycles[i] = cc[i]
- *         p.PlanetCycles[i].Card = v
- *     }
- *
- *     return nil
- * }
- */
-
-// FindCurrentPlanetCycles calculates planet cycles according to birthday
+// FindPlanetCycles calculates planet cycles according to birthday
 // and returns array with them
-//
-// input:
-//   - cycles
-//   - planets
-//   - rows
-/*
- * func FindCurrentPlanetCycles() map[string]*PlanetCycle {
- *
- *     // FIXME: wtf?
- *     if cycles == nil || planets == nil {
- *         return nil
- *     }
- *
- *     r := map[string]*PlanetCycle{}
- *
- *     // since table based on leap year, we need to move birthday (b)
- *     // to leap year, 2000, for instance
- *     date := time.Date(2000, b.Month(), b.Day(), 0, 0, 0, 0, time.UTC)
- *     // days := int(date.Sub(time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)).Hours() / 24)
- *
- *     // find coords in PlanetCyclesMatrix to start count
- *     x := int(date.YearDay() / 54)
- *     y := int(date.YearDay()+x*2) % 54
- *
- *     for i := 0; i < 7; i++ {
- *         // if we reached the end of a row in cycles matrix,
- *         // start from the beginning
- *         if x+i+1 >= 7 {
- *             x = (i + 1) * -1
- *         }
- *
- *         // map[string]Planet {
- *         //   "mercury": {
- *         //     "id": 1,
- *         //     "name": 1,
- *         //     "symbol": 1,
- *         //   },
- *         //   ...
- *         // }
- *         //
- *
- *         r[i] = (*cycles)[x+i+1][y]
- *         r[i].Planet = planets[i]
- *     }
- *
- *     return r
- * }
- */
+func FindPlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row) (*PlanetCycles, error) {
+	// var err error
+
+	pcc := &PlanetCycles{}
+
+	// since table based on leap year, we need to move birthday (b)
+	// to leap year, 2000, for instance
+	date := time.Date(2000, b.Month(), b.Day(), 0, 0, 0, 0, time.UTC)
+
+	// find coords in PlanetCyclesMatrix to start count
+	x := int(date.YearDay() / 54)
+	y := int(date.YearDay()+x*2) % 54
+
+	for i := 0; i < 7; i++ {
+		// if we reached the end of a row in cycles matrix,
+		// start from the beginning
+		if x+i+1 >= 7 {
+			x = (i + 1) * -1
+		}
+
+		c := (*cc)[x+i+1][y]
+
+		pcc[i] = &PlanetCycle{
+			Start:  c.Start,
+			End:    c.End,
+			Planet: pp[i],
+			Cards: struct {
+				H *Card
+				V *Card
+			}{
+				hr[i],
+				vr[i],
+			},
+		}
+
+	}
+
+	return pcc, nil
+}
 
 // TODO: FindPersonalCards
 // Men:

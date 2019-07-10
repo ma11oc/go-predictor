@@ -47,8 +47,10 @@ type Locale struct {
 	Exceptions struct {
 		Joker *Card
 	}
-	Cards   []Card `yaml:"cards"   validate:"len=52"`
-	Planets map[string]Planet
+	Cards []Card `yaml:"cards"   validate:"len=52"`
+	// Planets map[string]Planet
+
+	Planets *Planets
 }
 
 // GetOrderedDeck is ordered Deck getter

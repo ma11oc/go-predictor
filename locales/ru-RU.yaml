@@ -93,32 +93,32 @@ descriptors:
         FIXME
 
 planets:
-  mercury:
-    id: 1
+  # mercury:
+  - id: 1
     name: Меркурий
     symbol: ☿
-  venus:
-    id: 2
+  # venus:
+  - id: 2
     name: Венера
     symbol: ♀
-  mars:
-    id: 3
+  # mars:
+  - id: 3
     name: Марс
     symbol: ♂
-  jupiter:
-    id: 4
+  # jupiter:
+  - id: 4
     name: Юпитер
     symbol: ♃
-  saturn:
-    id: 5
+  # saturn:
+  - id: 5
     name: Сатурн
     symbol: ♄
-  uranus:
-    id: 6
+  # uranus:
+  - id: 6
     name: Уран
     symbol: ♅
-  neptune:
-    id: 7
+  # neptune:
+  - id: 7
     name: Нептун
     symbol: ♆
 

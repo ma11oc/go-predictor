@@ -67,7 +67,8 @@ type Person struct {
 		V *Row
 	}
 
-	PlanetCycles map[string]*PlanetCycle
+	// PlanetCycles map[string]*PlanetCycle
+	PlanetCycles *PlanetCycles
 
 	Matrix *YearMatrix // Matrix computed based on person age
 }
@@ -83,7 +84,9 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	var od *Deck
 	var om *Matrix
 	var mm *Matrices
-	// var cc *Cycles
+	var cc *Cycles
+	var pp *Planets
+	var pcc *PlanetCycles
 	var mc, dc, sc, pc, rc, lc *Card
 	var hr, vr *Row
 	var ym *YearMatrix
@@ -92,7 +95,8 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	od = loc.Base.od
 	om = loc.Base.om
 	mm = loc.Base.mm
-	// cc = loc.Base.cc
+	cc = loc.Base.cc
+	pp = loc.Planets
 
 	// get base info from conf
 	name = conf.Name
@@ -142,11 +146,9 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
-	/*
-	 * if err = FindPlanetCycles(pc, loc.Planets); err != nil {
-	 *     return nil, err
-	 * }
-	 */
+	if pcc, err = FindPlanetCycles(birthday, cc, pp, hr, vr); err != nil {
+		return nil, err
+	}
 
 	return &Person{
 		Name:     name,
@@ -178,5 +180,7 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 			hr,
 			vr,
 		},
+		PlanetCycles: pcc,
+		Matrix:       ym,
 	}, nil
 }
