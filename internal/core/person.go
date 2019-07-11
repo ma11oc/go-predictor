@@ -69,11 +69,11 @@ type Person struct {
 func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	var err error
 	var name string
-	var birthday time.Time
+	var b time.Time
 	var gender Gender
 	var age uint8
 	var od *Deck
-	var om *Matrix
+	var hm *Matrix
 	var mm *Matrices
 	var cc *Cycles
 	var pp *Planets
@@ -84,25 +84,25 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 
 	// get base primitives from locale
 	od = loc.GetOrderedDeck()
-	om = loc.GetOriginMatrix()
+	hm = loc.GetHumansMatrix()
 	mm = loc.GetYearMatrices()
 	cc = loc.GetCycles()
 	pp = loc.GetPlanets()
 
 	// get base info from conf
 	name = conf.Name
-	birthday = conf.Birthday
+	b = conf.Birthday
 	gender = conf.Gender
-	age = uint8(time.Since(birthday).Hours() / 24 / 365)
+	age = uint8(time.Since(b).Hours() / 24 / 365)
 
 	// In case of Joker, there is nothing to Find. It has only Main card
 	// with special meaning. So, handle this special case and return struct.
-	if birthday.Month() == time.December && birthday.Day() == 31 {
+	if b.Month() == time.December && b.Day() == 31 {
 		p := &Person{
 			Name:     name,
 			Gender:   gender,
 			Age:      age,
-			Birthday: birthday,
+			Birthday: b,
 		}
 
 		p.BaseCards = map[string]*Card{"main": loc.Exceptions.Joker}
@@ -111,7 +111,7 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	}
 
 	// Find main cards
-	if mc, dc, sc, err = FindMainCards(birthday, od, om); err != nil {
+	if mc, dc, sc, err = FindMainCards(b, od, hm); err != nil {
 		return nil, err
 	}
 
@@ -137,7 +137,7 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
-	if pcc, err = FindPlanetCycles(birthday, cc, pp, hr, vr); err != nil {
+	if pcc, err = FindPlanetCycles(b, cc, pp, hr, vr); err != nil {
 		return nil, err
 	}
 
@@ -145,7 +145,7 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		Name:     name,
 		Gender:   gender,
 		Age:      age,
-		Birthday: birthday,
+		Birthday: b,
 		BaseCards: map[string]*Card{
 			"main":     mc,
 			"drain":    dc,

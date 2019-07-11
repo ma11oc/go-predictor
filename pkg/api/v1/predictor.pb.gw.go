@@ -2,20 +2,20 @@
 // source: api/proto/v1/predictor.proto
 
 /*
-Package predictor is a reverse proxy.
+Package v1 is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package predictor
+package v1
 
 import (
+	"context"
 	"io"
 	"net/http"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -28,8 +28,8 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-func request_PredictorService_GetGeneralPrediction_0(ctx context.Context, marshaler runtime.Marshaler, client PredictorServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GeneralRequest
+func request_PredictorService_ComputePerson_0(ctx context.Context, marshaler runtime.Marshaler, client PredictorServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq PersonRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -40,7 +40,25 @@ func request_PredictorService_GetGeneralPrediction_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.GetGeneralPrediction(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["year"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "year")
+	}
+
+	protoReq.Year, err = runtime.Uint32(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "year", err)
+	}
+
+	msg, err := client.ComputePerson(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -83,7 +101,7 @@ func RegisterPredictorServiceHandler(ctx context.Context, mux *runtime.ServeMux,
 // "PredictorServiceClient" to call the correct interceptors.
 func RegisterPredictorServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client PredictorServiceClient) error {
 
-	mux.Handle("POST", pattern_PredictorService_GetGeneralPrediction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_PredictorService_ComputePerson_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -92,14 +110,14 @@ func RegisterPredictorServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_PredictorService_GetGeneralPrediction_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_PredictorService_ComputePerson_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_PredictorService_GetGeneralPrediction_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_PredictorService_ComputePerson_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -107,9 +125,9 @@ func RegisterPredictorServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_PredictorService_GetGeneralPrediction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "predict"}, ""))
+	pattern_PredictorService_ComputePerson_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "person", "year"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_PredictorService_GetGeneralPrediction_0 = runtime.ForwardResponseMessage
+	forward_PredictorService_ComputePerson_0 = runtime.ForwardResponseMessage
 )

@@ -1,14 +1,14 @@
 SHELL := /bin/bash
 
 build-server:
-	go build -o bin/predictor cmd/server/main.go
+	@go build -o bin/predictor cmd/server/main.go
 
-server: build-server
-	./bin/predictor -grpc-port 50051 -http-port 8080 -locale locales/ru-RU.yaml
+server: proto build-server
+	@./bin/predictor -grpc-port 50051 -http-port 8080 -locale locales/ru-RU.yaml
 
 
 build-client:
-	go build -o bin/crystal-ball cmd/client-grpc/main.go
+	@go build -o bin/crystal-ball cmd/client-grpc/main.go
 
 client: build-client
 	./bin/crystal-ball --grpc-addr localhost:50051 card -b 1986-04-16
@@ -18,22 +18,25 @@ proto:
 	$(eval TMP := $(shell mktemp -d))
 	@protoc -I/usr/local/include -I. \
 		-I$(GOPATH)/src \
+		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
 		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--go_out=plugins=grpc:$(TMP) \
 		api/proto/v1/predictor.proto
 	@protoc -I/usr/local/include -I. \
 		-I$(GOPATH)/src \
+		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
 		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--grpc-gateway_out=logtostderr=true:$(TMP) \
 		api/proto/v1/predictor.proto
 	@protoc -I/usr/local/include -I. \
 		-I$(GOPATH)/src \
+		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
 		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--swagger_out=logtostderr=true:$(TMP) \
 		api/proto/v1/predictor.proto
-	@install -v -m 0644 $(TMP)/api/proto/v1/predictor.pb.go pkg/api/v1/
-	@install -v -m 0644 $(TMP)/api/proto/v1/predictor.pb.gw.go pkg/api/v1/
-	@install -v -m 0644 $(TMP)/api/proto/v1/predictor.swagger.json api/swagger/v1/
+	@install -m 0644 $(TMP)/api/proto/v1/predictor.pb.go pkg/api/v1/
+	@install -m 0644 $(TMP)/api/proto/v1/predictor.pb.gw.go pkg/api/v1/
+	@install -m 0644 $(TMP)/api/proto/v1/predictor.swagger.json api/swagger/v1/
 	@rm -rf $(TMP)
 
 cpu-prof:

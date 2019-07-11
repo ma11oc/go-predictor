@@ -31,7 +31,7 @@ var (
 // required for any prediction
 type Locale struct {
 	Lang string `yaml:"lang" validate:"nonzero,langstr"`
-	// TODO: rename Base to Core
+
 	Core struct {
 		od *Deck
 		om *Matrix
@@ -106,21 +106,6 @@ func isParsableLanguageTag(v interface{}, param string) error {
 
 	return nil
 }
-
-// loadtranslation
-//
-/*
- * type Locale struct {
- *     Lang     string `yaml:"lang" validate:"nonzero,langstr"`
- *     Matrices []struct {
- *         ID string `yaml:"id"`
- *     }
- *     Exceptions struct {
- *         Joker *Card
- *     }
- *     Cards []Card `yaml:"cards" validate:"len=52"`
- * }
- */
 
 // FindCardByID receives a number (id) of card and returns appropriate *Card from Locale
 func (l *Locale) FindCardByID(id uint8) (*Card, error) {

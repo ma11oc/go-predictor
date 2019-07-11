@@ -23,11 +23,35 @@ func calcBirthdayHelper(c *core.Card, age uint8) (time.Time, error) {
 	return time.Date(y-1, bdays[0].Month(), bdays[0].Day(), 0, 0, 0, 0, time.UTC), nil
 }
 
-var _ = Describe("Internal/Core/Core", func() {
+var _ = Describe("internal/core/core", func() {
 
 	var (
 		conf = &core.PersonConfig{}
 	)
+
+	Describe("FindMainCards", func() {
+		Context("when birthday is 1 of January", func() {
+			It("should return (Main, Drain, Source) == (K♠, K♠, K♠)", func() {
+				b := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+				mc, dc, sc, err := core.FindMainCards(b, od, hm)
+
+				Expect(core.NewCardFromString("K♠", locale)).To(Equal(mc))
+				Expect(core.NewCardFromString("K♠", locale)).To(Equal(dc))
+				Expect(core.NewCardFromString("K♠", locale)).To(Equal(sc))
+				Expect(err).ShouldNot(HaveOccurred())
+			})
+
+			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
+				b := time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
+				mc, dc, sc, err := core.FindMainCards(b, od, hm)
+
+				Expect(core.NewCardFromString("6♦", locale)).To(Equal(mc))
+				Expect(core.NewCardFromString("9♣", locale)).To(Equal(dc))
+				Expect(core.NewCardFromString("3♠", locale)).To(Equal(sc))
+				Expect(err).ShouldNot(HaveOccurred())
+			})
+		})
+	})
 
 	Describe("FindLongtermCard", func() {
 		Context("when card is 3♦ and age is 40", func() {
@@ -72,7 +96,7 @@ var _ = Describe("Internal/Core/Core", func() {
 		})
 	})
 
-	Describe("resolve pluto/result card", func() {
+	Describe("FindPlutoCards", func() {
 		Context("when card is Q♦ and age is 31", func() {
 			It("should return pluto as 2♦ and pluto/result as 2♠", func() {
 				c, _ := core.NewCardFromString("Q♦", locale)
@@ -120,7 +144,7 @@ var _ = Describe("Internal/Core/Core", func() {
 	})
 
 	Describe("FindHRow", func() {
-		Context("for 3♦ (29)", func() {
+		Context("when main card is 3♦", func() {
 			It("should return a valid slice of cards", func() {
 				card, _ := core.NewCardFromString("3♦", locale)
 				row, err := core.FindHRow(mm[0], card)
@@ -136,7 +160,7 @@ var _ = Describe("Internal/Core/Core", func() {
 			})
 		})
 
-		Context("for 6♠ (45)", func() {
+		Context("when main card is 6♠", func() {
 			It("should return a valid slice of cards", func() {
 				card, _ := core.NewCardFromString("6♠", locale)
 				row, err := core.FindHRow(mm[0], card)
@@ -152,7 +176,7 @@ var _ = Describe("Internal/Core/Core", func() {
 			})
 		})
 
-		Context("for 8♦ (34)", func() {
+		Context("when main card is 8♦", func() {
 			It("should return a valid slice of cards", func() {
 				card, _ := core.NewCardFromString("8♦", locale)
 				row, err := core.FindHRow(mm[0], card)
@@ -168,7 +192,7 @@ var _ = Describe("Internal/Core/Core", func() {
 			})
 		})
 
-		Context("for 4♣ (17)", func() {
+		Context("when main card is 4♣", func() {
 			It("should return a valid slice of cards", func() {
 				card, _ := core.NewCardFromString("4♣", locale)
 				row, err := core.FindHRow(mm[0], card)
@@ -200,7 +224,7 @@ var _ = Describe("Internal/Core/Core", func() {
 	})
 
 	Describe("FindVRow", func() {
-		Context("for 3♦ (29)", func() {
+		Context("for 3♦", func() {
 			It("should return a valid slice of cards", func() {
 				card, _ := core.NewCardFromString("3♦", locale)
 				row, err := core.FindVRow(mm[0], card)
@@ -208,7 +232,7 @@ var _ = Describe("Internal/Core/Core", func() {
 				s := [7]string{"6♠", "K♣", "7♣", "A♥", "J♠", "9♠"}
 
 				Expect(err).ShouldNot(HaveOccurred())
-				// Expect(row[6]).To(Equal(nil))
+				Expect(row[6]).To(BeNil())
 
 				for i, v := range s {
 					c, _ := core.NewCardFromString(v, locale)
@@ -217,7 +241,7 @@ var _ = Describe("Internal/Core/Core", func() {
 			})
 		})
 
-		Context("for 4♣ (17)", func() {
+		Context("for 4♣", func() {
 			It("should return a valid slice of cards", func() {
 				card, _ := core.NewCardFromString("4♣", locale)
 				row, err := core.FindVRow(mm[0], card)
@@ -225,7 +249,6 @@ var _ = Describe("Internal/Core/Core", func() {
 				s := [7]string{"J♥", "10♠", "8♦", "8♥", "7♠", "3♠", "10♦"}
 
 				Expect(err).ShouldNot(HaveOccurred())
-				// Expect(row[6]).To(Equal(nil))
 
 				for i, v := range s {
 					c, _ := core.NewCardFromString(v, locale)

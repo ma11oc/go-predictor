@@ -1,30 +1,65 @@
 syntax = "proto3";
 
-package predictor;
+package v1;
 
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "Predictor Service";
+		version: "0.1";
+		contact: {
+			name: "predictor service project";
+			url: "https://predictor.reset.sh";
+			email: "predictor@reset.sh";
+        };
+    };
+    schemes: HTTP;
+    consumes: "application/json";
+    produces: "application/json";
+    responses: {
+		key: "404";
+		value: {
+			description: "Returned when the resource does not exist.";
+			schema: {
+				json_schema: {
+					type: STRING;
+				}
+			}
+		}
+	}
+};
+
+enum Gender {
+  OTHER  = 0;
+  MALE   = 1;
+  FEMALE = 2;
+}
+
+enum Features {
+  NOT_SPECIFIED  = 0x0;
+  BUSINESS_OWNER = 0x01;
+  CREATOR        = 0x02;
+}
 
 
 message PersonConfig {
-  enum Gender {
-    OTHER  = 0;
-    MALE   = 1;
-    FEMALE = 2;
-  }
+  string name                       = 1;
+  Gender gender                     = 2;
+  string birthday                   = 3;
 
-  enum Features {
-    NOT_SPECIFIED  = 0x0;
-    BUSINESS_OWNER = 0x01;
-    CREATOR        = 0x02;
-  }
+  uint32 features                   = 4;
+}
 
-  string name                       = 3;
-  Gender gender                     = 4;
-  string birthday                   = 5;
+message Person {
+  string name                            = 1;
+  Gender gender                          = 2;
+  string birthday                        = 3;
 
-  uint32 features                   = 6;
-
-  repeated PersonConfig environment = 7;
+  map<string, PlanetCycle> planet_cycles = 4;
+  map<string, Card> base_cards           = 5;
+  map<string, Card> personal_cards       = 6;
 }
 
 message Meaning {
@@ -37,11 +72,10 @@ message Card {
   string rank     = 2;
   string suit     = 3;
   string title    = 4;
-  string meta     = 5;
+  string meta     = 5;  // descriptor for context
 
-  // Only one meaning according to a context (e.g. longterm, pluto and so on)
+  // only one meaning according to a context (e.g. longterm, pluto and so on)
   Meaning meaning = 6;
-  // map<string, Meaning> meanings = 5;
 }
 
 message Planet {
@@ -62,12 +96,13 @@ message PlanetCycle {
 	PlanetCycleDate end   = 4;
 }
 
-message GeneralRequest {
-  // TODO: request for specific year
-  string api                = 1;
-  string lang               = 2;
+message PersonRequest {
+  string api                 = 1;
+  string lang                = 2;
 
-  PersonConfig personConfig = 3;
+  uint32 year                = 3;
+
+  PersonConfig person_config = 4;
 }
 
 message CardResponse {
@@ -77,19 +112,17 @@ message CardResponse {
   Card card   = 3;
 }
 
-message PredictionResponse {
-  string api                            = 1;
-  string lang                           = 2;
+message PersonResponse {
+  string api    = 1;
+  string lang   = 2;
 
-  map<string, PlanetCycle> planetCycles = 3;
-  map<string, Card> cards               = 4;
+  Person person = 3;
 }
 
-
 service PredictorService {
-  rpc GetGeneralPrediction(GeneralRequest) returns (PredictionResponse) {
+  rpc ComputePerson(PersonRequest) returns (PersonResponse) {
     option (google.api.http) = {
-      post: "/v1/predict"
+      post: "/v1/person/{year}"
       body: "*"
     };
   };

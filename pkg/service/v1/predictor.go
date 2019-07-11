@@ -86,7 +86,7 @@ func (s *predictorServiceServer) getLocale(lang string) (*core.Locale, error) {
 		"unsupported language: service speaks in '%s' languages, but asked for '%s'", langs, tag)
 }
 
-func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *v1.GeneralRequest) (*v1.PredictionResponse, error) {
+func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.PersonRequest) (*v1.PersonResponse, error) {
 	var locale *core.Locale
 	var person *core.Person
 	var err error
@@ -112,7 +112,6 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 		Gender:   core.Gender(pc.GetGender()),
 		Birthday: b,
 		Features: core.Features(pc.GetFeatures()),
-		// Environment: in.GetEnvironment(),
 	}
 
 	if err = validator.Validate(pconf); err != nil {
@@ -124,11 +123,10 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 	}
 
 	// set cards
-	cards := core.BaseCardsOrder
 	cc := map[string]*v1.Card{}
 	descriptors := locale.Descriptors
 
-	for _, v := range cards {
+	for _, v := range core.BaseCardsOrder {
 		kws := ""
 		dsc := ""
 
@@ -154,10 +152,9 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 	}
 
 	// set planet cycles
-	planets := core.PlanetsOrder
 	pcc := map[string]*v1.PlanetCycle{}
 
-	for i, v := range planets {
+	for i, v := range core.PlanetsOrder {
 		pcc[v] = &v1.PlanetCycle{
 			Card: &v1.Card{
 				Id:    uint32(person.PlanetCycles[i].Cards.H.ID),
@@ -165,8 +162,8 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 				Suit:  person.PlanetCycles[i].Cards.H.Suit,
 				Title: person.PlanetCycles[i].Cards.H.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.PlanetCycles[i].Cards.H.Meanings[planets[i]].Keywords,
-					Description: person.PlanetCycles[i].Cards.H.Meanings[planets[i]].Description,
+					Keywords:    person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Keywords,
+					Description: person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Description,
 				},
 			},
 			Planet: &v1.Planet{
@@ -185,11 +182,13 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 		}
 	}
 
-	return &v1.PredictionResponse{
+	return &v1.PersonResponse{
 		Api:  apiVersion,
 		Lang: req.Lang,
 
-		Cards:        cc,
-		PlanetCycles: pcc,
+		Person: &v1.Person{
+			BaseCards:    cc,
+			PlanetCycles: pcc,
+		},
 	}, nil
 }

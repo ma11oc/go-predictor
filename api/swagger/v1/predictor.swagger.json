@@ -1,12 +1,16 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/proto/v1/predictor.proto",
-    "version": "version not set"
+    "title": "Predictor Service",
+    "version": "0.1",
+    "contact": {
+      "name": "predictor service project",
+      "url": "https://predictor.reset.sh",
+      "email": "predictor@reset.sh"
+    }
   },
   "schemes": [
-    "http",
-    "https"
+    "http"
   ],
   "consumes": [
     "application/json"
@@ -15,24 +19,37 @@
     "application/json"
   ],
   "paths": {
-    "/v1/predict": {
+    "/v1/person/{year}": {
       "post": {
-        "operationId": "GetGeneralPrediction",
+        "operationId": "ComputePerson",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/predictorPredictionResponse"
+              "$ref": "#/definitions/v1PersonResponse"
+            }
+          },
+          "404": {
+            "description": "Returned when the resource does not exist.",
+            "schema": {
+              "format": "string"
             }
           }
         },
         "parameters": [
           {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/predictorGeneralRequest"
+              "$ref": "#/definitions/v1PersonRequest"
             }
           }
         ],
@@ -43,16 +60,7 @@
     }
   },
   "definitions": {
-    "PersonConfigGender": {
-      "type": "string",
-      "enum": [
-        "OTHER",
-        "MALE",
-        "FEMALE"
-      ],
-      "default": "OTHER"
-    },
-    "predictorCard": {
+    "v1Card": {
       "type": "object",
       "properties": {
         "id": {
@@ -72,27 +80,21 @@
           "type": "string"
         },
         "meaning": {
-          "$ref": "#/definitions/predictorMeaning",
-          "title": "Only one meaning according to a context (e.g. longterm, pluto and so on)"
+          "$ref": "#/definitions/v1Meaning",
+          "title": "only one meaning according to a context (e.g. longterm, pluto and so on)"
         }
       }
     },
-    "predictorGeneralRequest": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string",
-          "title": "TODO: request for specific year"
-        },
-        "lang": {
-          "type": "string"
-        },
-        "personConfig": {
-          "$ref": "#/definitions/predictorPersonConfig"
-        }
-      }
+    "v1Gender": {
+      "type": "string",
+      "enum": [
+        "OTHER",
+        "MALE",
+        "FEMALE"
+      ],
+      "default": "OTHER"
     },
-    "predictorMeaning": {
+    "v1Meaning": {
       "type": "object",
       "properties": {
         "keywords": {
@@ -103,14 +105,46 @@
         }
       }
     },
-    "predictorPersonConfig": {
+    "v1Person": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
         "gender": {
-          "$ref": "#/definitions/PersonConfigGender"
+          "$ref": "#/definitions/v1Gender"
+        },
+        "birthday": {
+          "type": "string"
+        },
+        "planet_cycles": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1PlanetCycle"
+          }
+        },
+        "base_cards": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Card"
+          }
+        },
+        "personal_cards": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Card"
+          }
+        }
+      }
+    },
+    "v1PersonConfig": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "gender": {
+          "$ref": "#/definitions/v1Gender"
         },
         "birthday": {
           "type": "string"
@@ -118,16 +152,42 @@
         "features": {
           "type": "integer",
           "format": "int64"
-        },
-        "environment": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/predictorPersonConfig"
-          }
         }
       }
     },
-    "predictorPlanet": {
+    "v1PersonRequest": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "person_config": {
+          "$ref": "#/definitions/v1PersonConfig"
+        }
+      }
+    },
+    "v1PersonResponse": {
+      "type": "object",
+      "properties": {
+        "api": {
+          "type": "string"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "person": {
+          "$ref": "#/definitions/v1Person"
+        }
+      }
+    },
+    "v1Planet": {
       "type": "object",
       "properties": {
         "id": {
@@ -142,24 +202,24 @@
         }
       }
     },
-    "predictorPlanetCycle": {
+    "v1PlanetCycle": {
       "type": "object",
       "properties": {
         "card": {
-          "$ref": "#/definitions/predictorCard"
+          "$ref": "#/definitions/v1Card"
         },
         "planet": {
-          "$ref": "#/definitions/predictorPlanet"
+          "$ref": "#/definitions/v1Planet"
         },
         "start": {
-          "$ref": "#/definitions/predictorPlanetCycleDate"
+          "$ref": "#/definitions/v1PlanetCycleDate"
         },
         "end": {
-          "$ref": "#/definitions/predictorPlanetCycleDate"
+          "$ref": "#/definitions/v1PlanetCycleDate"
         }
       }
     },
-    "predictorPlanetCycleDate": {
+    "v1PlanetCycleDate": {
       "type": "object",
       "properties": {
         "month": {
@@ -169,29 +229,6 @@
         "day": {
           "type": "integer",
           "format": "int64"
-        }
-      }
-    },
-    "predictorPredictionResponse": {
-      "type": "object",
-      "properties": {
-        "api": {
-          "type": "string"
-        },
-        "lang": {
-          "type": "string"
-        },
-        "planetCycles": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/predictorPlanetCycle"
-          }
-        },
-        "cards": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/predictorCard"
-          }
         }
       }
     }

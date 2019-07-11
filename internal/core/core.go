@@ -9,13 +9,13 @@ type Row [7]*Card
 
 // FindMainCards receives birthday, ordered deck and humans matrix and
 // returns 3 cards: Main, Drain and Source or error
-func FindMainCards(t time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, error) {
+func FindMainCards(b time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, error) {
 	var err error
 	var idx uint8
 
 	var mc, dc, sc *Card
 
-	if mc, err = od.FindCardByBirthday(t); err != nil {
+	if mc, err = od.FindCardByBirthday(b); err != nil {
 		return nil, nil, nil, err
 	}
 
