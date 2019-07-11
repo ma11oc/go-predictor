@@ -123,117 +123,73 @@ func (s *predictorServiceServer) GetGeneralPrediction(ctx context.Context, req *
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	/*
-	 *     planetCycles := make([]*v1.PlanetCycle, len(person.PlanetCycles))
-	 *
-	 *     for i, v := range person.PlanetCycles {
-	 *
-	 *         planetCycles[i] = &v1.PlanetCycle{
-	 *             Card: &v1.Card{
-	 *                 Id:    uint32(v.Card.ID),
-	 *                 Rank:  v.Card.Rank,
-	 *                 Suit:  v.Card.Suit,
-	 *                 Title: v.Card.Title,
-	 *                 Meaning: &v1.Meaning{
-	 *                     Keywords:    "UNSUPPORTED",
-	 *                     Description: "UNSUPPORTED",
-	 *                 },
-	 *             },
-	 *             Planet: &v1.Planet{
-	 *                 Id:     uint32(v.Planet.ID),
-	 *                 Name:   v.Planet.Name,
-	 *                 Symbol: v.Planet.Symbol,
-	 *             },
-	 *             Start: &v1.PlanetCycleDate{
-	 *                 Month: uint32(v.Start.Month()),
-	 *                 Day:   uint32(v.Start.Day()),
-	 *             },
-	 *             End: &v1.PlanetCycleDate{
-	 *                 Month: uint32(v.End.Month()),
-	 *                 Day:   uint32(v.End.Day()),
-	 *             },
-	 *         }
-	 *     }
-	 */
+	// set cards
+	cards := core.BaseCardsOrder
+	cc := map[string]*v1.Card{}
+	descriptors := locale.Descriptors
 
-	/*
-	 * scs := spew.ConfigState{
-	 *     Indent:   "    ",
-	 *     MaxDepth: 3,
-	 * }
-	 * scs.Dump(pconf)
-	 * scs.Dump(person.PlanetCycles)
-	 * scs.Dump(len(person.PlanetCycles))
-	 * scs.Dump(planetCycles)
-	 * scs.Dump(len(planetCycles))
-	 */
+	for _, v := range cards {
+		kws := ""
+		dsc := ""
+
+		if v == "main" || v == "drain" || v == "source" {
+			kws = person.BaseCards["main"].Meanings["general"].Keywords
+			dsc = person.BaseCards["main"].Meanings["general"].Description
+		} else {
+			kws = person.BaseCards[v].Meanings[v].Keywords
+			dsc = person.BaseCards[v].Meanings[v].Description
+		}
+
+		cc[v] = &v1.Card{
+			Id:    uint32(person.BaseCards[v].ID),
+			Rank:  person.BaseCards[v].Rank,
+			Suit:  person.BaseCards[v].Suit,
+			Title: person.BaseCards[v].Title,
+			Meta:  descriptors.Cards[v],
+			Meaning: &v1.Meaning{
+				Keywords:    kws,
+				Description: dsc,
+			},
+		}
+	}
+
+	// set planet cycles
+	planets := core.PlanetsOrder
+	pcc := map[string]*v1.PlanetCycle{}
+
+	for i, v := range planets {
+		pcc[v] = &v1.PlanetCycle{
+			Card: &v1.Card{
+				Id:    uint32(person.PlanetCycles[i].Cards.H.ID),
+				Rank:  person.PlanetCycles[i].Cards.H.Rank,
+				Suit:  person.PlanetCycles[i].Cards.H.Suit,
+				Title: person.PlanetCycles[i].Cards.H.Title,
+				Meaning: &v1.Meaning{
+					Keywords:    person.PlanetCycles[i].Cards.H.Meanings[planets[i]].Keywords,
+					Description: person.PlanetCycles[i].Cards.H.Meanings[planets[i]].Description,
+				},
+			},
+			Planet: &v1.Planet{
+				Id:     uint32(person.PlanetCycles[i].Planet.ID),
+				Name:   person.PlanetCycles[i].Planet.Name,
+				Symbol: person.PlanetCycles[i].Planet.Symbol,
+			},
+			Start: &v1.PlanetCycleDate{
+				Month: uint32(person.PlanetCycles[i].Start.Month()),
+				Day:   uint32(person.PlanetCycles[i].Start.Day()),
+			},
+			End: &v1.PlanetCycleDate{
+				Month: uint32(person.PlanetCycles[i].End.Month()),
+				Day:   uint32(person.PlanetCycles[i].End.Day()),
+			},
+		}
+	}
 
 	return &v1.PredictionResponse{
 		Api:  apiVersion,
 		Lang: req.Lang,
 
-		Cards: map[string]*v1.Card{
-			"main": &v1.Card{
-				Id:    uint32(person.Cards.Main.ID),
-				Rank:  person.Cards.Main.Rank,
-				Suit:  person.Cards.Main.Suit,
-				Title: person.Cards.Main.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Main.Context.General.Keywords,
-					Description: person.Cards.Main.Context.General.Description,
-				},
-			},
-			"drain": &v1.Card{
-				Id:    uint32(person.Cards.Drain.ID),
-				Rank:  person.Cards.Drain.Rank,
-				Suit:  person.Cards.Drain.Suit,
-				Title: person.Cards.Drain.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Drain.Context.General.Keywords,
-					Description: person.Cards.Drain.Context.General.Description,
-				},
-			},
-			"source": &v1.Card{
-				Id:    uint32(person.Cards.Source.ID),
-				Rank:  person.Cards.Source.Rank,
-				Suit:  person.Cards.Source.Suit,
-				Title: person.Cards.Source.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Source.Context.General.Keywords,
-					Description: person.Cards.Source.Context.General.Description,
-				},
-			},
-			"longterm": &v1.Card{
-				Id:    uint32(person.Cards.Longterm.ID),
-				Rank:  person.Cards.Longterm.Rank,
-				Suit:  person.Cards.Longterm.Suit,
-				Title: person.Cards.Longterm.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Longterm.Context.Longterm.Keywords,
-					Description: person.Cards.Longterm.Context.Longterm.Description,
-				},
-			},
-			"pluto": &v1.Card{
-				Id:    uint32(person.Cards.Pluto.ID),
-				Rank:  person.Cards.Pluto.Rank,
-				Suit:  person.Cards.Pluto.Suit,
-				Title: person.Cards.Pluto.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Longterm.Context.Pluto.Keywords,
-					Description: person.Cards.Longterm.Context.Pluto.Description,
-				},
-			},
-			"pluto/result": &v1.Card{
-				Id:    uint32(person.Cards.PlutoResult.ID),
-				Rank:  person.Cards.PlutoResult.Rank,
-				Suit:  person.Cards.PlutoResult.Suit,
-				Title: person.Cards.PlutoResult.Title,
-				Meaning: &v1.Meaning{
-					Keywords:    person.Cards.Longterm.Context.Result.Keywords,
-					Description: person.Cards.Longterm.Context.Result.Description,
-				},
-			},
-		},
-		// PlanetCycles: planetCycles,
+		Cards:        cc,
+		PlanetCycles: pcc,
 	}, nil
 }

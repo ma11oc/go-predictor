@@ -2,7 +2,6 @@ package core
 
 import (
 	"time"
-	// "github.com/davecgh/go-spew/spew"
 )
 
 // Gender could be one of Other, Male, Female.type Gender uint8
@@ -48,26 +47,18 @@ type PersonConfig struct {
 
 // Person contains all the information required for prediction
 type Person struct {
-	Name     string
-	Gender   Gender
-	Age      uint8
-	Birthday time.Time
-	Cards    struct {
-		Main        *Card
-		Drain       *Card
-		Source      *Card
-		Longterm    *Card
-		Pluto       *Card
-		PlutoResult *Card
-		Personal    [3]*Card
-	}
+	Name          string
+	Gender        Gender
+	Age           uint8
+	Birthday      time.Time
+	BaseCards     map[string]*Card
+	PersonalCards [3]*Card
 
 	Rows struct {
 		H *Row
 		V *Row
 	}
 
-	// PlanetCycles map[string]*PlanetCycle
 	PlanetCycles *PlanetCycles
 
 	Matrix *YearMatrix // Matrix computed based on person age
@@ -92,11 +83,11 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	var ym *YearMatrix
 
 	// get base primitives from locale
-	od = loc.Base.od
-	om = loc.Base.om
-	mm = loc.Base.mm
-	cc = loc.Base.cc
-	pp = loc.Planets
+	od = loc.GetOrderedDeck()
+	om = loc.GetOriginMatrix()
+	mm = loc.GetYearMatrices()
+	cc = loc.GetCycles()
+	pp = loc.GetPlanets()
 
 	// get base info from conf
 	name = conf.Name
@@ -114,7 +105,7 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 			Birthday: birthday,
 		}
 
-		p.Cards.Main = loc.Exceptions.Joker
+		p.BaseCards = map[string]*Card{"main": loc.Exceptions.Joker}
 
 		return p, nil
 	}
@@ -155,22 +146,13 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		Gender:   gender,
 		Age:      age,
 		Birthday: birthday,
-		Cards: struct {
-			Main        *Card
-			Drain       *Card
-			Source      *Card
-			Longterm    *Card
-			Pluto       *Card
-			PlutoResult *Card
-			Personal    [3]*Card
-		}{
-			mc,
-			dc,
-			sc,
-			lc,
-			pc,
-			rc,
-			[3]*Card{},
+		BaseCards: map[string]*Card{
+			"main":     mc,
+			"drain":    dc,
+			"source":   sc,
+			"longterm": lc,
+			"pluto":    pc,
+			"result":   rc,
 		},
 
 		Rows: struct {

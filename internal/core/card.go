@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+var (
+	// BaseCardsOrder sets the order of base cards. Useful in iterations over
+	// a Person cards
+	BaseCardsOrder = [6]string{"main", "drain", "source", "longterm", "pluto", "result"}
+)
+
 // Meaning describes a card
 type Meaning struct {
 	Keywords    string `yaml:"keywords"    validate:"nonzero"`
@@ -12,24 +18,12 @@ type Meaning struct {
 
 // Card represents a simple primitive in matrices
 type Card struct {
-	ID    uint8  `yaml:"id"    validate:"min=0,max=52"`
-	Rank  string `yaml:"rank"  validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
-	Suit  string `yaml:"suit"  validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
-	Title string `yaml:"title" validate:"nonzero"`
-	// Descriptor Meaning
-	Context struct {
-		General  Meaning
-		Longterm Meaning
-		Mercury  Meaning
-		Venus    Meaning
-		Mars     Meaning
-		Jupiter  Meaning
-		Saturn   Meaning
-		Uranus   Meaning
-		Neptune  Meaning
-		Pluto    Meaning
-		Result   Meaning
-	}
+	ID       uint8  `yaml:"id"    validate:"min=0,max=52"`
+	Rank     string `yaml:"rank"  validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
+	Suit     string `yaml:"suit"  validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
+	Title    string `yaml:"title" validate:"nonzero"`
+	Meta     string
+	Meanings map[string]Meaning `yaml:"meanings" validate:"nonzero,min=11,max=11"`
 }
 
 // GetBirthdays returns array with all the birthday dates during a year,

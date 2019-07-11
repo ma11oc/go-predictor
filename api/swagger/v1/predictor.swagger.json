@@ -68,6 +68,9 @@
         "title": {
           "type": "string"
         },
+        "meta": {
+          "type": "string"
+        },
         "meaning": {
           "$ref": "#/definitions/predictorMeaning",
           "title": "Only one meaning according to a context (e.g. longterm, pluto and so on)"
@@ -78,7 +81,8 @@
       "type": "object",
       "properties": {
         "api": {
-          "type": "string"
+          "type": "string",
+          "title": "TODO: request for specific year"
         },
         "lang": {
           "type": "string"
@@ -178,8 +182,8 @@
           "type": "string"
         },
         "planetCycles": {
-          "type": "array",
-          "items": {
+          "type": "object",
+          "additionalProperties": {
             "$ref": "#/definitions/predictorPlanetCycle"
           }
         },

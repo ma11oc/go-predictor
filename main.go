@@ -32,7 +32,7 @@ func main() {
 
 	scs := spew.ConfigState{
 		Indent:   "|---",
-		MaxDepth: 5,
+		MaxDepth: 8,
 	}
 	scs.Dump(p)
 

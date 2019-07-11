@@ -5,8 +5,12 @@ import (
 	"time"
 )
 
+var (
+	// PlanetsOrder is the order of planet and must be const
+	PlanetsOrder = [7]string{"mercury", "venus", "mars", "jupiter", "saturn", "uranus", "neptune"}
+)
+
 // Planet represents a planet primitive
-// TODO: planet order must be const
 type Planet struct {
 	ID     uint8  `yaml:"id"      validate:"min=1,max=7"`
 	Name   string `yaml:"name"    validate:"nonzero"`

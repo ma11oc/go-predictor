@@ -37,9 +37,10 @@ message Card {
   string rank     = 2;
   string suit     = 3;
   string title    = 4;
+  string meta     = 5;
 
   // Only one meaning according to a context (e.g. longterm, pluto and so on)
-  Meaning meaning = 5;
+  Meaning meaning = 6;
   // map<string, Meaning> meanings = 5;
 }
 
@@ -77,11 +78,11 @@ message CardResponse {
 }
 
 message PredictionResponse {
-  string api                        = 1;
-  string lang                       = 2;
+  string api                            = 1;
+  string lang                           = 2;
 
-  repeated PlanetCycle planetCycles = 3;
-  map<string, Card> cards           = 4;
+  map<string, PlanetCycle> planetCycles = 3;
+  map<string, Card> cards               = 4;
 }
 
 

@@ -30,9 +30,9 @@ var (
 // Locale is a fundamental primitive. It contains all the descriptions
 // required for any prediction
 type Locale struct {
-	// TODO: meta description of cards
 	Lang string `yaml:"lang" validate:"nonzero,langstr"`
-	Base struct {
+	// TODO: rename Base to Core
+	Core struct {
 		od *Deck
 		om *Matrix
 		hm *Matrix
@@ -40,42 +40,54 @@ type Locale struct {
 		mm *Matrices
 		cc *Cycles
 	}
-	// Descriptors map[string]Meaning
-	Matrices []struct {
-		ID string `yaml:"id"`
+	Descriptors struct {
+		Cards   map[string]string `yaml:"cards_meta"   validate:"nonzero"`
+		Planets map[string]string `yaml:"planets_meta" validate:"nonzero"`
 	}
+	// Matrices []struct {
+	// 	ID string `yaml:"id"`
+	// }
 	Exceptions struct {
 		Joker *Card
 	}
 	Cards []Card `yaml:"cards"   validate:"len=52"`
-	// Planets map[string]Planet
 
 	Planets *Planets
 }
 
 // GetOrderedDeck is ordered Deck getter
 func (l Locale) GetOrderedDeck() *Deck {
-	return l.Base.od
+	return l.Core.od
 }
 
 // GetYearMatrices is Year Matrices getter
 func (l Locale) GetYearMatrices() *Matrices {
-	return l.Base.mm
+	return l.Core.mm
 }
 
 // GetOriginMatrix is Origin Matrix getter
 func (l Locale) GetOriginMatrix() *Matrix {
-	return l.Base.om
+	return l.Core.om
 }
 
 // GetHumansMatrix is Humans Matrix getter
 func (l Locale) GetHumansMatrix() *Matrix {
-	return l.Base.hm
+	return l.Core.hm
+}
+
+// GetCycles is Cycles getter
+func (l Locale) GetCycles() *Cycles {
+	return l.Core.cc
+}
+
+// GetPlanets is Planets getter
+func (l Locale) GetPlanets() *Planets {
+	return l.Planets
 }
 
 // GetAngelsMatrix is Angels Matrix getter
 func (l Locale) GetAngelsMatrix() *Matrix {
-	return l.Base.am
+	return l.Core.am
 }
 
 // Locales contains all the available and loaded Locales
@@ -171,12 +183,12 @@ func NewLocale(p string) (*Locale, error) {
 		return nil, fmt.Errorf("locale %v is invalid: %v", p, err)
 	}
 
-	loc.Base.od = NewOrderedDeck(loc)
-	loc.Base.om = NewOriginMatrix(&origin, loc.Base.od)
-	loc.Base.hm = NewHumansMatrix(loc.Base.om, loc.Base.od)
-	loc.Base.am = NewAngelsMatrix(loc.Base.om, loc.Base.od)
-	loc.Base.mm = NewMatrices(loc.Base.om, loc.Base.od)
-	loc.Base.cc = NewCyclesMatrix()
+	loc.Core.od = NewOrderedDeck(loc)
+	loc.Core.om = NewOriginMatrix(&origin, loc.Core.od)
+	loc.Core.hm = NewHumansMatrix(loc.Core.om, loc.Core.od)
+	loc.Core.am = NewAngelsMatrix(loc.Core.om, loc.Core.od)
+	loc.Core.mm = NewMatrices(loc.Core.om, loc.Core.od)
+	loc.Core.cc = NewCyclesMatrix()
 
 	return loc, nil
 }
