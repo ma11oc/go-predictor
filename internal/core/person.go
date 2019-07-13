@@ -113,11 +113,11 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	}
 
 	// Find main cards
-	if mc, dc, sc, err = FindMainCards(b, od, hm); err != nil {
+	if mc, dc, sc, err = ComputeMainCards(b, od, hm); err != nil {
 		return nil, err
 	}
 
-	if lc, err = FindLongtermCard(mm, mc, a); err != nil {
+	if lc, err = ComputeLongtermCard(mm, mc, a); err != nil {
 		return nil, err
 	}
 
@@ -127,23 +127,23 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		ym = mm[a]
 	}
 
-	if pc, rc, err = FindPlutoCards(ym, mc); err != nil {
+	if pc, rc, err = ComputePlutoCards(ym, mc); err != nil {
 		return nil, err
 	}
 
-	if hr, err = FindHRow(ym, mc); err != nil {
+	if hr, err = ComputeHRow(ym, mc); err != nil {
 		return nil, err
 	}
 
-	if vr, err = FindVRow(ym, mc); err != nil {
+	if vr, err = ComputeVRow(ym, mc); err != nil {
 		return nil, err
 	}
 
-	if plcc, err = FindPlanetCycles(b, cc, pp, hr, vr); err != nil {
+	if plcc, err = ComputePlanetCycles(b, cc, pp, hr, vr); err != nil {
 		return nil, err
 	}
 
-	if pcc, err = FindPersonalCards(mc, g, f, a, loc); err != nil {
+	if pcc, err = ComputePersonalCards(mc, g, f, a, loc); err != nil {
 		return nil, err
 	}
 

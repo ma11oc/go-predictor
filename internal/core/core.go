@@ -8,9 +8,9 @@ import (
 // Row is alias, represents horizontal or vertical row in matrix
 type Row [7]*Card
 
-// FindMainCards receives birthday, ordered deck and humans matrix and
+// ComputeMainCards receives birthday, ordered deck and humans matrix and
 // returns 3 cards: Main, Drain and Source or error
-func FindMainCards(b time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, error) {
+func ComputeMainCards(b time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, error) {
 	var err error
 	var idx uint8
 
@@ -35,9 +35,9 @@ func FindMainCards(b time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, erro
 	return mc, dc, sc, nil
 }
 
-// FindLongtermCard receives array of year matrices, age and Main card of Person and
+// ComputeLongtermCard receives array of year matrices, age and Main card of Person and
 // returns appropriate longterm card or error
-func FindLongtermCard(mm *Matrices, c *Card, age uint8) (*Card, error) {
+func ComputeLongtermCard(mm *Matrices, c *Card, age uint8) (*Card, error) {
 	var idx uint8
 	var err error
 
@@ -61,9 +61,9 @@ func FindLongtermCard(mm *Matrices, c *Card, age uint8) (*Card, error) {
 	return lc, nil
 }
 
-// FindPlutoCards receives YearMatrix and Main card of Person and returns
+// ComputePlutoCards receives YearMatrix and Main card of Person and returns
 // pluto card and pluto result card or error
-func FindPlutoCards(m *YearMatrix, c *Card) (*Card, *Card, error) {
+func ComputePlutoCards(m *YearMatrix, c *Card) (*Card, *Card, error) {
 	var idx uint8
 	var err error
 	var pc, rc *Card
@@ -95,9 +95,9 @@ func FindPlutoCards(m *YearMatrix, c *Card) (*Card, *Card, error) {
 	return pc, rc, nil
 }
 
-// FindHRow receives year matrix and Main card of a Person and
+// ComputeHRow receives year matrix and Main card of a Person and
 // retuns Row (array with 7 cards)
-func FindHRow(m *YearMatrix, c *Card) (*Row, error) {
+func ComputeHRow(m *YearMatrix, c *Card) (*Row, error) {
 	var row *Row
 	var ci uint8 // card index
 	var err error
@@ -121,7 +121,7 @@ func FindHRow(m *YearMatrix, c *Card) (*Row, error) {
 	return row, nil
 }
 
-// FindVRow receives year matrix and Main card of a Person and
+// ComputeVRow receives year matrix and Main card of a Person and
 // retuns Row (array with 7 cards)
 // 6: [48, 41, 34, 27, 20, 13, 6]      [-1, -8,  -15, ...]
 // 5: [47, 40, 33, 26, 19, 12, 5]      [-2, -9,  -16, ...]
@@ -130,7 +130,7 @@ func FindHRow(m *YearMatrix, c *Card) (*Row, error) {
 // 2: [44, 37, 30, 23, 16, 9,  2, 49]  [-5, -12, -19, ...]
 // 1: [43, 36, 29, 22, 15, 8,  1]      [-6, -13, -20, ...]
 // 0: [42, 35, 28, 21, 14, 7,  0]      [-7, -14, -21, ...]
-func FindVRow(m *YearMatrix, c *Card) (*Row, error) {
+func ComputeVRow(m *YearMatrix, c *Card) (*Row, error) {
 	var row *Row
 	var ci uint8 // card index
 	var err error
@@ -166,9 +166,9 @@ func FindVRow(m *YearMatrix, c *Card) (*Row, error) {
 	return row, nil
 }
 
-// FindPlanetCycles calculates planet cycles according to birthday
+// ComputePlanetCycles calculates planet cycles according to birthday
 // and returns array with them
-func FindPlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row) (*PlanetCycles, error) {
+func ComputePlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row) (*PlanetCycles, error) {
 	// var err error
 
 	pcc := &PlanetCycles{}
@@ -227,7 +227,7 @@ func FindPlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row) (*
 //   - if a woman is a business owner with at least 2 employees and more,
 //     or a woman is a chief (behaves like a chief) she has King with the same Suit
 //   - women younger than 20 years old has Jack with the same Suit
-func FindPersonalCards(c *Card, g Gender, f Feature, a uint8, l *Locale) (*PersonalCards, error) {
+func ComputePersonalCards(c *Card, g Gender, f Feature, a uint8, l *Locale) (*PersonalCards, error) {
 	var err error
 
 	pcc := &PersonalCards{}
