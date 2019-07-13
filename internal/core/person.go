@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-validator/validator"
 )
 
@@ -42,17 +43,18 @@ const (
 // PersonProfile represents a minimum piece of information, required for prediction
 type PersonProfile struct {
 	Name     string    `yaml:"name"        validate:"nonzero"`
-	Gender   Gender    `yaml:"gender"      validate:"min=0,max=2"`
+	Gender   Gender    `yaml:"gender"      validate:"nonzero,min=0,max=2"`
 	Birthday time.Time `yaml:"birthday"    validate:"nonzero"`
+	Age      int8      `yaml:"age"`
 	Features Feature   `yaml:"features"    validate:"min=0,max=3"`
 }
 
 // Person contains all the information required for prediction
 type Person struct {
 	Name     string    `yaml:"name"        validate:"nonzero"`
-	Gender   Gender    `yaml:"gender"      validate:"min=0,max=2"`
+	Gender   Gender    `yaml:"gender"      validate:"min=1,max=2"`
 	Birthday time.Time `yaml:"birthday"    validate:"nonzero"`
-	Age      uint8     `yaml:"age"`
+	Age      uint8     `yaml:"age"         validate:"min=0"`
 
 	BaseCards map[string]*Card `yaml:"base_cards"       validate:"nonzero,min=6,max=6"`
 
@@ -107,7 +109,12 @@ func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 	b = pp.Birthday
 	g = pp.Gender
 	f = pp.Features
-	a = uint8(time.Since(b).Hours() / 24 / 365)
+
+	if pp.Age < 0 {
+		a = uint8(time.Since(b).Hours() / 24 / 365)
+	} else {
+		a = uint8(pp.Age)
+	}
 
 	// In case of Joker, there is nothing to compute. It has only Main card
 	// with special meaning. So, handle this special case and return struct.
@@ -184,6 +191,12 @@ func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 	if err = validator.Validate(p); err != nil {
 		return nil, fmt.Errorf("Person validation error: %v", err)
 	}
+	scs := spew.ConfigState{
+		Indent:   "    ",
+		MaxDepth: 3,
+	}
+	scs.Dump(pp)
+	scs.Dump(p)
 
 	return p, nil
 }

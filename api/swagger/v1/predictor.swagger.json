@@ -19,7 +19,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/person/{year}": {
+    "/v1/person": {
       "post": {
         "operationId": "ComputePerson",
         "responses": {
@@ -37,13 +37,6 @@
           }
         },
         "parameters": [
-          {
-            "name": "year",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          },
           {
             "name": "body",
             "in": "body",
@@ -117,6 +110,10 @@
         "birthday": {
           "type": "string"
         },
+        "age": {
+          "type": "integer",
+          "format": "int64"
+        },
         "planet_cycles": {
           "type": "object",
           "additionalProperties": {
@@ -149,6 +146,10 @@
         "birthday": {
           "type": "string"
         },
+        "age": {
+          "type": "integer",
+          "format": "int32"
+        },
         "features": {
           "type": "integer",
           "format": "int64"
@@ -163,10 +164,6 @@
         },
         "lang": {
           "type": "string"
-        },
-        "year": {
-          "type": "integer",
-          "format": "int64"
         },
         "person_profile": {
           "$ref": "#/definitions/v1PersonProfile"

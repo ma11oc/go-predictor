@@ -40,24 +40,6 @@ func request_PredictorService_ComputePerson_0(ctx context.Context, marshaler run
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["year"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "year")
-	}
-
-	protoReq.Year, err = runtime.Uint32(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "year", err)
-	}
-
 	msg, err := client.ComputePerson(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -125,7 +107,7 @@ func RegisterPredictorServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_PredictorService_ComputePerson_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "person", "year"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_PredictorService_ComputePerson_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "person"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

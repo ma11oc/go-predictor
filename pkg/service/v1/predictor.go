@@ -93,9 +93,10 @@ func (s *predictorServiceServer) getLocale(lang string) (*core.Locale, error) {
 }
 
 func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.PersonRequest) (*v1.PersonResponse, error) {
+	var err error
+
 	var locale *core.Locale
 	var person *core.Person
-	var err error
 
 	defer HandlePanic("ComputePerson", logger.Log)
 
@@ -118,6 +119,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		Name:     rpp.GetName(),
 		Gender:   core.Gender(rpp.GetGender()),
 		Birthday: b,
+		Age:      int8(rpp.GetAge()),
 		Features: core.Feature(rpp.GetFeatures()),
 	}
 
@@ -211,6 +213,11 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		Lang: req.Lang,
 
 		Person: &v1.Person{
+			Name:     person.Name,
+			Gender:   v1.Gender(person.Gender),
+			Birthday: person.Birthday.String(),
+			Age:      uint32(person.Age),
+
 			BaseCards:     baseCards,
 			PlanetCycles:  planetCycles,
 			PersonalCards: personalCards,

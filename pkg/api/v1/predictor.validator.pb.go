@@ -90,7 +90,6 @@ func (this *CardResponse) Validate() error {
 
 var _regex_PersonRequest_Api = regexp.MustCompile(`^v[0-9]+$`)
 var _regex_PersonRequest_Lang = regexp.MustCompile(`^[a-z]{2,2}-[A-Z]{2,2}$`)
-var _regex_PersonRequest_Year = regexp.MustCompile(`^[0-9]{4,4}$`)
 
 func (this *PersonRequest) Validate() error {
 	if !_regex_PersonRequest_Api.MatchString(this.Api) {
