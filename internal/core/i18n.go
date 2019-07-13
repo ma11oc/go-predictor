@@ -44,12 +44,11 @@ type Locale struct {
 		Cards   map[string]string `yaml:"cards_meta"   validate:"nonzero"`
 		Planets map[string]string `yaml:"planets_meta" validate:"nonzero"`
 	}
-	// Matrices []struct {
-	// 	ID string `yaml:"id"`
-	// }
+
 	Exceptions struct {
 		Joker *Card
 	}
+
 	Cards []Card `yaml:"cards"   validate:"len=52"`
 
 	Planets *Planets
@@ -122,8 +121,8 @@ func (l *Locale) FindCardByID(id uint8) (*Card, error) {
 	return &card, nil
 }
 
-// FindCardByStr receives string like 'K♠' and returns appropriate *Card from Locale
-func (l *Locale) FindCardByStr(s string) (*Card, error) {
+// FindCardByString receives string like 'K♠' and returns appropriate *Card from Locale
+func (l *Locale) FindCardByString(s string) (*Card, error) {
 	runes := []rune(s)
 
 	if len(runes) < 2 || len(runes) > 3 {

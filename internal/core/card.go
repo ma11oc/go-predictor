@@ -26,6 +26,9 @@ type Card struct {
 	Meanings map[string]Meaning `yaml:"meanings" validate:"nonzero,min=11,max=11"`
 }
 
+// PersonalCards is alias to array of 3 Cards
+type PersonalCards [3]*Card
+
 // GetBirthdays returns array with all the birthday dates during a year,
 // associated with particular card
 func (c Card) GetBirthdays() ([]time.Time, error) {
@@ -53,5 +56,5 @@ func NewCardFromNumber(n uint8, loc *Locale) (*Card, error) {
 
 // NewCardFromString returns card, found by string like 'K♠'
 func NewCardFromString(s string, loc *Locale) (*Card, error) {
-	return loc.FindCardByStr(s)
+	return loc.FindCardByString(s)
 }

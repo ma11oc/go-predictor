@@ -18,19 +18,19 @@ const (
 	Female
 )
 
-// Features represents qualities of a person which is very important
+// Feature represents qualities of a person which is very important
 // for predictions.
 // Could be one of:
 //   - BusinessOwner 0x01
 //   - Creator       0x02
 // Several features can be set simultaneously and be checked like:
-//   features|BusinessOwner != 0
-type Features uint8
+//   features & (BusinessOwner | Creator)
+type Feature uint8
 
 const (
-	// BusinessOwner means businessmen/businesswomen or
+	// Business means businessmen/businesswomen or
 	// chief with more than 1 empleyee
-	BusinessOwner Features = 1 << iota
+	Business Feature = 1 << iota
 
 	// Creator means actress, writer or artist.
 	Creator
@@ -38,11 +38,10 @@ const (
 
 // PersonConfig represents a minimum piece of information, required for prediction
 type PersonConfig struct {
-	Name        string          `yaml:"name"        validate:"nonzero"`
-	Gender      Gender          `yaml:"gender"      validate:"min=0,max=2"`
-	Birthday    time.Time       `yaml:"birthday"    validate:"nonzero"`
-	Features    Features        `yaml:"features"    validate:"min=0,max=3"`
-	Environment []*PersonConfig `yaml:"environment"`
+	Name     string    `yaml:"name"        validate:"nonzero"`
+	Gender   Gender    `yaml:"gender"      validate:"min=0,max=2"`
+	Birthday time.Time `yaml:"birthday"    validate:"nonzero"`
+	Features Feature   `yaml:"features"    validate:"min=0,max=3"`
 }
 
 // Person contains all the information required for prediction
@@ -52,7 +51,7 @@ type Person struct {
 	Age           uint8
 	Birthday      time.Time
 	BaseCards     map[string]*Card
-	PersonalCards [3]*Card
+	PersonalCards *PersonalCards
 
 	Rows struct {
 		H *Row
@@ -68,16 +67,18 @@ type Person struct {
 // returns a Person
 func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	var err error
-	var name string
+	var n string
 	var b time.Time
-	var gender Gender
-	var age uint8
+	var g Gender
+	var f Feature
+	var a uint8
 	var od *Deck
 	var hm *Matrix
 	var mm *Matrices
 	var cc *Cycles
 	var pp *Planets
-	var pcc *PlanetCycles
+	var plcc *PlanetCycles
+	var pcc *PersonalCards
 	var mc, dc, sc, pc, rc, lc *Card
 	var hr, vr *Row
 	var ym *YearMatrix
@@ -90,18 +91,19 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 	pp = loc.GetPlanets()
 
 	// get base info from conf
-	name = conf.Name
+	n = conf.Name
 	b = conf.Birthday
-	gender = conf.Gender
-	age = uint8(time.Since(b).Hours() / 24 / 365)
+	g = conf.Gender
+	f = conf.Features
+	a = uint8(time.Since(b).Hours() / 24 / 365)
 
 	// In case of Joker, there is nothing to Find. It has only Main card
 	// with special meaning. So, handle this special case and return struct.
 	if b.Month() == time.December && b.Day() == 31 {
 		p := &Person{
-			Name:     name,
-			Gender:   gender,
-			Age:      age,
+			Name:     n,
+			Gender:   g,
+			Age:      a,
 			Birthday: b,
 		}
 
@@ -115,14 +117,14 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
-	if lc, err = FindLongtermCard(mm, mc, age); err != nil {
+	if lc, err = FindLongtermCard(mm, mc, a); err != nil {
 		return nil, err
 	}
 
-	if age > 89 {
-		ym = mm[age%90]
+	if a > 89 {
+		ym = mm[a%90]
 	} else {
-		ym = mm[age]
+		ym = mm[a]
 	}
 
 	if pc, rc, err = FindPlutoCards(ym, mc); err != nil {
@@ -137,14 +139,18 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
-	if pcc, err = FindPlanetCycles(b, cc, pp, hr, vr); err != nil {
+	if plcc, err = FindPlanetCycles(b, cc, pp, hr, vr); err != nil {
+		return nil, err
+	}
+
+	if pcc, err = FindPersonalCards(mc, g, f, a, loc); err != nil {
 		return nil, err
 	}
 
 	return &Person{
-		Name:     name,
-		Gender:   gender,
-		Age:      age,
+		Name:     n,
+		Gender:   g,
+		Age:      a,
 		Birthday: b,
 		BaseCards: map[string]*Card{
 			"main":     mc,
@@ -162,7 +168,8 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 			hr,
 			vr,
 		},
-		PlanetCycles: pcc,
-		Matrix:       ym,
+		PlanetCycles:  plcc,
+		PersonalCards: pcc,
+		Matrix:        ym,
 	}, nil
 }

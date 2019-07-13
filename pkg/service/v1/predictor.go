@@ -2,34 +2,20 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	// "database/sql"
-	// "fmt"
-	// "time"
-
-	// "github.com/golang/protobuf/ptypes"
-	// "google.golang.org/grpc/codes"
+	"go.uber.org/zap"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	// gw "bitbucket.org/shchukin_a/go-predictor/api"
 	core "bitbucket.org/shchukin_a/go-predictor/internal/core"
-	// pb "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
 
 	"github.com/go-validator/validator"
 
-	// "bitbucket.org/shchukin_a/go-predictor/pkg/logger"
-
 	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
-	// "github.com/golang/glog"
-	// "github.com/golang/protobuf/ptypes/empty"
-	// "github.com/golang/protobuf/ptypes/struct"
-	// "go.uber.org/zap"
-	// "github.com/grpc-ecosystem/grpc-gateway/runtime"
-	// "google.golang.org/grpc"
-	// "google.golang.org/grpc/reflection"
+	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
 )
 
 const (
@@ -39,6 +25,26 @@ const (
 
 type predictorServiceServer struct {
 	Locales core.Locales
+}
+
+// HandlePanic logs a error via zap.Logger
+func HandlePanic(f string, logger *zap.Logger) {
+	var err string
+
+	if r := recover(); r != nil {
+		// find out exactly what the error was and set err
+		switch x := r.(type) {
+		case string:
+			break
+		case error:
+			err = x.Error()
+		default:
+			// Fallback err (per specs, error strings should be lowercase w/o punctuation
+			err = "unknown panic"
+		}
+
+		logger.Error("error", zap.String("msg", fmt.Sprintf("recovered in %v: %v", f, err)))
+	}
 }
 
 // NewPredictorServiceServer creates Predictor service
@@ -91,6 +97,8 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	var person *core.Person
 	var err error
 
+	defer HandlePanic("ComputePerson", logger.Log)
+
 	// check if the API version requested by client is supported by server
 	if err = s.checkAPI(req.Api); err != nil {
 		return nil, err
@@ -101,7 +109,6 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	}
 
 	pc := req.GetPersonConfig()
-
 	b, err := time.Parse("2006-01-02", pc.GetBirthday())
 	if err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
@@ -111,7 +118,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		Name:     pc.GetName(),
 		Gender:   core.Gender(pc.GetGender()),
 		Birthday: b,
-		Features: core.Features(pc.GetFeatures()),
+		Features: core.Feature(pc.GetFeatures()),
 	}
 
 	if err = validator.Validate(pconf); err != nil {
@@ -123,7 +130,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	}
 
 	// set cards
-	cc := map[string]*v1.Card{}
+	baseCards := map[string]*v1.Card{}
 	descriptors := locale.Descriptors
 
 	for _, v := range core.BaseCardsOrder {
@@ -138,7 +145,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 			dsc = person.BaseCards[v].Meanings[v].Description
 		}
 
-		cc[v] = &v1.Card{
+		baseCards[v] = &v1.Card{
 			Id:    uint32(person.BaseCards[v].ID),
 			Rank:  person.BaseCards[v].Rank,
 			Suit:  person.BaseCards[v].Suit,
@@ -152,10 +159,10 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	}
 
 	// set planet cycles
-	pcc := map[string]*v1.PlanetCycle{}
+	planetCycles := map[string]*v1.PlanetCycle{}
 
 	for i, v := range core.PlanetsOrder {
-		pcc[v] = &v1.PlanetCycle{
+		planetCycles[v] = &v1.PlanetCycle{
 			Card: &v1.Card{
 				Id:    uint32(person.PlanetCycles[i].Cards.H.ID),
 				Rank:  person.PlanetCycles[i].Cards.H.Rank,
@@ -182,13 +189,31 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		}
 	}
 
+	personalCards := []*v1.Card{}
+
+	for _, v := range person.PersonalCards {
+		if v != nil {
+			personalCards = append(personalCards, &v1.Card{
+				Id:    uint32(v.ID),
+				Rank:  v.Rank,
+				Suit:  v.Suit,
+				Title: v.Title,
+				Meaning: &v1.Meaning{
+					Keywords:    v.Meanings["general"].Keywords,
+					Description: v.Meanings["general"].Description,
+				},
+			})
+		}
+	}
+
 	return &v1.PersonResponse{
 		Api:  apiVersion,
 		Lang: req.Lang,
 
 		Person: &v1.Person{
-			BaseCards:    cc,
-			PlanetCycles: pcc,
+			BaseCards:     baseCards,
+			PlanetCycles:  planetCycles,
+			PersonalCards: personalCards,
 		},
 	}, nil
 }

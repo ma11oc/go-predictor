@@ -271,4 +271,31 @@ var _ = Describe("internal/core/core", func() {
 			})
 		})
 	})
+
+	Describe("FindPersonalCards", func() {
+		Context("for 3♦", func() {
+			It("should return a valid slice of cards", func() {
+				c, _ := core.NewCardFromString("3♦", locale)
+				pcc, err := core.FindPersonalCards(c, core.Male, core.Business, 20, locale)
+
+				Expect(core.NewCardFromString("J♦", locale)).Should(Equal(pcc[0]))
+				Expect(core.NewCardFromString("K♦", locale)).Should(Equal(pcc[1]))
+				Expect(err).ShouldNot(HaveOccurred())
+
+			})
+		})
+
+		Context("for 3♦", func() {
+			It("should return a valid slice of cards", func() {
+				c, _ := core.NewCardFromString("3♦", locale)
+				pcc, err := core.FindPersonalCards(c, core.Female, core.Business|core.Creator, 30, locale)
+
+				Expect(core.NewCardFromString("J♦", locale)).Should(Equal(pcc[0]))
+				Expect(core.NewCardFromString("Q♦", locale)).Should(Equal(pcc[1]))
+				Expect(core.NewCardFromString("K♦", locale)).Should(Equal(pcc[2]))
+				Expect(err).ShouldNot(HaveOccurred())
+
+			})
+		})
+	})
 })

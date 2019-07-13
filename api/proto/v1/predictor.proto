@@ -59,7 +59,7 @@ message Person {
 
   map<string, PlanetCycle> planet_cycles = 4;
   map<string, Card> base_cards           = 5;
-  map<string, Card> personal_cards       = 6;
+  repeated Card personal_cards           = 6;
 }
 
 message Meaning {

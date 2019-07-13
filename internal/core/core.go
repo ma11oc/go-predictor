@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -36,8 +37,6 @@ func FindMainCards(b time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, erro
 
 // FindLongtermCard receives array of year matrices, age and Main card of Person and
 // returns appropriate longterm card or error
-// FIXME: there is no reason to pass all the Matrices to this function,
-//        single YearMatrix will be enough and age could be found from YM
 func FindLongtermCard(mm *Matrices, c *Card, age uint8) (*Card, error) {
 	var idx uint8
 	var err error
@@ -209,7 +208,8 @@ func FindPlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row) (*
 	return pcc, nil
 }
 
-// TODO: FindPersonalCards
+// FindPersonalCard receives Main card, gender, age, features and Locale and
+// returns PersonalCards ([3]*Card) or error
 // Men:
 //   - in spite of age, each man has Jack with the same Suit as his main card,
 //     except the case when a man already has Jack with the same Suit
@@ -227,6 +227,48 @@ func FindPlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row) (*
 //   - if a woman is a business owner with at least 2 employees and more,
 //     or a woman is a chief (behaves like a chief) she has King with the same Suit
 //   - women younger than 20 years old has Jack with the same Suit
-func (p *Person) FindPersonalCards(pc *PersonConfig, loc *Locale) error {
-	return nil
+func FindPersonalCards(c *Card, g Gender, f Feature, a uint8, l *Locale) (*PersonalCards, error) {
+	var err error
+
+	pcc := &PersonalCards{}
+
+	switch g {
+	case Male:
+		if c.Rank != "J" {
+			if pcc[0], err = l.FindCardByString("J" + c.Suit); err != nil {
+				return nil, err
+			}
+		}
+
+		if a >= 36 || f&Business > 0 {
+			if pcc[1], err = l.FindCardByString("K" + c.Suit); err != nil {
+				return nil, err
+			}
+		}
+
+	case Female:
+		if a <= 20 || f&Creator > 0 {
+			if pcc[0], err = l.FindCardByString("J" + c.Suit); err != nil {
+				return nil, err
+			}
+		}
+
+		if c.Rank != "Q" {
+			if pcc[1], err = l.FindCardByString("Q" + c.Suit); err != nil {
+				return nil, err
+			}
+		}
+
+		if f&Business > 0 {
+			if pcc[2], err = l.FindCardByString("K" + c.Suit); err != nil {
+				return nil, err
+			}
+		}
+
+	default:
+		return nil, fmt.Errorf("Unable to compute personal cards: no gender has been specified")
+	}
+
+	return pcc, nil
+
 }

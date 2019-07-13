@@ -130,8 +130,8 @@
           }
         },
         "personal_cards": {
-          "type": "object",
-          "additionalProperties": {
+          "type": "array",
+          "items": {
             "$ref": "#/definitions/v1Card"
           }
         }
