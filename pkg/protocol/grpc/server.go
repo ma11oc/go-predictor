@@ -9,6 +9,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
+
 	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
 	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
 	"bitbucket.org/shchukin_a/go-predictor/pkg/protocol/grpc/middleware"
@@ -22,10 +25,18 @@ func RunServer(ctx context.Context, v1API v1.PredictorServiceServer, port string
 	}
 
 	// gRPC server statup options
-	opts := []grpc.ServerOption{}
-
-	// add middleware
-	opts = middleware.AddLogging(logger.Log, opts)
+	opts := []grpc.ServerOption{
+		grpc_middleware.WithUnaryServerChain(
+			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+			middleware.NewUnaryLoggingInterceptor(logger.Log),
+			middleware.NewUnaryValidatorInterceptor(),
+		),
+		grpc_middleware.WithStreamServerChain(
+			grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+			middleware.NewStreamLoggingInterceptor(logger.Log),
+			middleware.NewStreamValidatorInterceptor(),
+		),
+	}
 
 	// register service
 	server := grpc.NewServer(opts...)
