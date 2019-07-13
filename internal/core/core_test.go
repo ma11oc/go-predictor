@@ -26,7 +26,7 @@ func calcBirthdayHelper(c *core.Card, age uint8) (time.Time, error) {
 var _ = Describe("internal/core/core", func() {
 
 	var (
-		conf = &core.PersonConfig{}
+		conf = &core.PersonProfile{}
 	)
 
 	Describe("ComputeMainCards", func() {
@@ -35,20 +35,20 @@ var _ = Describe("internal/core/core", func() {
 				b := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 				mc, dc, sc, err := core.ComputeMainCards(b, od, hm)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("K♠", locale)).To(Equal(mc))
 				Expect(core.NewCardFromString("K♠", locale)).To(Equal(dc))
 				Expect(core.NewCardFromString("K♠", locale)).To(Equal(sc))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 
 			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
 				b := time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				mc, dc, sc, err := core.ComputeMainCards(b, od, hm)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("6♦", locale)).To(Equal(mc))
 				Expect(core.NewCardFromString("9♣", locale)).To(Equal(dc))
 				Expect(core.NewCardFromString("3♠", locale)).To(Equal(sc))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 	})
@@ -60,8 +60,8 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 40)
 				lc, err := core.ComputeLongtermCard(mm, c, 40)
 
-				Expect(core.NewCardFromString("9♣", locale)).To(Equal(lc))
 				Expect(err).ShouldNot(HaveOccurred())
+				Expect(core.NewCardFromString("9♣", locale)).To(Equal(lc))
 			})
 		})
 		Context("when card is J♣ and age is 37", func() {
@@ -70,8 +70,8 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 37)
 				lc, err := core.ComputeLongtermCard(mm, c, 37)
 
-				Expect(core.NewCardFromString("K♠", locale)).To(Equal(lc))
 				Expect(err).ShouldNot(HaveOccurred())
+				Expect(core.NewCardFromString("K♠", locale)).To(Equal(lc))
 			})
 		})
 		Context("when card is 9♣ and age is 40", func() {
@@ -80,8 +80,8 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 40)
 				lc, err := core.ComputeLongtermCard(mm, c, 40)
 
-				Expect(core.NewCardFromString("J♦", locale)).To(Equal(lc))
 				Expect(err).ShouldNot(HaveOccurred())
+				Expect(core.NewCardFromString("J♦", locale)).To(Equal(lc))
 			})
 		})
 		Context("when card is 6♦ and age is 66", func() {
@@ -90,8 +90,8 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 66)
 				lc, err := core.ComputeLongtermCard(mm, c, 66)
 
-				Expect(core.NewCardFromString("10♠", locale)).To(Equal(lc))
 				Expect(err).ShouldNot(HaveOccurred())
+				Expect(core.NewCardFromString("10♠", locale)).To(Equal(lc))
 			})
 		})
 	})
@@ -103,9 +103,9 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("2♦", locale)).To(Equal(pc))
 				Expect(core.NewCardFromString("2♠", locale)).To(Equal(rc))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 		Context("when card is K♥ and age is 31", func() {
@@ -114,9 +114,9 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("4♦", locale)).To(Equal(pc))
 				Expect(core.NewCardFromString("5♠", locale)).To(Equal(rc))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 		Context("when card is 10♥ and age is 31", func() {
@@ -125,9 +125,9 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("2♥", locale)).To(Equal(pc))
 				Expect(core.NewCardFromString("7♥", locale)).To(Equal(rc))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 		Context("when card is 9♦ and age is 67", func() {
@@ -136,9 +136,9 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 67)
 				pc, rc, err := core.ComputePlutoCards(mm[67], c)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("10♠", locale)).To(Equal(pc))
 				Expect(core.NewCardFromString("4♥", locale)).To(Equal(rc))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 	})
@@ -215,8 +215,8 @@ var _ = Describe("internal/core/core", func() {
 						c, _ := core.NewCardFromNumber(j, locale)
 						row, err := core.ComputeHRow(mm[i], c)
 
-						Expect(row).Should(BeAssignableToTypeOf(&core.Row{}))
 						Expect(err).ShouldNot(HaveOccurred())
+						Expect(row).Should(BeAssignableToTypeOf(&core.Row{}))
 					}
 				}
 			})
@@ -264,8 +264,8 @@ var _ = Describe("internal/core/core", func() {
 						c, _ := core.NewCardFromNumber(j, locale)
 						row, err := core.ComputeVRow(mm[i], c)
 
-						Expect(row).Should(BeAssignableToTypeOf(&core.Row{}))
 						Expect(err).ShouldNot(HaveOccurred())
+						Expect(row).Should(BeAssignableToTypeOf(&core.Row{}))
 					}
 				}
 			})
@@ -278,9 +278,9 @@ var _ = Describe("internal/core/core", func() {
 				c, _ := core.NewCardFromString("3♦", locale)
 				pcc, err := core.ComputePersonalCards(c, core.Male, core.Business, 20, locale)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("J♦", locale)).Should(Equal(pcc[0]))
 				Expect(core.NewCardFromString("K♦", locale)).Should(Equal(pcc[1]))
-				Expect(err).ShouldNot(HaveOccurred())
 
 			})
 		})
@@ -290,11 +290,10 @@ var _ = Describe("internal/core/core", func() {
 				c, _ := core.NewCardFromString("3♦", locale)
 				pcc, err := core.ComputePersonalCards(c, core.Female, core.Business|core.Creator, 30, locale)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("J♦", locale)).Should(Equal(pcc[0]))
 				Expect(core.NewCardFromString("Q♦", locale)).Should(Equal(pcc[1]))
 				Expect(core.NewCardFromString("K♦", locale)).Should(Equal(pcc[2]))
-				Expect(err).ShouldNot(HaveOccurred())
-
 			})
 		})
 	})

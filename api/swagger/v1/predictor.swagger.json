@@ -137,7 +137,7 @@
         }
       }
     },
-    "v1PersonConfig": {
+    "v1PersonProfile": {
       "type": "object",
       "properties": {
         "name": {
@@ -168,8 +168,8 @@
           "type": "integer",
           "format": "int64"
         },
-        "person_config": {
-          "$ref": "#/definitions/v1PersonConfig"
+        "person_profile": {
+          "$ref": "#/definitions/v1PersonProfile"
         }
       }
     },

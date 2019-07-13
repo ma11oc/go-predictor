@@ -22,7 +22,7 @@ func main() {
 	locales := core.MustBuildLocales("locales/ru-RU.yaml")
 	lang := language.Make("ru-RU")
 
-	pc := &core.PersonConfig{
+	pc := &core.PersonProfile{
 		Name:     "Requester1",
 		Birthday: time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC),
 		Gender:   core.Male,

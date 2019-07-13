@@ -10,33 +10,36 @@ import (
 )
 
 var _ = Describe("Internal/Core/Person", func() {
+	var (
+		pp = &core.PersonProfile{
+			Name:     "John",
+			Birthday: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
+			Gender:   core.Male,
+			Features: core.Feature(0x0),
+		}
+	)
 
 	Describe("NewPerson", func() {
 		Context("when birthday is 1 of January", func() {
 			It("should return (Main, Drain, Source) == (K♠, K♠, K♠)", func() {
-				pc := &core.PersonConfig{
-					Birthday: time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC),
-				}
-				p, err := core.NewPerson(pc, locale)
+				p, err := core.NewPerson(pp, locale)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("K♠", locale)).To(Equal(p.BaseCards["main"]))
 				Expect(core.NewCardFromString("K♠", locale)).To(Equal(p.BaseCards["drain"]))
 				Expect(core.NewCardFromString("K♠", locale)).To(Equal(p.BaseCards["source"]))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 
 		Context("when birthday is 5 of September", func() {
 			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
-				pc := &core.PersonConfig{
-					Birthday: time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC),
-				}
-				p, err := core.NewPerson(pc, locale)
+				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
+				p, err := core.NewPerson(pp, locale)
 
+				Expect(err).ShouldNot(HaveOccurred())
 				Expect(core.NewCardFromString("6♦", locale)).To(Equal(p.BaseCards["main"]))
 				Expect(core.NewCardFromString("9♣", locale)).To(Equal(p.BaseCards["drain"]))
 				Expect(core.NewCardFromString("3♠", locale)).To(Equal(p.BaseCards["source"]))
-				Expect(err).ShouldNot(HaveOccurred())
 			})
 		})
 	})

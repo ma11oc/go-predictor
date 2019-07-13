@@ -38,18 +38,18 @@ enum Gender {
 }
 
 enum Features {
-  NOT_SPECIFIED  = 0x0;
+  NOT_SPECIFIED  = 0x00;
   BUSINESS_OWNER = 0x01;
   CREATOR        = 0x02;
 }
 
 
-message PersonConfig {
-  string name                       = 1;
-  Gender gender                     = 2;
-  string birthday                   = 3;
+message PersonProfile {
+  string name     = 1;
+  Gender gender   = 2;
+  string birthday = 3;
 
-  uint32 features                   = 4;
+  uint32 features = 4;
 }
 
 message Person {
@@ -102,7 +102,7 @@ message PersonRequest {
 
   uint32 year                = 3;
 
-  PersonConfig person_config = 4;
+  PersonProfile person_profile = 4;
 }
 
 message CardResponse {

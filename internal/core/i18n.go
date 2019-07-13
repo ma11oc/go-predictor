@@ -27,6 +27,9 @@ var (
 	}
 )
 
+// TODO: validate planets order
+// TODO: validate cards order
+
 // Locale is a fundamental primitive. It contains all the descriptions
 // required for any prediction
 type Locale struct {
@@ -172,7 +175,7 @@ func NewLocale(p string) (*Locale, error) {
 	loc.Core.hm = NewHumansMatrix(loc.Core.om, loc.Core.od)
 	loc.Core.am = NewAngelsMatrix(loc.Core.om, loc.Core.od)
 	loc.Core.mm = NewMatrices(loc.Core.om, loc.Core.od)
-	loc.Core.cc = NewCyclesMatrix()
+	loc.Core.cc = NewCyclesTable()
 
 	return loc, nil
 }

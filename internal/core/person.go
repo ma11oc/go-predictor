@@ -1,7 +1,10 @@
 package core
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/go-validator/validator"
 )
 
 // Gender could be one of Other, Male, Female.type Gender uint8
@@ -29,15 +32,15 @@ type Feature uint8
 
 const (
 	// Business means businessmen/businesswomen or
-	// chief with more than 1 empleyee
+	// chief with more than 1 employee
 	Business Feature = 1 << iota
 
 	// Creator means actress, writer or artist.
 	Creator
 )
 
-// PersonConfig represents a minimum piece of information, required for prediction
-type PersonConfig struct {
+// PersonProfile represents a minimum piece of information, required for prediction
+type PersonProfile struct {
 	Name     string    `yaml:"name"        validate:"nonzero"`
 	Gender   Gender    `yaml:"gender"      validate:"min=0,max=2"`
 	Birthday time.Time `yaml:"birthday"    validate:"nonzero"`
@@ -46,58 +49,67 @@ type PersonConfig struct {
 
 // Person contains all the information required for prediction
 type Person struct {
-	Name          string
-	Gender        Gender
-	Age           uint8
-	Birthday      time.Time
-	BaseCards     map[string]*Card
-	PersonalCards *PersonalCards
+	Name     string    `yaml:"name"        validate:"nonzero"`
+	Gender   Gender    `yaml:"gender"      validate:"min=0,max=2"`
+	Birthday time.Time `yaml:"birthday"    validate:"nonzero"`
+	Age      uint8     `yaml:"age"`
 
-	Rows struct {
-		H *Row
-		V *Row
-	}
+	BaseCards map[string]*Card `yaml:"base_cards"       validate:"nonzero,min=6,max=6"`
 
-	PlanetCycles *PlanetCycles
+	PersonalCards *PersonalCards `yaml:"personal_cards" validate:"nonzero,min=0,max=3"`
+
+	Rows *Rows `yaml:"rows"                             validate:"nonzero"`
+
+	PlanetCycles *PlanetCycles `yaml:"planet_cycles"    validate:"nonzero,min=7,max=7"`
 
 	Matrix *YearMatrix // Matrix computed based on person age
 }
 
-// NewPerson receives valid PersonConfig and valid Locale and
-// returns a Person
-func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
+// NewPerson receives valid PersonProfile and valid Locale
+// It returns a Person
+func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 	var err error
+
 	var n string
 	var b time.Time
 	var g Gender
 	var f Feature
 	var a uint8
+
 	var od *Deck
 	var hm *Matrix
 	var mm *Matrices
 	var cc *Cycles
-	var pp *Planets
-	var plcc *PlanetCycles
-	var pcc *PersonalCards
+	var planets *Planets
+
+	var planetCycles *PlanetCycles
+	var personalCards *PersonalCards
+
 	var mc, dc, sc, pc, rc, lc *Card
 	var hr, vr *Row
 	var ym *YearMatrix
+
+	// Validate PersonProfile
+	if err = validator.Validate(pp); err != nil {
+		return nil, fmt.Errorf("PersonProfile validation error: %v", err)
+	}
 
 	// get base primitives from locale
 	od = loc.GetOrderedDeck()
 	hm = loc.GetHumansMatrix()
 	mm = loc.GetYearMatrices()
 	cc = loc.GetCycles()
-	pp = loc.GetPlanets()
 
-	// get base info from conf
-	n = conf.Name
-	b = conf.Birthday
-	g = conf.Gender
-	f = conf.Features
+	planets = loc.GetPlanets()
+
+	// get base info from pp
+	n = pp.Name
+	b = pp.Birthday
+	g = pp.Gender
+	f = pp.Features
 	a = uint8(time.Since(b).Hours() / 24 / 365)
 
-	// In case of Joker, there is nothing to Find. It has only Main card
+	// In case of Joker, there is nothing to compute. It has only Main card
 	// with special meaning. So, handle this special case and return struct.
 	if b.Month() == time.December && b.Day() == 31 {
 		p := &Person{
@@ -112,7 +124,6 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		return p, nil
 	}
 
-	// Find main cards
 	if mc, dc, sc, err = ComputeMainCards(b, od, hm); err != nil {
 		return nil, err
 	}
@@ -139,15 +150,15 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
-	if plcc, err = ComputePlanetCycles(b, cc, pp, hr, vr); err != nil {
+	if planetCycles, err = ComputePlanetCycles(b, cc, planets, hr, vr); err != nil {
 		return nil, err
 	}
 
-	if pcc, err = ComputePersonalCards(mc, g, f, a, loc); err != nil {
+	if personalCards, err = ComputePersonalCards(mc, g, f, a, loc); err != nil {
 		return nil, err
 	}
 
-	return &Person{
+	p := &Person{
 		Name:     n,
 		Gender:   g,
 		Age:      a,
@@ -161,15 +172,18 @@ func NewPerson(conf *PersonConfig, loc *Locale) (*Person, error) {
 			"result":   rc,
 		},
 
-		Rows: struct {
-			H *Row
-			V *Row
-		}{
-			hr,
-			vr,
+		Rows: &Rows{
+			H: hr,
+			V: vr,
 		},
-		PlanetCycles:  plcc,
-		PersonalCards: pcc,
+		PlanetCycles:  planetCycles,
+		PersonalCards: personalCards,
 		Matrix:        ym,
-	}, nil
+	}
+
+	if err = validator.Validate(p); err != nil {
+		return nil, fmt.Errorf("Person validation error: %v", err)
+	}
+
+	return p, nil
 }

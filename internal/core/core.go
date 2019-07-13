@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-// Row is alias, represents horizontal or vertical row in matrix
-type Row [7]*Card
-
 // ComputeMainCards receives birthday, ordered deck and humans matrix and
 // returns 3 cards: Main, Drain and Source or error
 func ComputeMainCards(b time.Time, od *Deck, hm *Matrix) (*Card, *Card, *Card, error) {
@@ -208,7 +205,7 @@ func ComputePlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row)
 	return pcc, nil
 }
 
-// FindPersonalCard receives Main card, gender, age, features and Locale and
+// ComputePersonalCards receives Main card, gender, age, features and Locale and
 // returns PersonalCards ([3]*Card) or error
 // Men:
 //   - in spite of age, each man has Jack with the same Suit as his main card,

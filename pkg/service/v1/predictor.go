@@ -108,24 +108,24 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		return nil, err
 	}
 
-	pc := req.GetPersonConfig()
-	b, err := time.Parse("2006-01-02", pc.GetBirthday())
+	rpp := req.GetPersonProfile()
+	b, err := time.Parse("2006-01-02", rpp.GetBirthday())
 	if err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	pconf := &core.PersonConfig{
-		Name:     pc.GetName(),
-		Gender:   core.Gender(pc.GetGender()),
+	pp := &core.PersonProfile{
+		Name:     rpp.GetName(),
+		Gender:   core.Gender(rpp.GetGender()),
 		Birthday: b,
-		Features: core.Feature(pc.GetFeatures()),
+		Features: core.Feature(rpp.GetFeatures()),
 	}
 
-	if err = validator.Validate(pconf); err != nil {
+	if err = validator.Validate(pp); err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	if person, err = core.NewPerson(pconf, locale); err != nil {
+	if person, err = core.NewPerson(pp, locale); err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 

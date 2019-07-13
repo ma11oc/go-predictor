@@ -43,9 +43,18 @@ type PlanetCycle struct {
 // PlanetCycles is alias to array of PlanetCycle
 type PlanetCycles [7]*PlanetCycle
 
-// NewCyclesMatrix returns matrix with planet cycles during a year
+// Row is alias, represents horizontal or vertical row in matrix
+type Row [7]*Card
+
+// Rows is alias for set of horizontal and vertical row
+type Rows struct {
+	H *Row `yaml:"hrow" validate:"nonzero,min=7,max=7"`
+	V *Row `yaml:"vrow" validate:"nonzero,min=6,max=7"`
+}
+
+// NewCyclesTable returns matrix with planet cycles during a year
 // See README.md > Appendix > Planet Cycles
-func NewCyclesMatrix() *Cycles {
+func NewCyclesTable() *Cycles {
 	d := time.Date(1999, 12, 31, 0, 0, 0, 0, time.UTC)
 	m := Cycles{}
 
@@ -68,7 +77,7 @@ func NewCyclesMatrix() *Cycles {
 
 // PrintCycles prints the table of cycles to stdout
 func PrintCycles() {
-	m := NewCyclesMatrix()
+	m := NewCyclesTable()
 
 	for y := 0; y < 54; y++ {
 		for x := 0; x < 7; x++ {
