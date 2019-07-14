@@ -26,7 +26,7 @@ func calcBirthdayHelper(c *core.Card, age uint8) (time.Time, error) {
 var _ = Describe("internal/core/core", func() {
 
 	var (
-		conf = &core.PersonProfile{}
+		pp = &core.PersonProfile{}
 	)
 
 	Describe("ComputeMainCards", func() {
@@ -63,7 +63,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is 3♦ and age is 40", func() {
 			It("should return 9♣", func() {
 				c, _ := core.NewCardFromString("3♦", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 40)
+				pp.Birthday, _ = calcBirthdayHelper(c, 40)
 				lc, err := core.ComputeLongtermCard(mm, c, 40)
 
 				lcw, _ := core.NewCardFromString("9♣", locale)
@@ -75,7 +75,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is J♣ and age is 37", func() {
 			It("should return K♠", func() {
 				c, _ := core.NewCardFromString("J♣", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 37)
+				pp.Birthday, _ = calcBirthdayHelper(c, 37)
 				lc, err := core.ComputeLongtermCard(mm, c, 37)
 
 				lcw, _ := core.NewCardFromString("K♠", locale)
@@ -87,7 +87,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is 9♣ and age is 40", func() {
 			It("should return J♦", func() {
 				c, _ := core.NewCardFromString("9♣", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 40)
+				pp.Birthday, _ = calcBirthdayHelper(c, 40)
 				lc, err := core.ComputeLongtermCard(mm, c, 40)
 
 				lcw, _ := core.NewCardFromString("J♦", locale)
@@ -96,10 +96,50 @@ var _ = Describe("internal/core/core", func() {
 				Expect(lc).To(Equal(lcw))
 			})
 		})
-		Context("when card is 6♦ and age is 66", func() {
-			It("should return 10♠", func() {
+		Context("when card is 6♦", func() {
+			It("should return 6♣, when age is 32", func() {
 				c, _ := core.NewCardFromString("6♦", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 66)
+				pp.Birthday, _ = calcBirthdayHelper(c, 32)
+				lc, err := core.ComputeLongtermCard(mm, c, 32)
+
+				lcw, _ := core.NewCardFromString("6♣", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(lc).To(Equal(lcw))
+			})
+			It("should return J♦, when age is 33", func() {
+				c, _ := core.NewCardFromString("6♦", locale)
+				pp.Birthday, _ = calcBirthdayHelper(c, 33)
+				lc, err := core.ComputeLongtermCard(mm, c, 33)
+
+				lcw, _ := core.NewCardFromString("J♦", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(lc).To(Equal(lcw))
+			})
+			It("should return Q♥, when age is 34", func() {
+				c, _ := core.NewCardFromString("6♦", locale)
+				pp.Birthday, _ = calcBirthdayHelper(c, 34)
+				lc, err := core.ComputeLongtermCard(mm, c, 34)
+
+				lcw, _ := core.NewCardFromString("Q♥", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(lc).To(Equal(lcw))
+			})
+			It("should return 4♣, when age is 35", func() {
+				c, _ := core.NewCardFromString("6♦", locale)
+				pp.Birthday, _ = calcBirthdayHelper(c, 35)
+				lc, err := core.ComputeLongtermCard(mm, c, 35)
+
+				lcw, _ := core.NewCardFromString("4♣", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(lc).To(Equal(lcw))
+			})
+			It("should return 10♠, when age is 66", func() {
+				c, _ := core.NewCardFromString("6♦", locale)
+				pp.Birthday, _ = calcBirthdayHelper(c, 66)
 				lc, err := core.ComputeLongtermCard(mm, c, 66)
 
 				lcw, _ := core.NewCardFromString("10♠", locale)
@@ -114,7 +154,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is Q♦ and age is 31", func() {
 			It("should return pluto as 2♦ and pluto/result as 2♠", func() {
 				c, _ := core.NewCardFromString("Q♦", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 31)
+				pp.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
 				pcw, _ := core.NewCardFromString("2♦", locale)
@@ -128,7 +168,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is K♥ and age is 31", func() {
 			It("should return pluto as 4♦ and pluto/result as 5♠", func() {
 				c, _ := core.NewCardFromString("K♥", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 31)
+				pp.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
 				pcw, _ := core.NewCardFromString("4♦", locale)
@@ -142,7 +182,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is 10♥ and age is 31", func() {
 			It("should return pluto as 2♥ and pluto/result as 7♥", func() {
 				c, _ := core.NewCardFromString("10♥", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 31)
+				pp.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
 				pcw, _ := core.NewCardFromString("2♥", locale)
@@ -156,7 +196,7 @@ var _ = Describe("internal/core/core", func() {
 		Context("when card is 9♦ and age is 67", func() {
 			It("should return pluto as 10♠ and pluto/result as 4♥", func() {
 				c, _ := core.NewCardFromString("9♦", locale)
-				conf.Birthday, _ = calcBirthdayHelper(c, 67)
+				pp.Birthday, _ = calcBirthdayHelper(c, 67)
 				pc, rc, err := core.ComputePlutoCards(mm[67], c)
 
 				pcw, _ := core.NewCardFromString("10♠", locale)

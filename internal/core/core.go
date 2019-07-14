@@ -207,6 +207,7 @@ func ComputePlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row)
 
 // ComputePersonalCards receives Main card, gender, age, features and Locale and
 // returns PersonalCards ([3]*Card) or error
+//
 // Men:
 //   - in spite of age, each man has Jack with the same Suit as his main card,
 //     except the case when a man already has Jack with the same Suit
@@ -214,6 +215,7 @@ func ComputePlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row)
 //   - if a man over 36 years old, he has King with the same Suit
 //   - if a man is a business owner with at least 2 employees and more,
 //     or a man is a chief (behaves like a chief) he has King with the same Suit
+//
 // Women:
 //   - women may have up to 3 personal cards at the same time
 //   - in spite of age, each woman has Queen with the same Suit as her main card
@@ -224,6 +226,8 @@ func ComputePlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row)
 //   - if a woman is a business owner with at least 2 employees and more,
 //     or a woman is a chief (behaves like a chief) she has King with the same Suit
 //   - women younger than 20 years old has Jack with the same Suit
+//
+// Each personal card have its own horizontal and vertical rows
 func ComputePersonalCards(c *Card, g Gender, f Feature, a uint8, l *Locale) (*PersonalCards, error) {
 	var err error
 	var card *Card
