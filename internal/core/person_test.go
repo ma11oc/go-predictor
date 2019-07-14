@@ -49,8 +49,8 @@ var _ = Describe("Internal/Core/Person", func() {
 			})
 		})
 
-		Context("when birthday is 5 of September and age is 33", func() {
-			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
+		Context("when birthday is 5 of September", func() {
+			It("should return return a valid person, when age is 33", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				pp.Age = 33
 				p, err := core.NewPerson(pp, locale)
@@ -66,7 +66,7 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
 			})
-			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
+			It("should return return a valid person, when age is 34", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				pp.Age = 34
 				p, err := core.NewPerson(pp, locale)
@@ -82,7 +82,7 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
 			})
-			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
+			It("should return return a valid person, when age is 35", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				pp.Age = 35
 				p, err := core.NewPerson(pp, locale)
@@ -98,7 +98,7 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
 			})
-			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
+			It("should return return a valid person, when age is 66", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				pp.Age = 66
 				p, err := core.NewPerson(pp, locale)

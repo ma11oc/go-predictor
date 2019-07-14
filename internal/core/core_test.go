@@ -410,4 +410,89 @@ var _ = Describe("internal/core/core", func() {
 			})
 		})
 	})
+
+	Describe("ComputeKarmaCards", func() {
+		Context("for 4♥", func() {
+			It("should return array with 2 cards", func() {
+				c, _ := core.NewCardFromString("4♥", locale)
+				kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+				kc1, _ := core.NewCardFromString("4♦", locale)
+				kc2, _ := core.NewCardFromString("10♠", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(kc1.In((*kcc))).Should(Equal(true))
+				Expect(kc2.In((*kcc))).Should(Equal(true))
+				Expect(len((*kcc))).Should(Equal(2))
+			})
+		})
+		Context("for J♥", func() {
+			It("should return array with 2 cards", func() {
+				c, _ := core.NewCardFromString("J♥", locale)
+				kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+				kc1, _ := core.NewCardFromString("K♠", locale)
+				kc2, _ := core.NewCardFromString("8♣", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(kc1.In((*kcc))).Should(Equal(true))
+				Expect(kc2.In((*kcc))).Should(Equal(true))
+				Expect(len((*kcc))).Should(Equal(2))
+			})
+		})
+		Context("for 8♣", func() {
+			It("should return array with 2 cards", func() {
+				c, _ := core.NewCardFromString("8♣", locale)
+				kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+				kc1, _ := core.NewCardFromString("J♥", locale)
+				kc2, _ := core.NewCardFromString("K♠", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(kc1.In((*kcc))).Should(Equal(true))
+				Expect(kc2.In((*kcc))).Should(Equal(true))
+				Expect(len((*kcc))).Should(Equal(2))
+			})
+		})
+		Context("for K♠", func() {
+			It("should return array with 2 cards", func() {
+				c, _ := core.NewCardFromString("K♠", locale)
+				kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+				kc1, _ := core.NewCardFromString("8♣", locale)
+				kc2, _ := core.NewCardFromString("J♥", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(kc1.In((*kcc))).Should(Equal(true))
+				Expect(kc2.In((*kcc))).Should(Equal(true))
+				Expect(len((*kcc))).Should(Equal(2))
+			})
+		})
+		Context("for 2♥", func() {
+			It("should return array with 2 cards", func() {
+				c, _ := core.NewCardFromString("2♥", locale)
+				kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+				kc1, _ := core.NewCardFromString("A♣", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(kc1.In((*kcc))).Should(Equal(true))
+				Expect(len((*kcc))).Should(Equal(1))
+			})
+		})
+		Context("for 6♦", func() {
+			It("should return array with 2 cards", func() {
+				c, _ := core.NewCardFromString("6♦", locale)
+				kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+				kc1, _ := core.NewCardFromString("9♣", locale)
+				kc2, _ := core.NewCardFromString("3♠", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(kc1.In((*kcc))).Should(Equal(true))
+				Expect(kc2.In((*kcc))).Should(Equal(true))
+				Expect(len((*kcc))).Should(Equal(2))
+			})
+		})
+	})
 })

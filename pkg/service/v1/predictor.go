@@ -230,6 +230,23 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		}
 	}
 
+	karmaCards := []*v1.Card{}
+
+	for _, v := range *person.KarmaCards {
+		if v != nil {
+			karmaCards = append(karmaCards, &v1.Card{
+				Id:    uint32(v.ID),
+				Rank:  v.Rank,
+				Suit:  v.Suit,
+				Title: v.Title,
+				Meaning: &v1.Meaning{
+					Keywords:    v.Meanings["general"].Keywords,
+					Description: v.Meanings["general"].Description,
+				},
+			})
+		}
+	}
+
 	return &v1.PersonResponse{
 		Api:  apiVersion,
 		Lang: req.Lang,
@@ -243,6 +260,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 			BaseCards:     baseCards,
 			PlanetCycles:  planetCycles,
 			PersonalCards: personalCards,
+			KarmaCards:    karmaCards,
 		},
 	}, nil
 }

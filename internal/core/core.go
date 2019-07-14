@@ -278,3 +278,68 @@ func ComputePersonalCards(c *Card, g Gender, f Feature, a uint8, l *Locale) (*Pe
 
 	return &pcc, nil
 }
+
+// ComputeKarmaCards receives main card and humans matrix.
+// It returns array with 1 or 2 cards.
+func ComputeKarmaCards(mc *Card, hm *Matrix, loc *Locale) (*KarmaCards, error) {
+	var err error
+	var idx uint8
+	var kc1, kc2 *Card
+
+	switch mc.ID {
+	case 4: // 4♥
+		if kc1, err = loc.FindCardByString("4♦"); err != nil {
+			return nil, err
+		}
+		if kc2, err = loc.FindCardByString("10♠"); err != nil {
+			return nil, err
+		}
+		return &KarmaCards{kc1, kc2}, nil
+
+	case 11: // J♥
+		if kc1, err = loc.FindCardByString("K♠"); err != nil {
+			return nil, err
+		}
+		if kc2, err = loc.FindCardByString("8♣"); err != nil {
+			return nil, err
+		}
+		return &KarmaCards{kc1, kc2}, nil
+
+	case 21: // 8♣
+		if kc1, err = loc.FindCardByString("J♥"); err != nil {
+			return nil, err
+		}
+		if kc2, err = loc.FindCardByString("K♠"); err != nil {
+			return nil, err
+		}
+		return &KarmaCards{kc1, kc2}, nil
+
+	case 52: // K♠
+		if kc1, err = loc.FindCardByString("8♣"); err != nil {
+			return nil, err
+		}
+		if kc2, err = loc.FindCardByString("J♥"); err != nil {
+			return nil, err
+		}
+		return &KarmaCards{kc1, kc2}, nil
+
+	}
+
+	if idx, err = hm.Decks.Main.indexOf(mc.ID); err != nil {
+		return nil, err
+	}
+
+	if kc1, err = hm.Decks.Drain.FindCardByIndex(idx); err != nil {
+		return nil, err
+	}
+
+	if kc2, err = hm.Decks.Source.FindCardByIndex(idx); err != nil {
+		return nil, err
+	}
+
+	if kc1 == kc2 {
+		return &KarmaCards{kc1}, nil
+	}
+
+	return &KarmaCards{kc1, kc2}, nil
+}

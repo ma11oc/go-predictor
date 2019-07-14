@@ -42,6 +42,9 @@ const (
 // PersonalCards is alias to array of 3 Cards
 type PersonalCards []*Card
 
+// KarmaCards is alias to array of 2 Cards
+type KarmaCards []*Card
+
 // PersonProfile represents a minimum piece of information, required for prediction
 type PersonProfile struct {
 	Name     string    `yaml:"name"        validate:"nonzero"`
@@ -59,6 +62,8 @@ type Person struct {
 	Age      uint8     `yaml:"age"         validate:"min=0"`
 
 	BaseCards map[string]*Card `yaml:"base_cards"       validate:"nonzero,min=6,max=6"`
+
+	KarmaCards *KarmaCards `yaml:"karma_cards"          validate:"nonzero,min=1,max=2"`
 
 	PersonalCards *PersonalCards `yaml:"personal_cards" validate:"nonzero,min=0,max=3"`
 
@@ -88,6 +93,7 @@ func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 
 	var planetCycles *PlanetCycles
 	var personalCards *PersonalCards
+	var karmaCards *KarmaCards
 
 	var mc, dc, sc, pc, rc, lc *Card
 	var hr, vr *Row
@@ -167,6 +173,10 @@ func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 		return nil, err
 	}
 
+	if karmaCards, err = ComputeKarmaCards(mc, hm, loc); err != nil {
+		return nil, err
+	}
+
 	p := &Person{
 		Name:     n,
 		Gender:   g,
@@ -187,6 +197,7 @@ func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 		},
 		PlanetCycles:  planetCycles,
 		PersonalCards: personalCards,
+		KarmaCards:    karmaCards,
 		Matrix:        ym,
 	}
 
