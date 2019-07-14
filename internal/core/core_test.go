@@ -273,27 +273,74 @@ var _ = Describe("internal/core/core", func() {
 	})
 
 	Describe("ComputePersonalCards", func() {
-		Context("for 3♦", func() {
-			It("should return a valid slice of cards", func() {
-				c, _ := core.NewCardFromString("3♦", locale)
-				pcc, err := core.ComputePersonalCards(c, core.Male, core.Business, 20, locale)
+		Context("for J♣, male, 28 years old, student", func() {
+			It("should return empty array of personal cards", func() {
+				c, _ := core.NewCardFromString("J♣", locale)
+				pcc, err := core.ComputePersonalCards(c, core.Male, core.Feature(0x0), 28, locale)
 
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("J♦", locale)).Should(Equal(pcc[0]))
-				Expect(core.NewCardFromString("K♦", locale)).Should(Equal(pcc[1]))
+				Expect(len((*pcc))).Should(Equal(0))
+			})
+		})
+
+		Context("for Q♦, male, 40 years old", func() {
+			It("should return array with 2 personal cards", func() {
+				c, _ := core.NewCardFromString("Q♦", locale)
+				pcc, err := core.ComputePersonalCards(c, core.Male, core.Feature(0x0), 40, locale)
+
+				pc0, _ := core.NewCardFromString("J♦", locale)
+				pc1, _ := core.NewCardFromString("K♦", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(len(*pcc)).Should(Equal(2))
+				Expect(pc0.In((*pcc))).Should(Equal(true))
+				Expect(pc1.In((*pcc))).Should(Equal(true))
 
 			})
 		})
 
-		Context("for 3♦", func() {
-			It("should return a valid slice of cards", func() {
+		Context("for K♣, female, 40 years old", func() {
+			It("should return array with 1 personal card", func() {
+				c, _ := core.NewCardFromString("K♣", locale)
+				pcc, err := core.ComputePersonalCards(c, core.Female, core.Feature(0x0), 40, locale)
+
+				pc0, _ := core.NewCardFromString("Q♣", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(len(*pcc)).Should(Equal(1))
+				Expect(pc0.In((*pcc))).Should(Equal(true))
+
+			})
+		})
+
+		Context("for 3♦, male, 20 years old, businessman", func() {
+			It("should return array with 2 personal cards", func() {
+				c, _ := core.NewCardFromString("3♦", locale)
+				pcc, err := core.ComputePersonalCards(c, core.Male, core.Business, 20, locale)
+
+				pc0, _ := core.NewCardFromString("J♦", locale)
+				pc1, _ := core.NewCardFromString("K♦", locale)
+
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(len(*pcc)).Should(Equal(2))
+				Expect(pc0.In((*pcc))).Should(Equal(true))
+				Expect(pc1.In((*pcc))).Should(Equal(true))
+			})
+		})
+		Context("for 3♦, female, 30 years old, businesswoman and actress", func() {
+			It("should return array with 3 personal cards", func() {
 				c, _ := core.NewCardFromString("3♦", locale)
 				pcc, err := core.ComputePersonalCards(c, core.Female, core.Business|core.Creator, 30, locale)
 
+				pc0, _ := core.NewCardFromString("J♦", locale)
+				pc1, _ := core.NewCardFromString("Q♦", locale)
+				pc2, _ := core.NewCardFromString("K♦", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("J♦", locale)).Should(Equal(pcc[0]))
-				Expect(core.NewCardFromString("Q♦", locale)).Should(Equal(pcc[1]))
-				Expect(core.NewCardFromString("K♦", locale)).Should(Equal(pcc[2]))
+				Expect(len(*pcc)).Should(Equal(3))
+				Expect(pc0.In((*pcc))).Should(Equal(true))
+				Expect(pc1.In((*pcc))).Should(Equal(true))
+				Expect(pc2.In((*pcc))).Should(Equal(true))
 			})
 		})
 	})

@@ -26,9 +26,6 @@ type Card struct {
 	Meanings map[string]Meaning `yaml:"meanings" validate:"nonzero,min=11,max=11"`
 }
 
-// PersonalCards is alias to array of 3 Cards
-type PersonalCards [3]*Card
-
 // GetBirthdays returns array with all the birthday dates during a year,
 // associated with particular card
 func (c Card) GetBirthdays() ([]time.Time, error) {
@@ -47,6 +44,18 @@ func (c Card) GetBirthdays() ([]time.Time, error) {
 	}
 
 	return bdays, nil
+}
+
+// In is an auxiliary function to determine whether Card c in array of Cards cc
+func (c Card) In(cc []*Card) (bool, error) {
+
+	for _, v := range cc {
+		if c.ID == v.ID {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 // NewCardFromNumber returns type *Card from the given number (0, 52]

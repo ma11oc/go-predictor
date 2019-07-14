@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-validator/validator"
 )
 
@@ -39,6 +38,9 @@ const (
 	// Creator means actress, writer or artist.
 	Creator
 )
+
+// PersonalCards is alias to array of 3 Cards
+type PersonalCards []*Card
 
 // PersonProfile represents a minimum piece of information, required for prediction
 type PersonProfile struct {
@@ -191,12 +193,6 @@ func NewPerson(pp *PersonProfile, loc *Locale) (*Person, error) {
 	if err = validator.Validate(p); err != nil {
 		return nil, fmt.Errorf("Person validation error: %v", err)
 	}
-	scs := spew.ConfigState{
-		Indent:   "    ",
-		MaxDepth: 3,
-	}
-	scs.Dump(pp)
-	scs.Dump(p)
 
 	return p, nil
 }

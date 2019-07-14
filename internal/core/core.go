@@ -226,46 +226,51 @@ func ComputePlanetCycles(b time.Time, cc *Cycles, pp *Planets, hr *Row, vr *Row)
 //   - women younger than 20 years old has Jack with the same Suit
 func ComputePersonalCards(c *Card, g Gender, f Feature, a uint8, l *Locale) (*PersonalCards, error) {
 	var err error
+	var card *Card
 
-	pcc := &PersonalCards{}
+	pcc := PersonalCards{}
 
 	switch g {
 	case Male:
 		if c.Rank != "J" {
-			if pcc[0], err = l.FindCardByString("J" + c.Suit); err != nil {
+			if card, err = l.FindCardByString("J" + c.Suit); err != nil {
 				return nil, err
 			}
+			pcc = append(pcc, card)
 		}
 
 		if a >= 36 || f&Business > 0 {
-			if pcc[1], err = l.FindCardByString("K" + c.Suit); err != nil {
+			if card, err = l.FindCardByString("K" + c.Suit); err != nil {
 				return nil, err
 			}
+			pcc = append(pcc, card)
 		}
 
 	case Female:
 		if a <= 20 || f&Creator > 0 {
-			if pcc[0], err = l.FindCardByString("J" + c.Suit); err != nil {
+			if card, err = l.FindCardByString("J" + c.Suit); err != nil {
 				return nil, err
 			}
+			pcc = append(pcc, card)
 		}
 
 		if c.Rank != "Q" {
-			if pcc[1], err = l.FindCardByString("Q" + c.Suit); err != nil {
+			if card, err = l.FindCardByString("Q" + c.Suit); err != nil {
 				return nil, err
 			}
+			pcc = append(pcc, card)
 		}
 
 		if f&Business > 0 {
-			if pcc[2], err = l.FindCardByString("K" + c.Suit); err != nil {
+			if card, err = l.FindCardByString("K" + c.Suit); err != nil {
 				return nil, err
 			}
+			pcc = append(pcc, card)
 		}
 
 	default:
 		return nil, fmt.Errorf("Unable to compute personal cards: no gender has been specified")
 	}
 
-	return pcc, nil
-
+	return &pcc, nil
 }
