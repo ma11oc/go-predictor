@@ -164,16 +164,36 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	planetCycles := map[string]*v1.PlanetCycle{}
 
 	for i, v := range core.PlanetsOrder {
-		planetCycles[v] = &v1.PlanetCycle{
-			Card: &v1.Card{
-				Id:    uint32(person.PlanetCycles[i].Cards.H.ID),
-				Rank:  person.PlanetCycles[i].Cards.H.Rank,
-				Suit:  person.PlanetCycles[i].Cards.H.Suit,
-				Title: person.PlanetCycles[i].Cards.H.Title,
+		vcard := &v1.Card{}
+
+		if person.PlanetCycles[i].Cards.V != nil {
+			vcard = &v1.Card{
+				Id:    uint32(person.PlanetCycles[i].Cards.V.ID),
+				Rank:  person.PlanetCycles[i].Cards.V.Rank,
+				Suit:  person.PlanetCycles[i].Cards.V.Suit,
+				Title: person.PlanetCycles[i].Cards.V.Title,
 				Meaning: &v1.Meaning{
-					Keywords:    person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Keywords,
-					Description: person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Description,
+					Keywords:    person.PlanetCycles[i].Cards.V.Meanings[core.PlanetsOrder[i]].Keywords,
+					Description: person.PlanetCycles[i].Cards.V.Meanings[core.PlanetsOrder[i]].Description,
 				},
+			}
+		} else {
+			vcard = nil
+		}
+
+		planetCycles[v] = &v1.PlanetCycle{
+			Cards: map[string]*v1.Card{
+				"horizontal": &v1.Card{
+					Id:    uint32(person.PlanetCycles[i].Cards.H.ID),
+					Rank:  person.PlanetCycles[i].Cards.H.Rank,
+					Suit:  person.PlanetCycles[i].Cards.H.Suit,
+					Title: person.PlanetCycles[i].Cards.H.Title,
+					Meaning: &v1.Meaning{
+						Keywords:    person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Keywords,
+						Description: person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Description,
+					},
+				},
+				"vertical": vcard,
 			},
 			Planet: &v1.Planet{
 				Id:     uint32(person.PlanetCycles[i].Planet.ID),
@@ -193,7 +213,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 
 	personalCards := []*v1.Card{}
 
-	for _, v := range person.PersonalCards {
+	for _, v := range *person.PersonalCards {
 		if v != nil {
 			personalCards = append(personalCards, &v1.Card{
 				Id:    uint32(v.ID),

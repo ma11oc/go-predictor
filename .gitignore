@@ -15,3 +15,6 @@ bin/
 vendor/*
 
 core.coverprofile
+
+pkg/api
+api/swagger

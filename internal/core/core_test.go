@@ -35,20 +35,26 @@ var _ = Describe("internal/core/core", func() {
 				b := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 				mc, dc, sc, err := core.ComputeMainCards(b, od, hm)
 
+				want, _ := core.NewCardFromString("K♠", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("K♠", locale)).To(Equal(mc))
-				Expect(core.NewCardFromString("K♠", locale)).To(Equal(dc))
-				Expect(core.NewCardFromString("K♠", locale)).To(Equal(sc))
+				Expect(mc).To(Equal(want))
+				Expect(dc).To(Equal(want))
+				Expect(sc).To(Equal(want))
 			})
 
 			It("should return (Main, Drain, Source) == (6♦, 9♣, 3♠)", func() {
 				b := time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				mc, dc, sc, err := core.ComputeMainCards(b, od, hm)
 
+				mcw, _ := core.NewCardFromString("6♦", locale)
+				dcw, _ := core.NewCardFromString("9♣", locale)
+				scw, _ := core.NewCardFromString("3♠", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("6♦", locale)).To(Equal(mc))
-				Expect(core.NewCardFromString("9♣", locale)).To(Equal(dc))
-				Expect(core.NewCardFromString("3♠", locale)).To(Equal(sc))
+				Expect(mc).To(Equal(mcw))
+				Expect(dc).To(Equal(dcw))
+				Expect(sc).To(Equal(scw))
 			})
 		})
 	})
@@ -60,8 +66,10 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 40)
 				lc, err := core.ComputeLongtermCard(mm, c, 40)
 
+				lcw, _ := core.NewCardFromString("9♣", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("9♣", locale)).To(Equal(lc))
+				Expect(lc).To(Equal(lcw))
 			})
 		})
 		Context("when card is J♣ and age is 37", func() {
@@ -70,8 +78,10 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 37)
 				lc, err := core.ComputeLongtermCard(mm, c, 37)
 
+				lcw, _ := core.NewCardFromString("K♠", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("K♠", locale)).To(Equal(lc))
+				Expect(lc).To(Equal(lcw))
 			})
 		})
 		Context("when card is 9♣ and age is 40", func() {
@@ -80,8 +90,10 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 40)
 				lc, err := core.ComputeLongtermCard(mm, c, 40)
 
+				lcw, _ := core.NewCardFromString("J♦", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("J♦", locale)).To(Equal(lc))
+				Expect(lc).To(Equal(lcw))
 			})
 		})
 		Context("when card is 6♦ and age is 66", func() {
@@ -90,8 +102,10 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 66)
 				lc, err := core.ComputeLongtermCard(mm, c, 66)
 
+				lcw, _ := core.NewCardFromString("10♠", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("10♠", locale)).To(Equal(lc))
+				Expect(lc).To(Equal(lcw))
 			})
 		})
 	})
@@ -103,9 +117,12 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
+				pcw, _ := core.NewCardFromString("2♦", locale)
+				rcw, _ := core.NewCardFromString("2♠", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("2♦", locale)).To(Equal(pc))
-				Expect(core.NewCardFromString("2♠", locale)).To(Equal(rc))
+				Expect(pc).To(Equal(pcw))
+				Expect(rc).To(Equal(rcw))
 			})
 		})
 		Context("when card is K♥ and age is 31", func() {
@@ -114,9 +131,12 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
+				pcw, _ := core.NewCardFromString("4♦", locale)
+				rcw, _ := core.NewCardFromString("5♠", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("4♦", locale)).To(Equal(pc))
-				Expect(core.NewCardFromString("5♠", locale)).To(Equal(rc))
+				Expect(pc).To(Equal(pcw))
+				Expect(rc).To(Equal(rcw))
 			})
 		})
 		Context("when card is 10♥ and age is 31", func() {
@@ -125,9 +145,12 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 31)
 				pc, rc, err := core.ComputePlutoCards(mm[31], c)
 
+				pcw, _ := core.NewCardFromString("2♥", locale)
+				rcw, _ := core.NewCardFromString("7♥", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("2♥", locale)).To(Equal(pc))
-				Expect(core.NewCardFromString("7♥", locale)).To(Equal(rc))
+				Expect(pc).To(Equal(pcw))
+				Expect(rc).To(Equal(rcw))
 			})
 		})
 		Context("when card is 9♦ and age is 67", func() {
@@ -136,9 +159,12 @@ var _ = Describe("internal/core/core", func() {
 				conf.Birthday, _ = calcBirthdayHelper(c, 67)
 				pc, rc, err := core.ComputePlutoCards(mm[67], c)
 
+				pcw, _ := core.NewCardFromString("10♠", locale)
+				rcw, _ := core.NewCardFromString("4♥", locale)
+
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(core.NewCardFromString("10♠", locale)).To(Equal(pc))
-				Expect(core.NewCardFromString("4♥", locale)).To(Equal(rc))
+				Expect(pc).To(Equal(pcw))
+				Expect(rc).To(Equal(rcw))
 			})
 		})
 	})
@@ -155,7 +181,7 @@ var _ = Describe("internal/core/core", func() {
 
 				for i, v := range s {
 					c, _ := core.NewCardFromString(v, locale)
-					Expect(row[i]).To(Equal(c))
+					Expect(c).To(Equal(row[i]))
 				}
 			})
 		})
@@ -171,7 +197,7 @@ var _ = Describe("internal/core/core", func() {
 
 				for i, v := range s {
 					c, _ := core.NewCardFromString(v, locale)
-					Expect(row[i]).To(Equal(c))
+					Expect(c).To(Equal(row[i]))
 				}
 			})
 		})
@@ -187,7 +213,7 @@ var _ = Describe("internal/core/core", func() {
 
 				for i, v := range s {
 					c, _ := core.NewCardFromString(v, locale)
-					Expect(row[i]).To(Equal(c))
+					Expect(c).To(Equal(row[i]))
 				}
 			})
 		})
@@ -203,7 +229,7 @@ var _ = Describe("internal/core/core", func() {
 
 				for i, v := range s {
 					c, _ := core.NewCardFromString(v, locale)
-					Expect(row[i]).To(Equal(c))
+					Expect(c).To(Equal(row[i]))
 				}
 			})
 		})

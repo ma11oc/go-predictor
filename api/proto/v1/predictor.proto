@@ -93,10 +93,10 @@ message PlanetCycleDate {
 }
 
 message PlanetCycle {
-	Card card             = 1;
-	Planet planet         = 2;
-	PlanetCycleDate start = 3;
-	PlanetCycleDate end   = 4;
+	map<string, Card> cards = 1;
+	Planet planet           = 2;
+	PlanetCycleDate start   = 3;
+	PlanetCycleDate end     = 4;
 }
 
 message CardResponse {
