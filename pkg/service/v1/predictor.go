@@ -140,8 +140,8 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		dsc := ""
 
 		if v == "main" || v == "drain" || v == "source" {
-			kws = person.BaseCards["main"].Meanings["general"].Keywords
-			dsc = person.BaseCards["main"].Meanings["general"].Description
+			kws = person.BaseCards[v].Meanings["general"].Keywords
+			dsc = person.BaseCards[v].Meanings["general"].Description
 		} else {
 			kws = person.BaseCards[v].Meanings[v].Keywords
 			dsc = person.BaseCards[v].Meanings[v].Description
