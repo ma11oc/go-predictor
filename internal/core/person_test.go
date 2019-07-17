@@ -65,6 +65,31 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["drain"]).To(Equal(dcw))
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
+
+				hrw := []string{"4♠", "J♣", "10♦", "7♦", "2♠", "J♦", "9♠"}
+				vrw := []string{"Q♣", "6♥", "5♥", "A♠", "2♦", "9♠"}
+				// TODO: check v[3]
+
+				for i := range core.PlanetsOrder {
+					vc := &core.Card{}
+					hc := p.PlanetCycles[i].Cards.H
+					vcw := &core.Card{}
+
+					if p.PlanetCycles[i].Cards.V != nil {
+						vc = p.PlanetCycles[i].Cards.V
+						vcw, _ = core.NewCardFromString(vrw[i], locale)
+
+						Expect(vc).To(Equal(vcw))
+					} else {
+						vc = nil
+						Expect(vc).To(BeNil())
+					}
+
+					hcw, _ := core.NewCardFromString(hrw[i], locale)
+
+					Expect(hc).To(Equal(hcw))
+				}
+
 			})
 			It("should return return a valid person, when age is 34", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
@@ -81,6 +106,29 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["drain"]).To(Equal(dcw))
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
+
+				hrw := []string{"4♣", "5♣", "7♦", "10♣", "J♥", "Q♣", "Q♦"}
+				vrw := []string{"9♦", "3♣", "K♣", "A♠", "8♠", "Q♦"}
+
+				for i := range core.PlanetsOrder {
+					vc := &core.Card{}
+					hc := p.PlanetCycles[i].Cards.H
+					vcw := &core.Card{}
+
+					if p.PlanetCycles[i].Cards.V != nil {
+						vc = p.PlanetCycles[i].Cards.V
+						vcw, _ = core.NewCardFromString(vrw[i], locale)
+
+						Expect(vc).To(Equal(vcw))
+					} else {
+						vc = nil
+						Expect(vc).To(BeNil())
+					}
+
+					hcw, _ := core.NewCardFromString(hrw[i], locale)
+
+					Expect(hc).To(Equal(hcw))
+				}
 			})
 			It("should return return a valid person, when age is 35", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
@@ -97,6 +145,29 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["drain"]).To(Equal(dcw))
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
+
+				hrw := []string{"9♣", "7♥", "6♣", "8♣", "Q♠", "A♦", "10♣"}
+				vrw := []string{"4♠", "9♠", "2♦", "3♣", "J♣", "5♠", "10♣"}
+
+				for i := range core.PlanetsOrder {
+					vc := &core.Card{}
+					hc := p.PlanetCycles[i].Cards.H
+					vcw := &core.Card{}
+
+					if p.PlanetCycles[i].Cards.V != nil {
+						vc = p.PlanetCycles[i].Cards.V
+						vcw, _ = core.NewCardFromString(vrw[i], locale)
+
+						Expect(vc).To(Equal(vcw))
+					} else {
+						vc = nil
+						Expect(vc).To(BeNil())
+					}
+
+					hcw, _ := core.NewCardFromString(hrw[i], locale)
+
+					Expect(hc).To(Equal(hcw))
+				}
 			})
 			It("should return return a valid person, when age is 66", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
@@ -113,6 +184,29 @@ var _ = Describe("Internal/Core/Person", func() {
 				Expect(p.BaseCards["drain"]).To(Equal(dcw))
 				Expect(p.BaseCards["source"]).To(Equal(scw))
 				Expect(p.BaseCards["longterm"]).To(Equal(lcw))
+
+				hrw := []string{"7♥", "3♣", "Q♦", "K♠", "5♣", "A♣", "4♣"}
+				vrw := []string{"J♦", "9♦", "5♥", "5♦", "9♣", "3♥"}
+
+				for i := range core.PlanetsOrder {
+					vc := &core.Card{}
+					hc := p.PlanetCycles[i].Cards.H
+					vcw := &core.Card{}
+
+					if p.PlanetCycles[i].Cards.V != nil {
+						vc = p.PlanetCycles[i].Cards.V
+						vcw, _ = core.NewCardFromString(vrw[i], locale)
+
+						Expect(vc).To(Equal(vcw))
+					} else {
+						vc = nil
+						Expect(vc).To(BeNil())
+					}
+
+					hcw, _ := core.NewCardFromString(hrw[i], locale)
+
+					Expect(hc).To(Equal(hcw))
+				}
 			})
 		})
 	})
