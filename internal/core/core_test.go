@@ -495,4 +495,6 @@ var _ = Describe("internal/core/core", func() {
 			})
 		})
 	})
+	Describe("ComputePlanetCycles", func() { // TODO
+	})
 })

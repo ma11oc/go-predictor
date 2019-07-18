@@ -152,7 +152,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 			Rank:  person.BaseCards[v].Rank,
 			Suit:  person.BaseCards[v].Suit,
 			Title: person.BaseCards[v].Title,
-			Meta:  descriptors.Cards[v],
+			XMeta: descriptors.Cards[v],
 			Meaning: &v1.Meaning{
 				Keywords:    kws,
 				Description: dsc,
@@ -172,7 +172,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 				Rank:  person.PlanetCycles[i].Cards.V.Rank,
 				Suit:  person.PlanetCycles[i].Cards.V.Suit,
 				Title: person.PlanetCycles[i].Cards.V.Title,
-				Meta:  descriptors.Cards["vertical"],
+				XMeta: descriptors.Cards["vertical"],
 				Meaning: &v1.Meaning{
 					Keywords:    person.PlanetCycles[i].Cards.V.Meanings[core.PlanetsOrder[i]].Keywords,
 					Description: person.PlanetCycles[i].Cards.V.Meanings[core.PlanetsOrder[i]].Description,
@@ -189,7 +189,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 					Rank:  person.PlanetCycles[i].Cards.H.Rank,
 					Suit:  person.PlanetCycles[i].Cards.H.Suit,
 					Title: person.PlanetCycles[i].Cards.H.Title,
-					Meta:  descriptors.Cards["horizontal"],
+					XMeta: descriptors.Cards["horizontal"],
 					Meaning: &v1.Meaning{
 						Keywords:    person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Keywords,
 						Description: person.PlanetCycles[i].Cards.H.Meanings[core.PlanetsOrder[i]].Description,

@@ -72,11 +72,11 @@ message Meaning {
 }
 
 message Card {
-  uint32 id       = 1;
-  string rank     = 2;
-  string suit     = 3;
-  string title    = 4;
-  string meta     = 5;  // descriptor for context
+  string _meta    = 1;  // descriptor for context
+  uint32 id       = 2;
+  string rank     = 3;
+  string suit     = 4;
+  string title    = 5;
 
   // only one meaning according to a context (e.g. longterm, pluto and so on)
   Meaning meaning = 6;
