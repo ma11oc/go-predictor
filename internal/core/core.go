@@ -343,3 +343,63 @@ func ComputeKarmaCards(mc *Card, hm *Matrix, loc *Locale) (*KarmaCards, error) {
 
 	return &KarmaCards{kc1, kc2}, nil
 }
+
+// ComputeCalendar receives birthday, year and array of all the matrices
+// It returns
+//                   YEAR
+//    ddb                                dde
+//     |---------------o----------------->|
+//  |-----------o------------------------------------------o------>
+//             doc                                        doc
+//              |<----------- 630 days interval ---------->|
+//
+func ComputeCalendar(b time.Time, od *Deck, pp *Planets, year uint32, mm *Matrices) (*Calendar, error) {
+	var err error
+	var c *Card
+	var week *Week
+
+	if c, err = od.FindCardByBirthday(b); err != nil {
+		return nil, err
+	}
+
+	ys := time.Date(int(year), time.January, 1, 0, 0, 0, 0, time.UTC)
+	ye := time.Date(int(year), time.December, 31, 0, 0, 0, 0, time.UTC)
+
+	// days passed from birthday at the beginning of the year
+	ddb := ys.Sub(b).Hours() / 24
+	// days passed from birthday at the end of the year
+	dde := ye.Sub(b).Hours() / 24
+
+	// index of matrix in matrices at the beginning of the year
+	idb := ddb / 7 / 90
+
+	// day when period will be changed
+	doc := int(idb+1) * 7 * 90
+
+	// week 1 start and end
+	w1s := b.AddDate(0, 0, int(idb)*7*90)
+	w1e := b.AddDate(0, 0, int(idb+1)*7*90-1)
+
+	cal := &Calendar{}
+
+	if week, err = NewWeek(c, mm[int(idb)], pp, b.Weekday(), w1s, w1e); err != nil {
+		return nil, err
+	}
+
+	cal.Weeks = append(cal.Weeks, week)
+
+	// if a period will be changed this year
+	if doc < int(dde) {
+		// week 2 start and end
+		w2s := b.AddDate(0, 0, int(idb+1)*7*90)
+		w2e := b.AddDate(0, 0, int(idb+2)*7*90-1)
+
+		if week, err = NewWeek(c, mm[int(idb+1)], pp, b.Weekday(), w2s, w2e); err != nil {
+			return nil, err
+		}
+
+		cal.Weeks = append(cal.Weeks, week)
+	}
+
+	return cal, nil
+}
