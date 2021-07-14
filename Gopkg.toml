@@ -29,9 +29,9 @@
 #   branch = "master"
 #   name = "github.com/golang/glog"
 
-[[constraint]]
-  branch = "master"
-  name = "github.com/golang/protobuf"
+# [[constraint]]
+#   branch = "master"
+#   name = "github.com/golang/protobuf"
 
 [[constraint]]
   name = "github.com/grpc-ecosystem/go-grpc-middleware"

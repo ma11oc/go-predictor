@@ -22,18 +22,24 @@ func main() {
 	locales := core.MustBuildLocales("locales/ru-RU.yaml")
 	lang := language.Make("ru-RU")
 
-	pc := &core.PersonProfile{
-		Name:     "Requester1",
-		Birthday: time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC),
-		Gender:   core.Male,
-	}
+	/*
+	 * pc := &core.PersonProfile{
+	 *     Name:     "Requester1",
+	 *     Birthday: time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC),
+	 *     Gender:   core.Male,
+	 * }
+	 */
 
-	p, _ := core.NewPerson(pc, locales[lang])
+	// p, _ := core.NewPerson(pc, locales[lang])
+
+	// cal, _ := core.ComputeCalendar(time.Date(1966, time.October, 24, 0, 0, 0, 0, time.UTC),
+	cal, _ := core.ComputeCalendar(time.Date(1986, time.April, 15, 0, 0, 0, 0, time.UTC),
+		locales[lang].GetOrderedDeck(), locales[lang].GetPlanets(), 2019, locales[lang].GetYearMatrices())
 
 	scs := spew.ConfigState{
-		Indent:   "|---",
-		MaxDepth: 8,
+		Indent:   "    ",
+		MaxDepth: 7,
 	}
-	scs.Dump(p)
+	scs.Dump(cal)
 
 }

@@ -480,14 +480,14 @@ var _ = Describe("internal/core/core", func() {
 				Expect(len((*kcc))).Should(Equal(1))
 			})
 		})
-		Context("for 6♦", func() {
+		When("main card is 6♦", func() {
+			c, _ := core.NewCardFromString("6♦", locale)
+			kcc, err := core.ComputeKarmaCards(c, hm, locale)
+
+			kc1, _ := core.NewCardFromString("9♣", locale)
+			kc2, _ := core.NewCardFromString("3♠", locale)
+
 			It("should return array with 2 cards", func() {
-				c, _ := core.NewCardFromString("6♦", locale)
-				kcc, err := core.ComputeKarmaCards(c, hm, locale)
-
-				kc1, _ := core.NewCardFromString("9♣", locale)
-				kc2, _ := core.NewCardFromString("3♠", locale)
-
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(kc1.In((*kcc))).Should(Equal(true))
 				Expect(kc2.In((*kcc))).Should(Equal(true))
@@ -495,6 +495,55 @@ var _ = Describe("internal/core/core", func() {
 			})
 		})
 	})
+
 	Describe("ComputePlanetCycles", func() { // TODO
+	})
+
+	Describe("ComputeCalendar", func() {
+		When("brithday is 2000-09-05 and request for 2019 year", func() {
+			planets := locale.GetPlanets()
+
+			b := time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
+			cal, err := core.ComputeCalendar(b, od, planets, 2019, mm)
+
+			It("should not raise an error", func() {
+				Expect(err).ShouldNot(HaveOccurred())
+			})
+			It("should return arrays of weeks with 2 elements", func() {
+				Expect(len((cal.Weeks))).Should(Equal(2))
+			})
+			It("should return first week with valid set of cards", func() {
+				hrw := []string{"9♦", "9♠", "8♠", "A♥", "8♦", "Q♦", "4♦"}
+				vrw := []string{"K♥", "6♥", "3♥", "2♦", "10♠", "4♦"}
+				dsw := time.Date(2017, time.December, 5, 0, 0, 0, 0, time.UTC)
+				dew := time.Date(2019, time.August, 26, 0, 0, 0, 0, time.UTC)
+
+				for i := 0; i < 7; i++ {
+					hcw, _ := core.NewCardFromString(hrw[i], locale)
+					vcw, _ := core.NewCardFromString(vrw[i], locale)
+
+					Expect(cal.Weeks[0].Days[i].Cards.H).Should(Equal(hcw))
+					Expect(cal.Weeks[0].Days[i].Cards.V).Should(Equal(vcw))
+				}
+				Expect(cal.Weeks[0].Start).Should(Equal(dsw))
+				Expect(cal.Weeks[0].End).Should(Equal(dew))
+			})
+			It("should return second week with valid set of cards", func() {
+				hrw := []string{"J♠", "10♠", "4♥", "9♠", "8♥", "K♣", "Q♦"}
+				vrw := []string{"A♠", "J♥", "5♣", "J♦", "2♦", "6♣", "Q♦"}
+				dsw := time.Date(2019, time.August, 27, 0, 0, 0, 0, time.UTC)
+				dew := time.Date(2021, time.May, 17, 0, 0, 0, 0, time.UTC)
+
+				for i := 0; i < 7; i++ {
+					hcw, _ := core.NewCardFromString(hrw[i], locale)
+					vcw, _ := core.NewCardFromString(vrw[i], locale)
+
+					Expect(cal.Weeks[0].Days[i].Cards.H).Should(Equal(hcw))
+					Expect(cal.Weeks[0].Days[i].Cards.V).Should(Equal(vcw))
+				}
+				Expect(cal.Weeks[0].Start).Should(Equal(dsw))
+				Expect(cal.Weeks[0].End).Should(Equal(dew))
+			})
+		})
 	})
 })
