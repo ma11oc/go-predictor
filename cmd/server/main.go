@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"bitbucket.org/shchukin_a/go-predictor/pkg/cmd"
+	"github.com/ma11oc/go-predictor/pkg/cmd"
 )
 
 func main() {

@@ -27,10 +27,10 @@ import (
 	"github.com/spf13/viper"
 
 	// "os"
-	// "bitbucket.org/shchukin_a/go-predictor/internal/core"
+	// "github.com/ma11oc/go-predictor/internal/core"
 	// "time"
 
-	pb "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
+	pb "github.com/ma11oc/go-predictor/pkg/api/v1"
 	// "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 )

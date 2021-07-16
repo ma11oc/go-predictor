@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	core "bitbucket.org/shchukin_a/go-predictor/internal/core"
+	core "github.com/ma11oc/go-predictor/internal/core"
 
 	"github.com/go-validator/validator"
 
-	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
+	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
+	"github.com/ma11oc/go-predictor/pkg/logger"
 )
 
 const (
@@ -25,6 +25,7 @@ const (
 
 type predictorServiceServer struct {
 	Locales core.Locales
+	v1.UnimplementedPredictorServiceServer
 }
 
 // HandlePanic logs a error via zap.Logger

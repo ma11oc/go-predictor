@@ -1,7 +1,7 @@
 package main
 
 import (
-	cmd "bitbucket.org/shchukin_a/go-predictor/cmd/client-grpc/commands"
+	cmd "github.com/ma11oc/go-predictor/cmd/client-grpc/commands"
 )
 
 func main() {

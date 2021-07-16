@@ -8,7 +8,7 @@ import (
 
 	"time"
 
-	"bitbucket.org/shchukin_a/go-predictor/internal/core"
+	"github.com/ma11oc/go-predictor/internal/core"
 	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/text/language"
 )

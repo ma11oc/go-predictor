@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"bitbucket.org/shchukin_a/go-predictor/internal/core"
+	"github.com/ma11oc/go-predictor/internal/core"
 )
 
 var _ = Describe("Internal/Core/Matrix", func() {

@@ -25,7 +25,7 @@ import (
 	// "github.com/golang/protobuf/ptypes/empty"
 	// "google.golang.org/grpc"
 
-	pb "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
+	pb "github.com/ma11oc/go-predictor/pkg/api/v1"
 )
 
 // cardCmd represents the card command

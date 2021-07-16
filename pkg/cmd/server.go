@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 
-	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/protocol/grpc"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/protocol/rest"
-	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/service/v1"
+	"github.com/ma11oc/go-predictor/pkg/logger"
+	"github.com/ma11oc/go-predictor/pkg/protocol/grpc"
+	"github.com/ma11oc/go-predictor/pkg/protocol/rest"
+	v1 "github.com/ma11oc/go-predictor/pkg/service/v1"
 )
 
 // Config is configuration for Server

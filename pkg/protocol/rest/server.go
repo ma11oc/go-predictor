@@ -7,13 +7,13 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
-	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/protocol/rest/middleware"
+	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
+	"github.com/ma11oc/go-predictor/pkg/logger"
+	"github.com/ma11oc/go-predictor/pkg/protocol/rest/middleware"
 )
 
 // RunServer runs HTTP/REST gateway
@@ -23,6 +23,7 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
+
 	if err := v1.RegisterPredictorServiceHandlerFromEndpoint(ctx, mux, "localhost:"+grpcPort, opts); err != nil {
 		logger.Log.Fatal("failed to start HTTP gateway", zap.String("reason", err.Error()))
 	}

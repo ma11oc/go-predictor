@@ -20,7 +20,7 @@ type Meaning struct {
 type Card struct {
 	ID       uint8  `yaml:"id"    validate:"min=0,max=52"`
 	Rank     string `yaml:"rank"  validate:"nonzero,regexp=^(A|2|3|4|5|6|7|8|9|10|J|Q|K|Joker)$"`
-	Suit     string `yaml:"suit"  validate:"nonzero,min=3,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
+	Suit     string `yaml:"suit"  validate:"nonzero,min=1,max=4,regexp=^(♥|♣|♦|♠|🃏)$"`
 	Title    string `yaml:"title" validate:"nonzero"`
 	Meta     string
 	Meanings map[string]Meaning `yaml:"meanings" validate:"nonzero,min=11,max=11"`

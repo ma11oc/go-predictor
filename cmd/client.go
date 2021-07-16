@@ -9,8 +9,8 @@ import (
 	// "os"
 	"time"
 
-	"bitbucket.org/shchukin_a/go-predictor/internal/core"
-	pb "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
+	"github.com/ma11oc/go-predictor/internal/core"
+	pb "github.com/ma11oc/go-predictor/pkg/api/v1"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"

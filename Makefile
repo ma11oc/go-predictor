@@ -13,23 +13,30 @@ build-client:
 client: build-client
 	./bin/crystal-ball --grpc-addr localhost:50051 card -b 1986-04-16
 
-
 proto:
-	$(eval TMP := $(shell mktemp -d))
-	@protoc -I/usr/local/include -I. \
-		-I$(GOPATH)/src \
-		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway \
-		-I$(GOPATH)/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-		--go_out=plugins=grpc:$(TMP) \
-		--grpc-gateway_out=logtostderr=true:$(TMP) \
-		--swagger_out=logtostderr=true:$(TMP) \
-	 	--govalidators_out=$(TMP) \
-		api/proto/v1/predictor.proto
-	@install -m 0644 $(TMP)/api/proto/v1/predictor.pb.go pkg/api/v1/
-	@install -m 0644 $(TMP)/api/proto/v1/predictor.pb.gw.go pkg/api/v1/
-	@install -m 0644 $(TMP)/api/proto/v1/predictor.validator.pb.go pkg/api/v1/
-	@install -m 0644 $(TMP)/api/proto/v1/predictor.swagger.json api/swagger/v1/
-	@rm -rf $(TMP)
+	@buf generate
+
+# NOTE: use `buf generate`
+#
+# -I./vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+# -Ivendor/github.com/grpc-ecosystem/grpc-gateway \
+# -Ivendor/github.com/mwitkow/go-proto-validators \
+# -Ivendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options \
+#
+# proto:
+# 	$(eval TMP := $(shell mktemp -d))
+# 	@protoc -I/usr/local/include -I. \
+# 		-I vendor \
+# 		--go_out=plugins=grpc:$(TMP) \
+# 		--grpc-gateway_out=logtostderr=true:$(TMP) \
+# 		--swagger_out=logtostderr=true:$(TMP) \
+# 	 	--govalidators_out=$(TMP) \
+# 		api/proto/v1/predictor.proto
+# 	@install -m 0644 $(TMP)/api/proto/v1/predictor.pb.go pkg/api/v1/
+# 	@install -m 0644 $(TMP)/api/proto/v1/predictor.pb.gw.go pkg/api/v1/
+# 	@install -m 0644 $(TMP)/api/proto/v1/predictor.validator.pb.go pkg/api/v1/
+# 	@install -m 0644 $(TMP)/api/proto/v1/predictor.swagger.json api/swagger/v1/
+# 	@rm -rf $(TMP)
 
 cpu-prof:
 	go build -o predictor-main main.go

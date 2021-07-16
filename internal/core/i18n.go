@@ -180,7 +180,7 @@ func NewLocale(p string) (*Locale, error) {
 	return loc, nil
 }
 
-// MustBuildLocales returnes Locales (map[language.Tag]*Locale) or raises panic
+// MustBuildLocales returns Locales (map[language.Tag]*Locale) or raises panic
 // It doesn't make sense to continue without locales
 func MustBuildLocales(paths ...string) Locales {
 	var loc *Locale

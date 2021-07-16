@@ -3,7 +3,7 @@ package core_test
 import (
 	"testing"
 
-	"bitbucket.org/shchukin_a/go-predictor/internal/core"
+	"github.com/ma11oc/go-predictor/internal/core"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/text/language"

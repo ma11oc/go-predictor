@@ -1,0 +1,9 @@
+version: v1beta1
+name: buf.build/ma11oc/go-predictor
+deps:
+  - buf.build/beta/googleapis
+  - buf.build/beta/protoc-gen-validate
+  - buf.build/grpc-ecosystem/grpc-gateway
+build:
+  roots:
+    - api/proto/v1

@@ -4,6 +4,7 @@
   "person_profile": {
     "name": "Alex",
     "birthday": "1986-04-15",
+    "age": 35,
     "gender": 1,
     "features": 1
   }

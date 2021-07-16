@@ -12,9 +12,9 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 
-	v1 "bitbucket.org/shchukin_a/go-predictor/pkg/api/v1"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/logger"
-	"bitbucket.org/shchukin_a/go-predictor/pkg/protocol/grpc/middleware"
+	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
+	"github.com/ma11oc/go-predictor/pkg/logger"
+	"github.com/ma11oc/go-predictor/pkg/protocol/grpc/middleware"
 )
 
 // RunServer runs gRPC service to publish Predictor service
