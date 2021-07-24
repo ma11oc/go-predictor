@@ -169,7 +169,7 @@ var _ = Describe("Internal/Core/Person", func() {
 					Expect(hc).To(Equal(hcw))
 				}
 			})
-			It("should return return a valid person, when age is 66", func() {
+			It("should return a valid person, when age is 66", func() {
 				pp.Birthday = time.Date(2000, time.September, 5, 0, 0, 0, 0, time.UTC)
 				pp.Age = 66
 				p, err := core.NewPerson(pp, locale)
@@ -188,7 +188,7 @@ var _ = Describe("Internal/Core/Person", func() {
 				hrw := []string{"7♥", "3♣", "Q♦", "K♠", "5♣", "A♣", "4♣"}
 				vrw := []string{"J♦", "9♦", "5♥", "5♦", "9♣", "3♥"}
 
-				for i := range core.PlanetsOrder {
+				for i, planet := range core.PlanetsOrder {
 					vc := &core.Card{}
 					hc := p.PlanetCycles[i].Cards.H
 					vcw := &core.Card{}
@@ -206,6 +206,8 @@ var _ = Describe("Internal/Core/Person", func() {
 					hcw, _ := core.NewCardFromString(hrw[i], locale)
 
 					Expect(hc).To(Equal(hcw))
+
+					// Expect(p.PlanetCycles[i].Planet.Name).To(Equal(planet))
 				}
 			})
 		})

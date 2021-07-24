@@ -1,0 +1,55 @@
+---
+version: '3.7'
+
+networks:
+  predictor:
+    name: predictor
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.100.0/24
+
+
+services:
+  #---------------------------------------------------------------------------
+  # PREDICTOR
+  #---------------------------------------------------------------------------
+  predictor-srv:
+    image: local/go-predictor:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: predictor-srv
+    command:
+      - './predictor'
+      - '-grpc-port'
+      - '50051'
+      - '-http-port'
+      - '8080'
+      - '-locale'
+      - '/etc/predictor/locales/ru-RU.yaml'
+    ports:
+      - 50051:50051
+      - 8080:8080
+    networks:
+      - predictor
+    restart: always
+
+  predictor-tbot:
+    image: local/go-predictor-tbot:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.tbot
+    container_name: predictor-tbot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_DB_PATH=/tmp/sqlite/test.db
+      - PREDICTOR_SERVER_ADDRESS=predictor-srv:50051
+    command:
+      - './predictor-tbot'
+    volumes:
+      - /tmp/predictor-tbot/sqlite/test.db:/tmp/sqlite/test.db:rw
+    networks:
+      - predictor
+    restart: always

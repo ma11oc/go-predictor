@@ -1,0 +1,17 @@
+FROM golang:alpine as builder
+
+RUN apk add build-base
+RUN apk --no-cache add ca-certificates
+RUN mkdir /build
+ADD . /build/
+WORKDIR /build
+RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o predictor-tbot cmd/telegram-bot/main.go
+
+
+FROM scratch
+COPY --from=builder /build/predictor-tbot /app/
+COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
+
+WORKDIR /app
+
+CMD ["./predictor-tbot"]

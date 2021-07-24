@@ -65,7 +65,7 @@ type Person struct {
 
 	KarmaCards *KarmaCards `yaml:"karma_cards"          validate:"nonzero,min=1,max=2"`
 
-	PersonalCards *PersonalCards `yaml:"personal_cards" validate:"nonzero,min=0,max=3"`
+	PersonalCards *PersonalCards `yaml:"personal_cards" validate:"min=0,max=3"`
 
 	Rows *Rows `yaml:"rows"                             validate:"nonzero"`
 
