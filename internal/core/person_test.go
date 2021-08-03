@@ -188,7 +188,7 @@ var _ = Describe("Internal/Core/Person", func() {
 				hrw := []string{"7♥", "3♣", "Q♦", "K♠", "5♣", "A♣", "4♣"}
 				vrw := []string{"J♦", "9♦", "5♥", "5♦", "9♣", "3♥"}
 
-				for i, planet := range core.PlanetsOrder {
+				for i := range core.PlanetsOrder {
 					vc := &core.Card{}
 					hc := p.PlanetCycles[i].Cards.H
 					vcw := &core.Card{}

@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 
 	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
 	"github.com/ma11oc/go-predictor/pkg/logger"
@@ -30,6 +30,7 @@ func RunServer(ctx context.Context, v1API v1.PredictorServiceServer, port string
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
 			middleware.NewUnaryLoggingInterceptor(logger.Log),
 			middleware.NewUnaryValidatorInterceptor(),
+			middleware.NewUnaryTracerInterceptor(),
 		),
 		grpc_middleware.WithStreamServerChain(
 			grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),

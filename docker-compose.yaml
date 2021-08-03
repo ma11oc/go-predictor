@@ -53,3 +53,14 @@ services:
     networks:
       - predictor
     restart: always
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    environment: []
+    networks:
+      - predictor
+    ports:
+      - "14268:14268"
+      - "16686:16686"
+    restart: always

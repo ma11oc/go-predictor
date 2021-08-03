@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	core "github.com/ma11oc/go-predictor/internal/core"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/go-validator/validator"
 
@@ -100,6 +101,9 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	var person *core.Person
 
 	defer HandlePanic("ComputePerson", logger.Log)
+
+	span, _ := opentracing.StartSpanFromContext(ctx, "rpc.srv.ComputePerson")
+	defer span.Finish()
 
 	// check if the API version requested by client is supported by server
 	if err = s.checkAPI(req.Api); err != nil {
