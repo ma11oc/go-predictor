@@ -64,15 +64,18 @@ func initConfig() {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 
-	viper.SetDefault("database.auto_migrate", true)
-	viper.SetDefault("database.connection_string", fmt.Sprintf("sqlite://%s.db", ProgramName))
+	defaultConfig := NewConfig()
 
-	viper.SetDefault("tracer.service_name", ProgramName)
-	viper.SetDefault("tracer.endpoint", "http://localhost:14268/api/traces")
+	viper.SetDefault("database.auto_migrate", defaultConfig.Database.AutoMigrate)
+	viper.SetDefault("database.connection_string", defaultConfig.Database.ConnectionString)
 
-	viper.SetDefault("predictor.endpoint", "localhost:50051")
+	viper.SetDefault("tracer.service_name", defaultConfig.Tracer.ServiceName)
+	viper.SetDefault("tracer.endpoint", defaultConfig.Tracer.Endpoint)
+
+	viper.SetDefault("predictor.endpoint", defaultConfig.PredictorServer.Endpoint)
 
 	viper.SetDefault("auth.token", "<AUTH_TOKEN_PLACEHOLDER>")
 
-	// fmt.Println("root init done")
+	viper.SetDefault("logger.level", defaultConfig.Logger.Level)
+	viper.SetDefault("logger.time_format", defaultConfig.Logger.TimeFormat)
 }

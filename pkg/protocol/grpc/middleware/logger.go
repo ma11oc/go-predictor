@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"

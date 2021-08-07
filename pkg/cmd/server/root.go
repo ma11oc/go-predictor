@@ -12,6 +12,7 @@ import (
 	"github.com/ma11oc/go-predictor/pkg/protocol/grpc"
 	"github.com/ma11oc/go-predictor/pkg/protocol/rest"
 	v1 "github.com/ma11oc/go-predictor/pkg/service/v1"
+	"github.com/ma11oc/go-predictor/pkg/tracer"
 )
 
 // ProgramName is used in help messages and jaeger service name by default
@@ -94,7 +95,7 @@ func initConfig() {
 
 	viper.SetDefault("grpc_port", 50051)
 	viper.SetDefault("http_port", 8080)
-	viper.SetDefault("log_level", 8080)
+	viper.SetDefault("log_level", 0)
 
 	// fmt.Println("root init done")
 }
@@ -107,6 +108,12 @@ func RunServer(cfg *Config) error {
 	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
 		return fmt.Errorf("failed to initialize logger: %v", err)
 	}
+
+	_, closer, err := tracer.NewGlobalTracer("predictor-srv", "http://localhost:14268/api/traces")
+	if err != nil {
+		panic(err)
+	}
+	defer closer.Close()
 
 	v1API := v1.NewPredictorServiceServer(cfg.Locale)
 

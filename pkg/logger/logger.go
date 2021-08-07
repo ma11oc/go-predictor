@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -69,6 +70,8 @@ func Init(lvl int, timeFormat string) error {
 
 		// From a zapcore.Core, it's easy to construct a Logger.
 		Log = zap.New(core)
+		defer Log.Sync()
+
 		zap.RedirectStdLog(Log)
 
 		if !useCustomTimeFormat {
@@ -77,4 +80,24 @@ func Init(lvl int, timeFormat string) error {
 	})
 
 	return err
+}
+
+// HandlePanic logs a error via zap.Logger
+func HandlePanic(f string, logger *zap.Logger) {
+	var err string
+
+	if r := recover(); r != nil {
+		// find out exactly what the error was and set err
+		switch x := r.(type) {
+		case string:
+			break
+		case error:
+			err = x.Error()
+		default:
+			// Fallback err (per specs, error strings should be lowercase w/o punctuation
+			err = "unknown panic"
+		}
+
+		logger.Error("error", zap.String("msg", fmt.Sprintf("recovered in %v: %v", f, err)))
+	}
 }

@@ -25,12 +25,12 @@ func NewGlobalTracer(sn string, ce string) (opentracing.Tracer, io.Closer, error
 		},
 	}
 
-	jLogger := jaegerlog.StdLogger
+	stdLogger := jaegerlog.StdLogger
 	metricsFactory := prometheus.New()
 
 	// Initialize tracer with a logger and a metrics factory
 	tracer, closer, err := cfg.NewTracer(
-		jaegercfg.Logger(jLogger),
+		jaegercfg.Logger(stdLogger),
 		jaegercfg.Metrics(metricsFactory),
 	)
 	if err != nil {

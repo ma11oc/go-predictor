@@ -499,7 +499,7 @@ var _ = Describe("internal/core/core", func() {
 	Describe("ComputePlanetCycles", func() { // TODO
 	})
 
-	Describe("ComputeCalendar", func() {
+	PDescribe("ComputeCalendar", func() {
 		When("brithday is 2000-09-05 and request for 2019 year", func() {
 			planets := locale.GetPlanets()
 

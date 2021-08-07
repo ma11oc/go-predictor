@@ -1,6 +1,9 @@
 package tbot
 
-import "gorm.io/gorm"
+import (
+	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
+	"gorm.io/gorm"
+)
 
 // Request is used to store users queries
 type Request struct {
@@ -11,6 +14,7 @@ type Request struct {
 	Command          string
 	CommandArguments string
 	Response         *Response
+	PersonProfile    *PersonProfile
 }
 
 // Response is used to store response payload
@@ -32,4 +36,11 @@ type User struct {
 	UserName     string
 	LanguageCode string
 	IsBot        bool
+}
+
+// PersonProfile is used to store request data so it can be reused later
+type PersonProfile struct {
+	gorm.Model
+	RequestID     int
+	PersonProfile *v1.PersonProfile `gorm:"embedded"`
 }

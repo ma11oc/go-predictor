@@ -2,10 +2,8 @@ package v1
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,26 +25,6 @@ const (
 type predictorServiceServer struct {
 	Locales core.Locales
 	v1.UnimplementedPredictorServiceServer
-}
-
-// HandlePanic logs a error via zap.Logger
-func HandlePanic(f string, logger *zap.Logger) {
-	var err string
-
-	if r := recover(); r != nil {
-		// find out exactly what the error was and set err
-		switch x := r.(type) {
-		case string:
-			break
-		case error:
-			err = x.Error()
-		default:
-			// Fallback err (per specs, error strings should be lowercase w/o punctuation
-			err = "unknown panic"
-		}
-
-		logger.Error("error", zap.String("msg", fmt.Sprintf("recovered in %v: %v", f, err)))
-	}
 }
 
 // NewPredictorServiceServer creates Predictor service
@@ -100,10 +78,10 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 	var locale *core.Locale
 	var person *core.Person
 
-	defer HandlePanic("ComputePerson", logger.Log)
+	defer logger.HandlePanic("ComputePerson", logger.Log)
 
-	span, _ := opentracing.StartSpanFromContext(ctx, "rpc.srv.ComputePerson")
-	defer span.Finish()
+	tracer := opentracing.GlobalTracer()
+	ps := opentracing.SpanFromContext(ctx)
 
 	// check if the API version requested by client is supported by server
 	if err = s.checkAPI(req.Api); err != nil {
@@ -132,9 +110,11 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
+	cs := tracer.StartSpan("core.NewPerson", opentracing.ChildOf(ps.Context()))
 	if person, err = core.NewPerson(pp, locale); err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
+	cs.Finish()
 
 	// set cards
 	baseCards := map[string]*v1.Card{}
@@ -189,7 +169,7 @@ func (s *predictorServiceServer) ComputePerson(ctx context.Context, req *v1.Pers
 
 		planetCycles[v] = &v1.PlanetCycle{
 			Cards: map[string]*v1.Card{
-				"horizontal": &v1.Card{
+				"horizontal": {
 					Id:    uint32(person.PlanetCycles[i].Cards.H.ID),
 					Rank:  person.PlanetCycles[i].Cards.H.Rank,
 					Suit:  person.PlanetCycles[i].Cards.H.Suit,

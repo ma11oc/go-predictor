@@ -2,23 +2,22 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/ma11oc/go-predictor/pkg/logger"
 	"github.com/ma11oc/go-predictor/pkg/tracer"
 
-	"context"
-	"log"
-	"strconv"
-	"strings"
-	"time"
+	// "log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	tbot "github.com/ma11oc/go-predictor/internal/tbot"
+	commands "github.com/ma11oc/go-predictor/internal/tbot/commands"
 	model "github.com/ma11oc/go-predictor/internal/tbot/db"
 	pb "github.com/ma11oc/go-predictor/pkg/api/v1"
 	"google.golang.org/grpc"
@@ -27,54 +26,65 @@ import (
 	"gorm.io/gorm"
 )
 
-var dbCfg Database
-var pSrvCfg PredictorServer
-var authCfg Auth
+var cfg = NewConfig()
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "A brief description of your command",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("database.connection_string: %s\n", viper.GetString("database.connection_string"))
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var runtimeConfig *Config
+		var err error
 
-		// TODO: validate tracer config
+		if runtimeConfig, err = NewConfigFromMap(viper.AllSettings()); err != nil {
+			return err
+		}
 
-		sn := viper.GetString("tracer.service_name")
-		ce := viper.GetString("tracer.endpoint")
+		if err = runtimeConfig.Validate(); err != nil {
+			return err
+		}
 
-		tracer, closer, err := tracer.NewGlobalTracer(sn, ce)
+		// initialize logger
+		if err := logger.Init(runtimeConfig.Logger.Level, runtimeConfig.Logger.TimeFormat); err != nil {
+			return fmt.Errorf("Failed to initialize logger: %v", err)
+		}
+		defer logger.HandlePanic(ProgramName+".Run", logger.Log)
+
+		// initialize tracer
+		logger.Log.Info("Initializing tracer")
+		tracer, closer, err := tracer.NewGlobalTracer(runtimeConfig.Tracer.ServiceName, runtimeConfig.Tracer.Endpoint)
 		if err != nil {
 			panic(err)
 		}
 		defer closer.Close()
 
-		// tracer := opentracing.GlobalTracer()
-
-		// span := tracer.StartSpan("say-hello")
-		// println("hello")
-		// span.Finish()
-
-		db, err := gorm.Open(sqlite.Open(viper.GetString("database.connection_string")), &gorm.Config{})
+		logger.Log.Info("Initializing database")
+		db, err := gorm.Open(sqlite.Open(runtimeConfig.Database.ConnectionString), &gorm.Config{})
 		if err != nil {
-			log.Fatalf("database path: %s", viper.GetString("database.connection_string"))
-			log.Panic(err)
+			return fmt.Errorf("failed to connect to db: %s", err)
 		}
 
 		// Migrate the schema
-		db.AutoMigrate(&model.Request{}, &model.Response{}, &model.User{})
+		if runtimeConfig.Database.AutoMigrate {
+			logger.Log.Info("Applying database migrations")
+			if err := db.AutoMigrate(&model.Request{}, &model.Response{}, &model.User{}, &model.PersonProfile{}); err != nil {
+				return fmt.Errorf("Failed to apply database migrations: %s", err)
+			}
+		}
 
-		bot, err := tgbotapi.NewBotAPI(viper.GetString("auth.token"))
+		logger.Log.Info("Initializing BotAPI")
+		bot, err := tgbotapi.NewBotAPI(runtimeConfig.Auth.Token)
 		if err != nil {
-			log.Panic(err)
+			return fmt.Errorf("Failed to initialize a new BotAPI: %s", err)
 		}
 
 		bot.Debug = true
 
-		log.Printf("Authorized on account %s", bot.Self.UserName)
+		logger.Log.Info(fmt.Sprintf("Authorized on account %s", bot.Self.UserName))
 
 		// predictor service client
 
+		logger.Log.Info("Initializing GRPC Client")
 		unaryInterceptor := grpc_middleware.ChainUnaryClient(
 			grpc_opentracing.UnaryClientInterceptor(),
 		)
@@ -84,43 +94,47 @@ var runCmd = &cobra.Command{
 			grpc.WithUnaryInterceptor(unaryInterceptor),
 		}
 
-		conn, err := grpc.Dial(viper.GetString("predictor.endpoint"), opts...) // FIXME: hardcoded address
+		conn, err := grpc.Dial(runtimeConfig.PredictorServer.Endpoint, opts...)
 		if err != nil {
-			log.Panicf("unable to communicate with predictor server: %s", err)
+			return fmt.Errorf("Failed to dial predictor server: %s", err)
 		}
 		defer conn.Close()
 
 		psc := pb.NewPredictorServiceClient(conn)
 
-		runPredictorBot(db, bot, psc, tracer)
+		return runPredictorBot(db, bot, psc, tracer)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(runCmd)
 
-	runCmd.PersistentFlags().BoolVar(&dbCfg.AutoMigrate, "db-auto-migrate", true, "apply migrations (default is `true`)")
+	runCmd.PersistentFlags().BoolVar(&cfg.Database.AutoMigrate, "db-auto-migrate", true, "apply migrations")
 	viper.BindPFlag("database.auto_migrate", runCmd.PersistentFlags().Lookup("db-auto-migrate"))
 
-	runCmd.PersistentFlags().StringVar(&dbCfg.ConnectionString, "db-conn-str", fmt.Sprintf("sqlite://%s.db", ProgramName), "db connection string")
+	runCmd.PersistentFlags().StringVar(&cfg.Database.ConnectionString, "db-conn-str", fmt.Sprintf("sqlite://%s.db", ProgramName), "db connection string")
 	viper.BindPFlag("database.connection_string", runCmd.PersistentFlags().Lookup("db-conn-str"))
 
-	runCmd.PersistentFlags().StringVar(&pSrvCfg.Endpoint, "predictor-srv-url", "", "url of predictor server (default is localhost:50051)")
+	runCmd.PersistentFlags().StringVar(&cfg.PredictorServer.Endpoint, "predictor-srv-url", "", "url of predictor server (default is localhost:50051)")
 	viper.BindPFlag("predictor.endpoint", runCmd.PersistentFlags().Lookup("predictor-srv-url"))
 
-	runCmd.PersistentFlags().StringVar(&authCfg.Token, "auth-token", "", "telegram auth token")
+	runCmd.PersistentFlags().StringVar(&cfg.Auth.Token, "auth-token", "asdf", "telegram auth token")
 	viper.BindPFlag("auth.token", runCmd.PersistentFlags().Lookup("auth-token"))
+
+	runCmd.PersistentFlags().IntVar(&cfg.Logger.Level, "log-level", 0, "log level (debug=-1, fatal=5)")
+	viper.BindPFlag("logger.level", runCmd.PersistentFlags().Lookup("log-level"))
 
 	// fmt.Println("run init done")
 }
 
-func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceClient, tracer opentracing.Tracer) {
+func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceClient, tracer opentracing.Tracer) error {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
 
 	// main loop
+	logger.Log.Info("Entering main loop")
 	for update := range updates {
 		if update.Message == nil && update.CallbackQuery == nil && update.InlineQuery == nil { // ignore any non-Message Updates
 			continue
@@ -191,135 +205,36 @@ func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceC
 
 		}
 		if update.Message != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 			// var err error
 
 			if update.Message.IsCommand() {
-				log.Printf("got command: %s", update.Message.Command())
+				logger.Log.Sugar().Debug("got command: %s", update.Message.Command())
 
 				switch update.Message.Command() {
 				case "new":
+					err := commands.HandleCommandNew(update.Message, psc, db, bot)
 
-					span := tracer.StartSpan("command.new")
-
-					log.Printf("command arguments: %s", update.Message.CommandArguments())
-
-					args := strings.Split(update.Message.CommandArguments(), " ")
-
-					_, err := time.Parse("2006-01-02", args[0])
-					if err != nil {
-						msg.Text = fmt.Sprintf("Error: %s", err)
-						bot.Send(msg)
-						break
-					}
-
-					year, err := strconv.Atoi(args[1])
-					if err != nil {
-						msg.Text = fmt.Sprintf("Error: %s", err)
-						bot.Send(msg)
-						break
-					}
-
-					req := &pb.PersonRequest{
-						Api:  "v1",
-						Lang: "ru-RU",
-
-						PersonProfile: &pb.PersonProfile{
-							Name:     "A Person",
-							Gender:   1,
-							Features: 0,
-							Birthday: args[0],
-							Age:      int32(year),
-						},
-					}
-
-					ctx, cancel := context.WithTimeout(opentracing.ContextWithSpan(context.Background(), span), time.Second*3)
-					defer cancel()
-
-					resp, err := psc.ComputePerson(ctx, req)
-					if err != nil {
-						log.Fatalln("got error during communication to the server: ", err)
-					}
-
-					person := resp.GetPerson()
-					personBytes, err := proto.Marshal(person)
-					if err != nil {
-						log.Fatalf("unable to marshal person")
-					}
-
-					msg.Text, _ = tbot.MakeMessageByCallback(person, "card:base:main:desc") // FIXME: error handling
-					markup, _ := tbot.MakePersonMarkup(person)                              // FIXME: error handling
-					msg.ReplyMarkup = markup
-					msg.ParseMode = tgbotapi.ModeHTML
-
-					feedback, _ := bot.Send(msg)
-
-					/*
-					 * user := &User{
-					 *     User: update.Message.From,
-					 * }
-					 */
-
-					/*
-					 * db.Create(&Request{
-					 *     ChatID:    update.Message.Chat.ID,
-					 *     MessageID: feedback.MessageID,
-					 *     Result:    personBytes,
-					 *     UserID:    user.User.ID,
-					 * })
-					 */
-
-					// Create a Child Span. Note that we're using the ChildOf option.
-					childSpan := tracer.StartSpan(
-						"db.create",
-						opentracing.ChildOf(span.Context()),
-					)
-
-					user := &model.User{
-						ID:           update.Message.From.ID,
-						FirstName:    update.Message.From.FirstName,
-						LastName:     update.Message.From.LastName,
-						UserName:     update.Message.From.UserName,
-						LanguageCode: update.Message.From.LanguageCode,
-						IsBot:        update.Message.From.IsBot,
-					}
-
-					// TODO: transaction
-					db.FirstOrCreate(user)
-					db.Create(&model.Request{
-						ChatID:           update.Message.Chat.ID,
-						MessageID:        update.Message.MessageID,
-						UserID:           user.ID,
-						Command:          update.Message.Command(),
-						CommandArguments: update.Message.CommandArguments(),
-						Response: &model.Response{
-							TTL:       30,
-							MessageID: feedback.MessageID,
-							ChatID:    feedback.Chat.ID,
-							Payload:   personBytes,
-						},
-					})
-
-					childSpan.Finish()
-
-					span.Finish()
+					logger.Log.Sugar().Error(err)
 
 				case "settings":
 					log.Printf("don't know how to handle settings")
 
 				case "help", "start":
-					msg.ParseMode = tgbotapi.ModeHTML
-					msg.Text = "" +
-						"/new: Request for a new prediction\n" +
-						"```\n" +
-						"/new 1970-01-01 20 \n" +
-						"```\n" +
-						"/help: Show this message\n"
+					// msg.ParseMode = tgbotapi.ModeHTML
+					// msg.Text = "" +
+					// 	"/new: Request for a new prediction\n" +
+					// 	"```\n" +
+					// 	"/new 1970-01-01 20 \n" +
+					// 	"```\n" +
+					// 	"/help: Show this message\n"
 
-					bot.Send(msg)
+					// bot.Send(msg)
 				}
 			}
 
 		}
+
 	}
+	return nil
 }
