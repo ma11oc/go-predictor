@@ -21,30 +21,30 @@ func MakePersonMarkup(p *pb.Person) (tgbotapi.InlineKeyboardMarkup, error) {
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData("Base cards", "title_base_cards")),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("source", "card:base:source:meta"),
-			tgbotapi.NewInlineKeyboardButtonData("main", "card:base:main:meta"),
-			tgbotapi.NewInlineKeyboardButtonData("drain", "card:base:drain:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("source", "person:card:base:source:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("main", "person:card:base:main:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("drain", "person:card:base:drain:meta"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData(sc.Rank+sc.Suit, "card:base:source:desc"),
-			tgbotapi.NewInlineKeyboardButtonData(mc.Rank+mc.Suit, "card:base:main:desc"),
-			tgbotapi.NewInlineKeyboardButtonData(dc.Rank+dc.Suit, "card:base:drain:desc"),
+			tgbotapi.NewInlineKeyboardButtonData(sc.Rank+sc.Suit, "person:card:base:source:desc"),
+			tgbotapi.NewInlineKeyboardButtonData(mc.Rank+mc.Suit, "person:card:base:main:desc"),
+			tgbotapi.NewInlineKeyboardButtonData(dc.Rank+dc.Suit, "person:card:base:drain:desc"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("longterm", "card:base:longterm:meta"),
-			tgbotapi.NewInlineKeyboardButtonData("pluto", "card:base:pluto:meta"),
-			tgbotapi.NewInlineKeyboardButtonData("result", "card:base:result:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("longterm", "person:card:base:longterm:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("pluto", "person:card:base:pluto:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("result", "person:card:base:result:meta"),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData(lc.Rank+lc.Suit, "card:base:longterm:desc"),
-			tgbotapi.NewInlineKeyboardButtonData(pc.Rank+pc.Suit, "card:base:pluto:desc"),
-			tgbotapi.NewInlineKeyboardButtonData(rc.Rank+rc.Suit, "card:base:result:desc"),
+			tgbotapi.NewInlineKeyboardButtonData(lc.Rank+lc.Suit, "person:card:base:longterm:desc"),
+			tgbotapi.NewInlineKeyboardButtonData(pc.Rank+pc.Suit, "person:card:base:pluto:desc"),
+			tgbotapi.NewInlineKeyboardButtonData(rc.Rank+rc.Suit, "person:card:base:result:desc"),
 		),
 		tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData("Planet Cycles", "planet_cycles_title")),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("period", "planet:noop:period:meta"),
-			tgbotapi.NewInlineKeyboardButtonData("horizontal", "planet:all:horizontal:meta"),
-			tgbotapi.NewInlineKeyboardButtonData("vertical", "planet:all:vertical:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("period", "person:planet:noop:period:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("horizontal", "person:planet:all:horizontal:meta"),
+			tgbotapi.NewInlineKeyboardButtonData("vertical", "person:planet:all:vertical:meta"),
 		),
 	)
 
@@ -63,15 +63,15 @@ func MakePersonMarkup(p *pb.Person) (tgbotapi.InlineKeyboardMarkup, error) {
 						pcc[planet].GetEnd().GetMonth(),
 						pcc[planet].GetPlanet().GetSymbol(),
 					),
-					fmt.Sprintf("planet:%s:cycle:meta", planet),
+					fmt.Sprintf("person:planet:%s:cycle:meta", planet),
 				),
 				tgbotapi.NewInlineKeyboardButtonData(
 					pcc[planet].GetCards()["horizontal"].GetRank()+pcc[planet].GetCards()["horizontal"].GetSuit(),
-					fmt.Sprintf("planet:%s:horizontal:desc", planet),
+					fmt.Sprintf("person:planet:%s:horizontal:desc", planet),
 				),
 				tgbotapi.NewInlineKeyboardButtonData(
 					pcc[planet].GetCards()["vertical"].GetRank()+pcc[planet].GetCards()["vertical"].GetSuit(),
-					fmt.Sprintf("planet:%s:vertical:desc", planet),
+					fmt.Sprintf("person:planet:%s:vertical:desc", planet),
 				),
 			),
 		)

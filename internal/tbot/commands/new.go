@@ -8,13 +8,15 @@ import (
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/ma11oc/go-predictor/internal/tbot"
-	model "github.com/ma11oc/go-predictor/internal/tbot/db"
-	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
-	"github.com/ma11oc/go-predictor/pkg/logger"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 	"gorm.io/gorm"
+
+	"github.com/ma11oc/go-predictor/internal/tbot"
+	model "github.com/ma11oc/go-predictor/internal/tbot/db"
+	markups "github.com/ma11oc/go-predictor/internal/tbot/markups"
+	v1 "github.com/ma11oc/go-predictor/pkg/api/v1"
+	"github.com/ma11oc/go-predictor/pkg/logger"
 )
 
 // HandleCommandNew parses args and makes response
@@ -50,21 +52,15 @@ func HandleCommandNew(msg *tgbotapi.Message, psc v1.PredictorServiceClient, db *
 	}
 
 	person := resp.GetPerson()
-	// personBytes, err := proto.Marshal(person)
-	// if err != nil {
-	// 	logger.Log.Error("unable to marshal person", zap.Error(err))
-
-	// 	return nil, err
-	// }
 
 	reply := tgbotapi.NewMessage(msg.Chat.ID, "")
-	reply.Text, err = tbot.MakeMessageByCallback(person, "card:base:main:desc") // FIXME: MakeMessageByCallback?
+	reply.Text, err = tbot.MakeMessageByCallback(person, "person:card:base:main:desc") // FIXME: MakeMessageByCallback?
 	if err != nil {
 		pspan.SetTag("error", true).LogFields(log.Error(err))
 		return err
 	}
 
-	markup, err := tbot.MakePersonMarkup(person)
+	markup, err := markups.MakePersonMarkup(person)
 	if err != nil {
 		pspan.SetTag("error", true).LogFields(log.Error(err))
 		return err

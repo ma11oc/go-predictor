@@ -1,14 +1,18 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
-	"log"
+	"strings"
+	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 
 	"github.com/ma11oc/go-predictor/pkg/logger"
 	"github.com/ma11oc/go-predictor/pkg/tracer"
@@ -17,11 +21,11 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	tbot "github.com/ma11oc/go-predictor/internal/tbot"
+	callbacks "github.com/ma11oc/go-predictor/internal/tbot/callbacks"
 	commands "github.com/ma11oc/go-predictor/internal/tbot/commands"
 	model "github.com/ma11oc/go-predictor/internal/tbot/db"
 	pb "github.com/ma11oc/go-predictor/pkg/api/v1"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -48,7 +52,7 @@ var runCmd = &cobra.Command{
 		if err := logger.Init(runtimeConfig.Logger.Level, runtimeConfig.Logger.TimeFormat); err != nil {
 			return fmt.Errorf("Failed to initialize logger: %v", err)
 		}
-		defer logger.HandlePanic(ProgramName+".Run", logger.Log)
+		defer logger.HandlePanic(ProgramName+".Run", logger.Log) // FIXME: bot crashes despite recovery
 
 		// initialize tracer
 		logger.Log.Info("Initializing tracer")
@@ -128,10 +132,14 @@ func init() {
 }
 
 func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceClient, tracer opentracing.Tracer) error {
+	// TODO: move updates chan to init stage
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
+	if err != nil {
+		logger.Log.Fatal("Failed to get updates channel", zap.Error(err))
+	}
 
 	// main loop
 	logger.Log.Info("Entering main loop")
@@ -140,45 +148,41 @@ func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceC
 			continue
 		}
 
+		// TODO: create context here and start span
 		if update.CallbackQuery != nil {
-			bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data))
-
-			row := &model.Response{}
-
-			db.Where("chat_id = ? AND message_id = ?", update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID).First(row)
-
-			person := &pb.Person{}
-
-			if err := proto.Unmarshal(row.Payload, person); err != nil {
-				log.Fatalf("unable to unmarshal result: %s", err)
+			// TODO: test CallbackQuery.Data nil or ""
+			if update.CallbackQuery.Data == "" {
+				logger.Log.Warn("Received empty callback data")
+				continue
 			}
 
-			msg := tgbotapi.NewEditMessageText(
-				update.CallbackQuery.Message.Chat.ID,
-				update.CallbackQuery.Message.MessageID,
-				"",
-			)
-			msg.ParseMode = tgbotapi.ModeHTML
-
-			msg.Text, err = tbot.MakeMessageByCallback(person, update.CallbackQuery.Data)
-			if err != nil {
-				msg.Text = fmt.Sprintf("Error: %s", err)
-				break
+			callback := strings.Split(update.CallbackQuery.Data, ":")
+			if len(callback) == 0 {
+				logger.Log.Warn("Failed to decode callback", zap.String("callback", update.CallbackQuery.Data))
 			}
 
-			markup, err := tbot.MakePersonMarkup(person)
-			if err != nil {
-				msg.Text = fmt.Sprintf("Error: %s", err)
-				break
-			}
+			switch callback[0] {
+			case "person":
+				logger.Log.Debug("Received person callback")
 
-			msg.ReplyMarkup = &markup
+				span := tracer.StartSpan("update.CallbackQuery")
 
-			if msg.Text != "" {
-				bot.Send(msg)
+				span.LogFields(log.String("callback", update.CallbackQuery.Data))
+				span.SetTag("type", "callback")
+
+				ctx, cancel := context.WithTimeout(opentracing.ContextWithSpan(context.Background(), span), time.Second*3)
+				defer cancel()
+
+				callbacks.HandlePersonCallbackQuery(ctx, update.CallbackQuery, psc, db, bot)
+
+				span.Finish()
+			default:
+				logger.Log.Warn("Received unknown callback. Skipping...", zap.String("callback", update.CallbackQuery.Data))
+				if _, err := bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)); err != nil {
+					logger.Log.Error("Failed to answer callback query", zap.Error(err))
+				}
+				continue
 			}
-			// bot.Send(
-			// tgbotapi.NewEditMessageReplyMarkup(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Message.MessageID, update.CallbackQuery.Message.ReplyMarkup))
 
 		}
 
@@ -187,7 +191,7 @@ func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceC
 		if update.InlineQuery != nil {
 			switch update.InlineQuery.Query {
 			case "card":
-				log.Printf("inline query: %s", update.InlineQuery.Query)
+				logger.Log.Debug("inline query", zap.String("inline query", update.InlineQuery.Query))
 				resp := make([]interface{}, 5)
 
 				for i := range []int{1, 2, 3, 4, 5} {
@@ -204,6 +208,7 @@ func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceC
 			}
 
 		}
+
 		if update.Message != nil {
 			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 			// var err error
@@ -213,12 +218,23 @@ func runPredictorBot(db *gorm.DB, bot *tgbotapi.BotAPI, psc pb.PredictorServiceC
 
 				switch update.Message.Command() {
 				case "new":
-					err := commands.HandleCommandNew(update.Message, psc, db, bot)
+					// TODO: start main span here
+					if err := commands.HandleCommandNew(update.Message, psc, db, bot); err != nil {
+						logger.Log.Sugar().Error(err)
 
-					logger.Log.Sugar().Error(err)
+						// TODO: move into HandleCommandNew func
+						errMsg, err := tbot.MakeErrorMessage("Internal server error", err)
+						if err != nil {
+							logger.Log.Sugar().Error(err)
+						}
+						errMsg.ChatID = update.Message.Chat.ID
+						bot.Send(errMsg)
+
+					}
 
 				case "settings":
-					log.Printf("don't know how to handle settings")
+					//log.Printf("don't know how to handle settings")
+					continue
 
 				case "help", "start":
 					// msg.ParseMode = tgbotapi.ModeHTML

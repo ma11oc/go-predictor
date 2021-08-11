@@ -3,9 +3,10 @@ package tbot
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"strings"
 	"text/template"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 
 	pb "github.com/ma11oc/go-predictor/pkg/api/v1"
 )
@@ -52,16 +53,8 @@ var msgTemplate = `
 {{- end }}
 `
 
+// MakeMessageByCallback handles callbacks
 func MakeMessageByCallback(p *pb.Person, callback string) (string, error) {
-	var msg string
-	var err error
-	var buf bytes.Buffer
-
-	tmpl, err := template.New("msg").Parse(msgTemplate)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	m := &message{
 		Header: &header{
 			Title: fmt.Sprintf("%s, %d, %s%s, %s",
@@ -75,7 +68,7 @@ func MakeMessageByCallback(p *pb.Person, callback string) (string, error) {
 	}
 
 	cb := strings.Split(callback, ":")
-	cbType, cbSet, cbCard, cbQuery := cb[0], cb[1], cb[2], cb[3]
+	_, cbType, cbSet, cbCard, cbQuery := cb[0], cb[1], cb[2], cb[3], cb[4]
 
 	switch cbType {
 	// card:base:result:meta
@@ -145,12 +138,45 @@ func MakeMessageByCallback(p *pb.Person, callback string) (string, error) {
 		return "", nil
 	}
 
-	if err = tmpl.Execute(&buf, m); err != nil {
-		msg = fmt.Sprintf("Error: %s", err)
-	}
-	// log.Fatal(err)
+	return renderMessage(msgTemplate, m)
+}
 
-	msg = buf.String()
+// MakeErrorMessage prepares error message to be send to the user
+func MakeErrorMessage(title string, e error) (*tgbotapi.MessageConfig, error) {
+	m := &message{
+		Sections: []*section{
+			{
+				Title:   title,
+				Content: fmt.Sprint(e),
+			},
+		},
+	}
+
+	text, err := renderMessage(msgTemplate, m)
+	if err != nil {
+		return nil, err
+	}
+
+	msg := &tgbotapi.MessageConfig{
+		Text:      text,
+		ParseMode: tgbotapi.ModeHTML,
+	}
 
 	return msg, nil
+}
+
+func renderMessage(tmpl string, data interface{}) (string, error) {
+	t, err := template.New("msg").Parse(tmpl)
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+
+	if err := t.Execute(&buf, data); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+
 }
